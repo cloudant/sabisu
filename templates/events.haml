@@ -1,5 +1,5 @@
 #browse{:class => "col-md-3"}
-  %button{:type => "button", :class => "btn btn-default btn-xs rotate"}
+  %button{:type => "button", :class => "btn btn-default btn-xs rotate", :id => "collapseBrowser"}
     %span{:class => "glyphicon glyphicon-chevron-down"}
     Browse
     %span{:class => "glyphicon glyphicon-chevron-down"}
@@ -70,12 +70,22 @@
               %span{:class => "badge"}
                 6
 
-#filters{:class => "col-md-9"}
-  .h4= "Filters"
-  #fitler_field{:class => "jumbotron"}
+#stats{:class => "col-md-9 pull-right main-content"}
+  %button{:type => "button", :class => "btn btn-default btn-sm", :id => "collapseStats"}
+    %span{:class => "glyphicon glyphicon-chevron-up"}
+    Stats
+    %span{:class => "glyphicon glyphicon-chevron-up"}
+  #stats_field{:class => "jumbotron", :role => "stats"}
+
+#filters{:class => "col-md-9 pull-right main-content"}
+  %button{:type => "button", :class => "btn btn-default btn-sm", :id => "collapseFilters"}
+    %span{:class => "glyphicon glyphicon-chevron-up"}
+    Filters
+    %span{:class => "glyphicon glyphicon-chevron-up"}
+  #filters_field{:class => "jumbotron", :role => "filters"}
     
   
-#events{:class => "col-md-9"}
+#events{:class => "col-md-9 pull-right main-content"}
   .h4= "Events"
   %table{:class => ".table-hover"}
     %tr
@@ -83,3 +93,5 @@
       %td= "Check"
       %td= "Timestamp"
       %td= "Output"
+
+%script{:type => "text/javascript", :src => "/js/events.js"}
