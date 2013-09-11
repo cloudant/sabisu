@@ -27,8 +27,9 @@ end
 
 configure :production, :development do
   # this is defined by Heroku in production, by your .env file in development
-  CURRENT_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDAND_CURRENTDB']}")
-  HISTORY_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDAND_HISTORYDB']}")
+  puts "https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_CURRENTDB']}" 
+  CURRENT_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_CURRENTDB']}")
+  HISTORY_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_HISTORYDB']}")
 end
 
 configure :test do
