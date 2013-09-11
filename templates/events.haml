@@ -1,22 +1,27 @@
 #browse{:class => "col-md-3"}
-  .h5= "Browse"
-  %ul{:class => "list-group"}
-    %li{:class => "list-group-item"}
-      Client Name
-      %span{:class => "badge"}
-        11
-    %li{:class => "list-group-item"}
-      Check Name
-      %span{:class => "badge"}
-        34
-    %li{:class => "list-group-item"}
-      Check Status
-      %span{:class => "badge"}
-        3
-    %li{:class => "list-group-item"}
-      Check Output
-      %span{:class => "badge"}
-        56
+  %button{:type => "button", :class => "btn btn-default btn-xs rotate"}
+    %span{:class => "glyphicon glyphicon-chevron-down"}
+    Browse
+    %span{:class => "glyphicon glyphicon-chevron-down"}
+
+  #browse_list
+    %ul{:class => "list-group"}
+      %li{:class => "list-group-item"}
+        Client Name
+        %span{:class => "badge"}
+          11
+      %li{:class => "list-group-item"}
+        Check Name
+        %span{:class => "badge"}
+          34
+      %li{:class => "list-group-item"}
+        Check Status
+        %span{:class => "badge"}
+          3
+      %li{:class => "list-group-item"}
+        Check Output
+        %span{:class => "badge"}
+          56
 
 #filters{:class => "col-md-9"}
   .h4= "Filters"
