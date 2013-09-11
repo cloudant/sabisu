@@ -2,6 +2,7 @@ configure do
   use Rack::Session::Pool, :expire_after => 2592000
   set :session_secret, 'help me obi wan kenobi youre my only hope!'
   set :views, File.join(settings.root, 'templates')
+  #set :public_folder, File.join(settings.root, 'public')
   set :haml, :format => :html5
 
   # enable heroku realtime logging;
@@ -11,12 +12,12 @@ end
 
 configure :development do
   puts "DEVELOPMENT ENVIRONMENT!!!"
-  NOAUTH == true
+  NOAUTH = true
 end
 
 configure :production do
   puts "PRODUCTION ENVIRONMENT!!!"
-  NOAUTH == false
+  NOAUTH = false
 
   # force ssl connections only
   require 'rack-ssl-enforcer'
