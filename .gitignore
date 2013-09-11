@@ -12,9 +12,12 @@ test/tmp
 test/version_tmp
 tmp
 Gemfile.lock
-.env
 
 # YARD artifacts
 .yardoc
 _yardoc
 doc/
+
+# Bash stuff
+.env
+*.swp
