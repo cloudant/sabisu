@@ -35,6 +35,14 @@ configure :production, :development do
   
   UI_USERNAME = ENV['UILOGIN_USER']
   UI_PASSWORD = ENV['UILOGIN_PASSWORD']
+
+  if ENV['NOAUTH']
+    if ENV['NOAUTH'] == 'true'
+      NOAUTH = true
+    else
+      NOAUTH = false
+    end
+  end
 end
 
 configure :test do
