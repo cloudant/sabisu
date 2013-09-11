@@ -1,3 +1,5 @@
+/* @override http://localhost:8080/css/base.css */
+
 .rotate {
   -webkit-transform: rotate(-270deg);
   -moz-transform: rotate(-270deg);
@@ -14,4 +16,16 @@
 
   /* Should be unset in IE9+ I think. */
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+
+.collapseBrowserVisable {
+	position: absolute;
+	top: 30px;
+	right: -40px;
+}
+
+.collapseBrowserNonVisable {
+	position: absolute;
+	top: 30px;
+	left: -40px;
 }
