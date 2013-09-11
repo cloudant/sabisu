@@ -3,7 +3,11 @@
 # sinatra help functions
 helpers do
   def validate(username, password)
-    return true
+    if username == UI_USERNAME and password == UI_PASSWORD
+      return true
+    else
+      return false
+    end
   end
   
   def is_logged_in?
@@ -15,6 +19,7 @@ helpers do
   end
 
   def forceSessionAuth
+    return true if NOAUTH == true
     if is_logged_in?
       @session = session
       return true
@@ -30,7 +35,7 @@ helpers do
 
   def protected!
     unless authorized?
-      response['WWW-Authenticate'] = %(Basic realm="Pinch requires authentication")
+      response['WWW-Authenticate'] = %(Basic realm="Sabisu requires authentication")
       throw(:halt, [401, "Not authorized\n"])
     end
   end

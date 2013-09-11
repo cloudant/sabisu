@@ -11,10 +11,12 @@ end
 
 configure :development do
   puts "DEVELOPMENT ENVIRONMENT!!!"
+  NOAUTH == true
 end
 
 configure :production do
   puts "PRODUCTION ENVIRONMENT!!!"
+  NOAUTH == false
 
   # force ssl connections only
   require 'rack-ssl-enforcer'
@@ -27,9 +29,11 @@ end
 
 configure :production, :development do
   # this is defined by Heroku in production, by your .env file in development
-  puts "https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_CURRENTDB']}" 
   CURRENT_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_CURRENTDB']}")
   HISTORY_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_HISTORYDB']}")
+  
+  UI_USERNAME = ENV['UILOGIN_USER']
+  UI_PASSWORD = ENV['UILOGIN_PASSWORD']
 end
 
 configure :test do

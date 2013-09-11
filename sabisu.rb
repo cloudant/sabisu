@@ -2,10 +2,8 @@
 require 'sinatra'
 require 'redis'
 require 'couchrest'
-require 'uri'
 require 'cgi'
 require 'json'
-require 'digest'
 
 # load configuration settings
 require_relative 'config'
@@ -17,6 +15,25 @@ require_relative 'lib'
 require_relative 'classes/init'
 
 # URL Routing
-before '*' do
-  forceSessionAuth
+before '/:name' do
+  unless params[:name] == "login"
+    forceSessionAuth
+  end
+end
+
+get '/' do
+  redirect "/login"
+end
+
+get '/login' do
+  if session[:logged_in] = true and not session[:username].nil?
+    redirect "/events"
+  else
+    clear_session
+    haml :login, :locals => { :remember_me => session[:remember_me] }
+  end
+end
+
+get '/events' do
+  haml :events
 end
