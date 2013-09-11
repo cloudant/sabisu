@@ -1,8 +1,30 @@
-.h4= "Filters"
-#filters{:class => "jumbotron"}
+#browse{:class => "col-md-3"}
+  .h5= "Browse"
+  %ul{:class => "list-group"}
+    %li{:class => "list-group-item"}
+      Client Name
+      %span{:class => "badge"}
+        11
+    %li{:class => "list-group-item"}
+      Check Name
+      %span{:class => "badge"}
+        34
+    %li{:class => "list-group-item"}
+      Check Status
+      %span{:class => "badge"}
+        3
+    %li{:class => "list-group-item"}
+      Check Output
+      %span{:class => "badge"}
+        56
+
+#filters{:class => "col-md-9"}
+  .h4= "Filters"
+  #fitler_field{:class => "jumbotron"}
+    
   
-.h4= "Events"
-#events
+#events{:class => "col-md-9"}
+  .h4= "Events"
   %table{:class => ".table-hover"}
     %tr
       %td= "Client"
