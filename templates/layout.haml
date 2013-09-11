@@ -14,6 +14,10 @@
             %a{:class => 'navbar-brand', "href" => "/"}= "Sabisu"
           %ul{:class => 'nav navbar-nav pull-right'}
             - if is_logged_in?
+              %form{:class => 'navbar-form navbar-left', :role => 'search'}
+                .form-group{:class => 'form-group'}
+                  %input{:type => 'text', :class => 'form-control', :placeholder => 'Filter'}
+                %button{:type => 'submit', :class => 'btn btn-default'}= "Filter"
               %li
                 %a{"href" => "/events"}= "Events"
               %li
