@@ -1,0 +1,23 @@
+#login
+  - if ! locals[:message].nil?
+    .alert{:class => "alert-danger"}
+      %button{:type => "button", :class => "close", "data-dismiss" => "alert"}= "&times;"
+      %strong= "Error!"
+      = locals[:message]
+  %form{'class' => 'form-horizontal', :action => "/login", :method => "post"}
+    %div{'class' => 'control-group'}
+      %label{'class' => 'control-label', 'for' => 'username'}= "Username"
+      %div{'class' => 'controls'}
+        - if locals[:remember_me].nil?
+          %input{'type' => 'text', 'name' => 'username', 'id' => 'username', 'placeholder' => 'Username'}
+        - else
+          %input{'type' => 'text', 'name' => 'username', 'id' => 'username', 'value' => locals[:remember_me]}
+    %div{'class' => 'control-group'}
+      %label{'class' => 'control-label', 'for' => 'password'}= "Password"
+      %div{'class' => 'controls'}
+        %input{'type' => 'password', 'name' => 'password', 'id' => 'password', 'placeholder' => 'Password'}
+    %div{'class' => 'control-group'}
+      %div{'class' => 'controls'}
+        %label{'class' => 'checkbox'}
+          %input{'type' => 'checkbox', 'name' => 'remember_me', 'id' => 'remember_me'}= "Remember Me"
+        %button{'type' => 'submit', 'id' => 'loginBtn', 'class' => 'btn btn-primary'}= "Log in"
