@@ -70,28 +70,47 @@
               %span{:class => "badge"}
                 6
 
-#stats{:class => "col-md-9 pull-right main-content"}
-  %button{:type => "button", :class => "btn btn-default btn-sm", :id => "collapseStats"}
-    %span{:class => "glyphicon glyphicon-chevron-up"}
-    Stats
-    %span{:class => "glyphicon glyphicon-chevron-up"}
-  #stats_field{:class => "jumbotron", :role => "stats"}
-
 #filters{:class => "col-md-9 pull-right main-content"}
   %button{:type => "button", :class => "btn btn-default btn-sm", :id => "collapseFilters"}
     %span{:class => "glyphicon glyphicon-chevron-up"}
     Filters
     %span{:class => "glyphicon glyphicon-chevron-up"}
   #filters_field{:class => "jumbotron", :role => "filters"}
-    
+
+#stats{:class => "col-md-9 pull-right main-content"}
+  %button{:type => "button", :class => "btn btn-default btn-sm", :id => "collapseStats"}
+    %span{:class => "glyphicon glyphicon-chevron-up"}
+    Stats
+    %span{:class => "glyphicon glyphicon-chevron-up"}
+  #stats_field{:class => "jumbotron", :role => "stats"}
   
 #events{:class => "col-md-9 pull-right main-content"}
   .h4= "Events"
-  %table{:class => ".table-hover"}
-    %tr
+  %table{:class => "table table-hover"}
+    %tr{:class => 'active'}
       %td= "Client"
       %td= "Check"
       %td= "Timestamp"
       %td= "Output"
+    %tr{:class => "danger"}
+      %td= "db1.akamai001"
+      %td= "dbcore-status"
+      %td= "2 hours ago"
+      %td= "DOWN! It appears that dbcore is not up and not available"
+    %tr{:class => "warning"}
+      %td= "db13.julep"
+      %td= "dbcore-in-lb"
+      %td= "5 hours ago"
+      %td= "db13 is not available on lb3.julep.cloudant.com and lb2.julep.cloudant.net"
+    %tr{:class => "warning"}
+      %td= "monitor.dal"
+      %td= "redis db unavailable"
+      %td= "3 days ago"
+      %td= "Redis process is not running!"
+    %tr{:class => "danger"}
+      %td= "db3.mysatori001"
+      %td= "dbcore-bacon"
+      %td= "3 months ago"
+      %td= "bacon is running on db3.mysatori001"
 
 %script{:type => "text/javascript", :src => "/js/events.js"}
