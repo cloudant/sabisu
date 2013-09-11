@@ -3,6 +3,7 @@
 # sinatra help functions
 helpers do
   def validate(username, password)
+    return true
   end
   
   def is_logged_in?

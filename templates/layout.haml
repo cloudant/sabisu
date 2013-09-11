@@ -1,0 +1,28 @@
+!!! 5
+%html{:lang => "en"}
+  %head
+    %script{:type => "text/javascript", :src => "https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"}
+    %script{:type => "text/javascript", :src => "/js/base.js"}
+    %script{:type => "text/javascript", :src => "//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"}
+    %link{:rel => "stylesheet", :type => "text/css", :href => "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"}
+    %link{:rel => "stylesheet", :type => "text/css", :href => "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"}
+    %link{:rel => "stylesheet", :type => "text/css", :href  => "/css/base.css"}
+  %body
+    #wrapper{:class => 'container'}
+      #header
+        #logo
+          %a{'href' => '/', :style => "color:inherit;text-decoration:none;"}= "Sabisu"
+        .navbar
+          .navbar-inner
+            %ul{:class => 'nav pull-right'}
+              - if not @session.nil? and @session[:logged_in] == true and not @session[:username].nil?
+                %li
+                  %a{"href" => "/app/user/#{@session[:username]}"}= "Events"
+                %li
+                  %a{'href' => '/logout'}= "Logout"
+              - else
+                %li 
+                  %a{'href' => '/login'}= "Login" 
+      #content
+        =yield
+      #footer

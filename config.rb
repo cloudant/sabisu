@@ -1,6 +1,6 @@
 configure do
   use Rack::Session::Pool, :expire_after => 2592000
-  set :session_secret, 'help me obi wan kenobi youre my only hope'
+  set :session_secret, 'help me obi wan kenobi youre my only hope!'
   set :views, File.join(settings.root, 'templates')
   set :haml, :format => :html5
 
