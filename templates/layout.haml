@@ -14,9 +14,9 @@
         .navbar
           .navbar-inner
             %ul{:class => 'nav pull-right'}
-              - if not @session.nil? and @session[:logged_in] == true and not @session[:username].nil?
+              - if is_logged_in?
                 %li
-                  %a{"href" => "/app/user/#{@session[:username]}"}= "Events"
+                  %a{"href" => "/events"}= "Events"
                 %li
                   %a{'href' => '/logout'}= "Logout"
               - else

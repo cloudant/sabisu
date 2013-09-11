@@ -26,12 +26,30 @@ get '/' do
 end
 
 get '/login' do
-  if session[:logged_in] = true and not session[:username].nil?
+  if is_logged_in?
     redirect "/events"
   else
     clear_session
     haml :login, :locals => { :remember_me => session[:remember_me] }
   end
+end
+
+post '/login' do
+  if(validate(params[:username], params["password"]))
+    session[:logged_in] = true
+    session[:username] = params[:username]
+    if params[:remember_me] == "on"
+      session[:remember_me] = params[:username]
+    end
+    redirect "/events"
+  else
+    haml :login, :locals => { :message => 'Incorrect username and/or password' }
+  end
+end
+
+get '/logout' do
+  clear_session
+  redirect '/login'
 end
 
 get '/events' do

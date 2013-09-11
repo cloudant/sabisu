@@ -11,7 +11,7 @@ helpers do
   end
   
   def is_logged_in?
-    if session[:logged_in] == true and not session[:username].nil?
+    if NOAUTH == true or (session[:logged_in] == true and not session[:username].nil?)
       return true
     else
       return false
@@ -19,7 +19,6 @@ helpers do
   end
 
   def forceSessionAuth
-    return true if NOAUTH == true
     if is_logged_in?
       @session = session
       return true
