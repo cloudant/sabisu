@@ -9,19 +9,24 @@
   %body
     #wrapper{:class => 'container'}
       #header
-        #logo
-          %a{'href' => '/', :style => "color:inherit;text-decoration:none;"}= "Sabisu"
-        .navbar
-          .navbar-inner
-            %ul{:class => 'nav pull-right'}
-              - if is_logged_in?
-                %li
-                  %a{"href" => "/events"}= "Events"
-                %li
-                  %a{'href' => '/logout'}= "Logout"
-              - else
-                %li 
-                  %a{'href' => '/login'}= "Login" 
+        .nav{:class => 'navbar navbar-default', :role => "navigation"}
+          .navbar-header
+            %a{:class => 'navbar-brand', "href" => "/"}= "Sabisu"
+          %ul{:class => 'nav navbar-nav pull-right'}
+            - if is_logged_in?
+              %li
+                %a{"href" => "/events"}= "Events"
+              %li
+                %a{'href' => '/logout'}= "Logout"
+            - else
+              %li 
+                %a{'href' => '/login'}= "Login" 
       #content
         =yield
-      #footer
+      #footer{:class => "navbar navbar-fixed-bottom"}
+        .copyright{:class => 'text-center'}
+          © Copyright 
+          %a{:href => "https://www.cloudant.com"}= "Cloudant, Inc."
+          2013
+          %a{:href => "http://www.apache.org/licenses/LICENSE-2.0.html"}= "Apache License, Version 2.0"
+        
