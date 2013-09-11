@@ -18,14 +18,3 @@
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 }
 
-.collapseBrowserVisable {
-	position: absolute;
-	top: 30px;
-	right: -40px;
-}
-
-.collapseBrowserNonVisable {
-	position: absolute;
-	top: 30px;
-	left: -40px;
-}
