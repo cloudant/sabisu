@@ -9,11 +9,6 @@ configure do
   $stdout.sync = true
 end
 
-configure :production, :development do
-  # this is defined by Heroku in production, by your .env file in development
-
-end
-
 configure :development do
   puts "DEVELOPMENT ENVIRONMENT!!!"
 end
@@ -30,5 +25,12 @@ configure :production do
   set :show_exceptions, false
 end
 
+configure :production, :development do
+  # this is defined by Heroku in production, by your .env file in development
+  CURRENT_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDAND_CURRENTDB']}")
+  HISTORY_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDAND_HISTORYDB']}")
+end
+
 configure :test do
+  # run tests
 end
