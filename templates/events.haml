@@ -4,24 +4,71 @@
     Browse
     %span{:class => "glyphicon glyphicon-chevron-down"}
 
-  #browse_list
-    %ul{:class => "list-group"}
-      %li{:class => "list-group-item"}
-        Client Name
-        %span{:class => "badge"}
-          11
-      %li{:class => "list-group-item"}
-        Check Name
-        %span{:class => "badge"}
-          34
-      %li{:class => "list-group-item"}
-        Check Status
-        %span{:class => "badge"}
-          3
-      %li{:class => "list-group-item"}
-        Check Output
-        %span{:class => "badge"}
-          56
+  #browse_list{:class => "panel-group"}
+    %div{:class => "panel panel-default"}
+      %div{:class => "panel-heading"}
+        .h4{:class => "panel-title"}
+          %a{:class => "accordian-toggle", "data-toggle" => "collapse", "data-parent" => "browse_list", :href => "#collapseOne"}
+            Client Name
+      #collapseOne{:class => "panel-collapse collapse"}
+        %div{:class => "panel-body"}
+          %ul{:class => "list-group"}
+            %li{:class => "list-group-item"}
+              db1.akamai001
+              %span{:class => "badge"}
+                5
+            %li{:class => "list-group-item"}
+              db2.akamai001
+              %span{:class => "badge"}
+                3
+            %li{:class => "list-group-item"}
+              lb4.juelp
+              %span{:class => "badge"}
+                8
+            %li{:class => "list-group-item"}
+              monitor.dal
+              %span{:class => "badge"}
+                2
+    %div{:class => "panel panel-default"}
+      %div{:class => "panel-heading"}
+        .h4{:class => "panel-title"}
+          %a{:class => "accordian-toggle", "data-toggle" => "collapse", "data-parent" => "browse_list", :href => "#collapseTwo"}
+            Check Name
+      #collapseTwo{:class => "panel-collapse collapse"}
+        %div{:class => "panel-body"}
+          %ul{:class => "list-group"}
+            %li{:class => "list-group-item"}
+              dbcore-status
+              %span{:class => "badge"}
+                2
+            %li{:class => "list-group-item"}
+              dbcore-bacon
+              %span{:class => "badge"}
+                9
+            %li{:class => "list-group-item"}
+              disk_usage
+              %span{:class => "badge"}
+                9
+    %div{:class => "panel panel-default"}
+      %div{:class => "panel-heading"}
+        .h4{:class => "panel-title"}
+          %a{:class => "accordian-toggle", "data-toggle" => "collapse", "data-parent" => "browse_list", :href => "#collapseThree"}
+            Status
+      #collapseThree{:class => "panel-collapse collapse"}
+        %div{:class => "panel-body"}
+          %ul{:class => "list-group"}
+            %li{:class => "list-group-item"}
+              Warning
+              %span{:class => "badge"}
+                5
+            %li{:class => "list-group-item"}
+              Critical
+              %span{:class => "badge"}
+                9
+            %li{:class => "list-group-item"}
+              Unknown
+              %span{:class => "badge"}
+                6
 
 #filters{:class => "col-md-9"}
   .h4= "Filters"
