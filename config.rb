@@ -36,6 +36,25 @@ configure :production, :development do
   UI_USERNAME = ENV['UILOGIN_USER']
   UI_PASSWORD = ENV['UILOGIN_PASSWORD']
 
+  # create the design doc needed for sorting if necessary
+  sort_fields = { :client => 'client.name', :check => 'check.name', :issued => 'check.issued' }
+  sort_views = {}
+  sort_fields.to_a.permutation.to_a.collect { |x| x.take(2) }.uniq.each { |p| # crazy permutation function
+    sort_name = p.collect { |pp| pp.first.to_s }.join('_').to_sym
+    sort_key = p.collect { |pp| "doc.#{pp.last}" }.join(', ')
+    sort_views[sort_name] = { :map => "function(doc) { if (doc.name) emit([#{sort_key}], null);  }" } 
+  }
+  begin
+    doc = CURRENT_DB.get('_design/sort')
+    if doc[:views] != sort_views
+      CURRENT_DB.save_doc({ '_id' => '_design/sort', :views => sort_views })
+    end
+  rescue RestClient::Conflict
+    # ignore
+  rescue RestClient::ResourceNotFound
+    CURRENT_DB.save_doc({ '_id' => '_design/sort', :views => sort_views })
+  end
+
   if ENV['NOAUTH']
     if ENV['NOAUTH'] == 'true'
       NOAUTH = true

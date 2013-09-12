@@ -53,5 +53,8 @@ get '/logout' do
 end
 
 get '/events' do
-  haml :events
+  events = CURRENT_DB.view('sort/client', :skip => 5, :limit => 10, :descending => true, :include_docs => true)['rows']
+
+  haml :events, :locals => { :events => events }
 end
+

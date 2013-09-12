@@ -1,8 +1,11 @@
 source 'https://rubygems.org'
-gem 'sinatra', '1.1.0'
+gem 'sinatra'
 gem 'thin'
 gem 'haml'
 gem 'redis'
 gem 'couchrest'
 gem 'json'
 gem 'rack-ssl-enforcer'
+gem 'heroku'
+gem 'foreman'
+
