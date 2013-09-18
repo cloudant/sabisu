@@ -14,6 +14,9 @@ require_relative 'lib'
 # load classes
 require_relative 'classes/init'
 
+# load routes
+require_relative 'routes/init'
+
 # URL Routing
 before '/:name' do
   unless params[:name] == "login"
@@ -51,10 +54,3 @@ get '/logout' do
   clear_session
   redirect '/login'
 end
-
-get '/events' do
-  events = CURRENT_DB.view('sort/client', :skip => 5, :limit => 10, :descending => true, :include_docs => true)['rows']
-
-  haml :events, :locals => { :events => events }
-end
-
