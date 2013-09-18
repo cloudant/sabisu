@@ -18,3 +18,7 @@
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 }
 
+.panel {
+    padding: 0px;
+    margin: 2px;
+}

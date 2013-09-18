@@ -1,52 +1,86 @@
 %link{:rel => "stylesheet", :type => "text/css", :href => "/css/events.css"}
 
-#stats{:class => "col-md-9 pull-right main-content"}
-  %button{:type => "button", :class => "btn btn-default btn-sm", :id => "collapseStats"}
-    %span{:class => "glyphicon glyphicon-chevron-up"}
-    Stats
-    %span{:class => "glyphicon glyphicon-chevron-up"}
-  #stats_field{:class => "jumbotron", :role => "stats"}
-    #totals
-      %span{:class => "label label-success"}= "OK: 0"
-      %span{:class => "label label-warning"}= "Warning: 2"
-      %span{:class => "label label-danger"}= "Critical: 2"
-      %span{:class => "label label-primary"}= "Unknown: 1"
-    #bar_graph{:class => "progress"}
-      %div{:class => "progress-bar progress-bar-warning", :style => "width: 40%"}
-      %div{:class => "progress-bar progress-bar-danger", :style => "width: 40%"}
-      %div{:class => "progress-bar progress-bar-primary", :style => "width: 20%"}
-#events{:class => "col-md-9 pull-right main-content"}
-  .h4= "Events"
-  %table{:class => "table table-hover"}
-    %tr{:class => 'active'}
-      %td= "Client"
-      %td= "Check"
-      %td= "Timestamp"
-      %td= "Output"
-    %tr{:class => "danger"}
-      %td= "db1.akamai001"
-      %td= "dbcore-status"
-      %td= "2 hours ago"
-      %td= "DOWN! It appears that dbcore is not up and not available"
-    %tr{:class => "warning"}
-      %td= "db13.julep"
-      %td= "dbcore-in-lb"
-      %td= "5 hours ago"
-      %td= "db13 is not available on lb3.julep.cloudant.com and lb2.julep.cloudant.net"
-    %tr{:class => "warning"}
-      %td= "monitor.dal"
-      %td= "redis db unavailable"
-      %td= "3 days ago"
-      %td= "Redis process is not running!"
-    %tr{:class => "danger"}
-      %td= "db3.mysatori001"
-      %td= "dbcore-bacon"
-      %td= "3 months ago"
-      %td= "bacon is running on db3.mysatori001"
-    %tr{:class => "primary"}
-      %td= "db2.pearson001"
-      %td= "dbcore-bacon"
-      %td= "1 minute ago"
-      %td= "Erl_Call Unknown: Unable to connect to dbcore@localhost"
+%div{:class => "row"}
+  #client{:class => "col-md-6 panel panel-primary"}
+    %div{:class => "panel-heading"}="#{locals[:client]}"
+    %div{:class => "panel-body"}
+      %table{:class => "table"}
+        %tr
+          %td="Address"
+          %td="198.168.101.11"
+        %tr
+          %td="Subscriptions"
+          %td="base_linux, base, all, db_leader, dbcore_linux"
+  #actions{:class => "col-md-5 panel panel-primary"}
+    %div{:class => "panel-heading"}="Actions"
+    %div{:class => "panel-body"}
+      %button{:type => "button", :class => "btn btn-warning btn-sm unsilence", :id => "#{locals[:client]}"}
+        %span{:class => "glyphicon glyphicon-volume-up"}
+        Unsilence
+      %button{:type => "button", :class => "btn btn-danger btn-sm delete", :id => "#{locals[:client]}"}
+        %span{:class => "glyphicon glyphicon-remove"}
+        Delete
+
+%div{:class => "row"}
+  #events{:class => "col-md-12 panel panel-primary"}
+    %div{:class => "panel-heading"}="Current State"
+    %div{:class => "panel-body"}
+      %table{:class => "table table-hover"}
+        %tr{:class => 'active'}
+          %td= "Client"
+          %td= "Check"
+          %td= "Timestamp"
+          %td= "Output"
+        %tr{:class => "success"}
+          %td= "db1.akamai001"
+          %td= "ssh-auth"
+          %td= "13 days ago"
+          %td= "OK"
+        %tr{:class => "success"}
+          %td= "db1.akamai001"
+          %td= "dbcore-in-lb"
+          %td= "2 months ago"
+          %td= "db1.akamai001 is available on lb1.akamai001"
+        %tr{:class => "danger"}
+          %td= "db1.akamai001"
+          %td= "dbcore-status"
+          %td= "2 hours ago"
+          %td= "DOWN! It appears that dbcore is not up and not available"
+        %tr{:class => "success"}
+          %td= "db1.akamai001"
+          %td= "disk_usage"
+          %td= "7 months ago"
+          %td= "OK: Disk at 47% on / partition"
+
+%div{:class => "row"}
+  #events{:class => "col-md-12 panel panel-primary"}
+    %div{:class => "panel-heading"}="History"
+    %div{:class => "panel-body"}
+      %table{:class => "table table-hover"}
+        %tr{:class => 'active'}
+          %td= "Client"
+          %td= "Check"
+          %td= "Timestamp"
+          %td= "Output"
+        %tr{:class => "success"}
+          %td= "db1.akamai001"
+          %td= "ssh-auth"
+          %td= "13 days ago"
+          %td= "OK"
+        %tr{:class => "success"}
+          %td= "db1.akamai001"
+          %td= "dbcore-in-lb"
+          %td= "2 months ago"
+          %td= "db1.akamai001 is available on lb1.akamai001"
+        %tr{:class => "danger"}
+          %td= "db1.akamai001"
+          %td= "dbcore-status"
+          %td= "2 hours ago"
+          %td= "DOWN! It appears that dbcore is not up and not available"
+        %tr{:class => "success"}
+          %td= "db1.akamai001"
+          %td= "disk_usage"
+          %td= "7 months ago"
+          %td= "OK: Disk at 47% on / partition"
 
 %script{:type => "text/javascript", :src => "/js/events.js"}
