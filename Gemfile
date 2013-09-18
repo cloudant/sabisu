@@ -8,4 +8,5 @@ gem 'json'
 gem 'rack-ssl-enforcer'
 gem 'heroku'
 gem 'foreman'
+gem 'racksh'
 

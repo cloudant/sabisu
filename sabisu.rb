@@ -5,9 +5,6 @@ require 'couchrest'
 require 'cgi'
 require 'json'
 
-# load configuration settings
-require_relative 'config'
-
 # load shared library
 require_relative 'lib'
 
@@ -16,6 +13,9 @@ require_relative 'classes/init'
 
 # load routes
 require_relative 'routes/init'
+
+# load configuration settings
+require_relative 'config'
 
 # URL Routing
 before '/:name' do
