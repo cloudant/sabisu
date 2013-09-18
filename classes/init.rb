@@ -1,1 +1,1 @@
-# require_relative 'classname'
+require_relative 'sensu'
