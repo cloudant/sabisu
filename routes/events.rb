@@ -4,9 +4,9 @@ get '/events' do
 end
 
 get '/events/:client' do
-  haml :event_client, :locals => { :client => params[:client] }
+  haml :events_client, :locals => { :client => params[:client] }
 end
 
 get '/events/:client/:check' do
-  haml :event_client_check, :locals => { :client => params[:client], :check => params[:check] }
+  haml :events_client_check, :locals => { :client => params[:client], :check => params[:check] }
 end
