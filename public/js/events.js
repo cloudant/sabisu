@@ -18,4 +18,9 @@ $(document).ready(function(){
       $(this).children("span").addClass("glyphicon-chevron-down");
     };
   });
+
+  $(".event_line").click(function(){
+    $("#" + $(this).next().attr("id")).collapse('toggle');
+  });
+
 });

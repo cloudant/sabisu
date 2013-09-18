@@ -11,3 +11,20 @@
     top: 30px;
     left: -40px;
 }
+
+li.list-group-item {
+	margin: 0px;
+	padding: 0px;
+}
+
+.flat-heading {
+	padding: 0px;
+	margin: 0x;
+	min-height: 30px;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+div.row {
+	margin: 0px;
+}

@@ -97,37 +97,33 @@
       %div{:class => "panel-heading"}
         %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#events_field"}="Events"
     #events_field{:role => "events", :class => "collapse in"}
-      %div{:class => "panel-body"}
-        %table{:class => "table table-hover"}
-          %tr{:class => 'active'}
-            %td= "Client"
-            %td= "Check"
-            %td= "Timestamp"
-            %td= "Output"
-          %tr{:class => "danger"}
-            %td= "db1.akamai001"
-            %td= "dbcore-status"
-            %td= "2 hours ago"
-            %td= "DOWN! It appears that dbcore is not up and not available"
-          %tr{:class => "warning"}
-            %td= "db13.julep"
-            %td= "dbcore-in-lb"
-            %td= "5 hours ago"
-            %td= "db13 is not available on lb3.julep.cloudant.com and lb2.julep.cloudant.net"
-          %tr{:class => "warning"}
-            %td= "monitor.dal"
-            %td= "redis db unavailable"
-            %td= "3 days ago"
-            %td= "Redis process is not running!"
-          %tr{:class => "danger"}
-            %td= "db3.mysatori001"
-            %td= "dbcore-bacon"
-            %td= "3 months ago"
-            %td= "bacon is running on db3.mysatori001"
-          %tr{:class => "primary"}
-            %td= "db2.pearson001"
-            %td= "dbcore-bacon"
-            %td= "1 minute ago"
-            %td= "Erl_Call Unknown: Unable to connect to dbcore@localhost"
-
+      %ul{:class => "list-group"}
+        -#%li{:class => "list-group-item"}
+          %div{:class => "row"}
+            %div{:class => "col-xs-2"}="Client"
+            %div{:class => "col-xs-2"}="Check"
+            %div{:class => "col-xs-2"}="Timestamp"
+            %div{:class => "col-xs-6"}="Output"
+        %li{:class => "list-group-item"}
+          %div{:class => "row"}
+            %div{:class => "panel panel-danger"}
+              %div{:class => "panel-heading flat-heading event_line", :panel => "13204059"}
+                %div{:class => "col-xs-2"}="db1.akamai001"
+                %div{:class => "col-xs-2"}="dbcore-status"
+                %div{:class => "col-xs-2"}="2 hours ago"
+                %div{:class => "col-xs-6"}="DOWN! It appears that dbcore is not up and not available"
+              %div{:class => "panel-body panel-collapse collapse in", :id => "13204059"}
+                %table{:class => "table table-striped"}
+                  %tr
+                    %td="Key"
+                    %td="Actions"
+                    %td="Value"
+                  %tr
+                    %td="Client"
+                    %td
+                      %button{:type => "button", :class => "btn btn-default btn-xs", :id => "silence/db1.akamai001/dbcore-status"}
+                        %span{:class => "glyphicon glyphicon-volume-off"}
+                    %td="db1.akamai001"
+                    
 %script{:type => "text/javascript", :src => "/js/events.js"}
+
