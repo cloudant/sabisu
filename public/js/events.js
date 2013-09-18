@@ -1,26 +1,4 @@
 $(document).ready(function(){
-  $("#collapseStats").click(function(){
-    if ($("#stats_field").is(":visible")) {
-      $("#stats_field").hide();
-      $(this).children("span").removeClass("glyphicon-chevron-up");
-      $(this).children("span").addClass("glyphicon-chevron-down");
-    } else {
-      $("#stats_field").show();
-      $(this).children("span").removeClass("glyphicon-chevron-down");
-      $(this).children("span").addClass("glyphicon-chevron-up");
-    };
-  });
-  $("#collapseFilters").click(function(){
-    if ($("#filters_field").is(":visible")) {
-      $("#filters_field").hide();
-      $(this).children("span").removeClass("glyphicon-chevron-up");
-      $(this).children("span").addClass("glyphicon-chevron-down");
-    } else {
-      $("#filters_field").show();
-      $(this).children("span").removeClass("glyphicon-chevron-down");
-      $(this).children("span").addClass("glyphicon-chevron-up");
-    };
-  });
   $("#collapseBrowser").click(function(){
     if ($("#browse_list").is(":visible")) {
       $("#browse_list").hide();

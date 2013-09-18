@@ -1,134 +1,133 @@
 %link{:rel => "stylesheet", :type => "text/css", :href => "/css/events.css"}
 
-#browse{:class => "col-md-3"}
-  %button{:type => "button", :class => "btn btn-default btn-xs rotate collapseBrowserVisable", :id => "collapseBrowser"}
-    %span{:class => "glyphicon glyphicon-chevron-down"}
-    Browse
-    %span{:class => "glyphicon glyphicon-chevron-down"}
+%div{:class => "row"}
+  #browse{:class => "col-md-3"}
+    %button{:type => "button", :class => "btn btn-primary btn-xs rotate collapseBrowserVisable", :id => "collapseBrowser"}
+      %span{:class => "glyphicon glyphicon-chevron-down"}
+      Browse
+      %span{:class => "glyphicon glyphicon-chevron-down"}
 
-  #browse_list{:class => "panel-group"}
-    %div{:class => "panel panel-default"}
+    #browse_list{:class => "panel-group"}
+      %div{:class => "panel panel-primary"}
+        %div{:class => "panel-heading"}
+          %button{:type => "button", :class => "btn btn-primary btn-xs", "data-toggle" => "collapse", "data-target" => "#collapseOne"}="Client Name"
+        #collapseOne{:class => "panel-collapse collapse"}
+          %div{:class => "panel-body"}
+            %ul{:class => "list-group"}
+              %li{:class => "list-group-item"}
+                db1.akamai001
+                %span{:class => "badge"}
+                  5
+              %li{:class => "list-group-item"}
+                db2.akamai001
+                %span{:class => "badge"}
+                  3
+              %li{:class => "list-group-item"}
+                lb4.juelp
+                %span{:class => "badge"}
+                  8
+              %li{:class => "list-group-item"}
+                monitor.dal
+                %span{:class => "badge"}
+                  2
+      %div{:class => "panel panel-primary"}
+        %div{:class => "panel-heading"}
+          %button{:type => "button", :class => "btn btn-primary btn-xs", "data-toggle" => "collapse", "data-target" => "#collapseTwo"}="Check Name"
+        #collapseTwo{:class => "panel-collapse collapse"}
+          %div{:class => "panel-body"}
+            %ul{:class => "list-group"}
+              %li{:class => "list-group-item"}
+                dbcore-status
+                %span{:class => "badge"}
+                  2
+              %li{:class => "list-group-item"}
+                dbcore-bacon
+                %span{:class => "badge"}
+                  9
+              %li{:class => "list-group-item"}
+                disk_usage
+                %span{:class => "badge"}
+                  9
+      %div{:class => "panel panel-primary"}
+        %div{:class => "panel-heading"}
+          %button{:type => "button", :class => "btn btn-primary btn-xs", "data-toggle" => "collapse", "data-target" => "#collapseThree"}="Status"
+        #collapseThree{:class => "panel-collapse collapse"}
+          %div{:class => "panel-body"}
+            %ul{:class => "list-group"}
+              %li{:class => "list-group-item"}
+                Warning
+                %span{:class => "badge"}
+                  5
+              %li{:class => "list-group-item"}
+                Critical
+                %span{:class => "badge"}
+                  9
+              %li{:class => "list-group-item"}
+                Unknown
+                %span{:class => "badge"}
+                  6
+  #filters{:class => "col-md-9 pull-right main-content"}
+    %div{:class => "panel panel-primary"}
       %div{:class => "panel-heading"}
-        .h4{:class => "panel-title"}
-          %a{:class => "accordian-toggle", "data-toggle" => "collapse", "data-parent" => "browse_list", :href => "#collapseOne"}
-            Client Name
-      #collapseOne{:class => "panel-collapse collapse"}
-        %div{:class => "panel-body"}
-          %ul{:class => "list-group"}
-            %li{:class => "list-group-item"}
-              db1.akamai001
-              %span{:class => "badge"}
-                5
-            %li{:class => "list-group-item"}
-              db2.akamai001
-              %span{:class => "badge"}
-                3
-            %li{:class => "list-group-item"}
-              lb4.juelp
-              %span{:class => "badge"}
-                8
-            %li{:class => "list-group-item"}
-              monitor.dal
-              %span{:class => "badge"}
-                2
-    %div{:class => "panel panel-default"}
-      %div{:class => "panel-heading"}
-        .h4{:class => "panel-title"}
-          %a{:class => "accordian-toggle", "data-toggle" => "collapse", "data-parent" => "browse_list", :href => "#collapseTwo"}
-            Check Name
-      #collapseTwo{:class => "panel-collapse collapse"}
-        %div{:class => "panel-body"}
-          %ul{:class => "list-group"}
-            %li{:class => "list-group-item"}
-              dbcore-status
-              %span{:class => "badge"}
-                2
-            %li{:class => "list-group-item"}
-              dbcore-bacon
-              %span{:class => "badge"}
-                9
-            %li{:class => "list-group-item"}
-              disk_usage
-              %span{:class => "badge"}
-                9
-    %div{:class => "panel panel-default"}
-      %div{:class => "panel-heading"}
-        .h4{:class => "panel-title"}
-          %a{:class => "accordian-toggle", "data-toggle" => "collapse", "data-parent" => "browse_list", :href => "#collapseThree"}
-            Status
-      #collapseThree{:class => "panel-collapse collapse"}
-        %div{:class => "panel-body"}
-          %ul{:class => "list-group"}
-            %li{:class => "list-group-item"}
-              Warning
-              %span{:class => "badge"}
-                5
-            %li{:class => "list-group-item"}
-              Critical
-              %span{:class => "badge"}
-                9
-            %li{:class => "list-group-item"}
-              Unknown
-              %span{:class => "badge"}
-                6
+        %button{:type => "button", :class => "btn btn-primary btn-xs", "data-toggle" => "collapse", "data-target" => "#filters_field", :id => "collapseFilters"}="Filters"
+    #filters_field{:role => "filters", :class => "collapse in"}
+      %div{:class => "panel-body"}
+        %button{:type => "button", :class => "btn btn-primary"}
+          %span{:class => "glyphicon glyphicon-remove-sign"}
+          status:-ok
 
-#filters{:class => "col-md-9 pull-right main-content"}
-  %button{:type => "button", :class => "btn btn-default btn-sm", :id => "collapseFilters"}
-    %span{:class => "glyphicon glyphicon-chevron-up"}
-    Filters
-    %span{:class => "glyphicon glyphicon-chevron-up"}
-  #filters_field{:class => "jumbotron", :role => "filters"}
-    %button{:type => "button", :class => "btn btn-primary"}
-      %span{:class => "glyphicon glyphicon-remove-sign"}
-      status:-ok
-
-#stats{:class => "col-md-9 pull-right main-content"}
-  %button{:type => "button", :class => "btn btn-default btn-sm", :id => "collapseStats"}
-    %span{:class => "glyphicon glyphicon-chevron-up"}
-    Stats
-    %span{:class => "glyphicon glyphicon-chevron-up"}
-  #stats_field{:class => "jumbotron", :role => "stats"}
-    #totals
-      %span{:class => "label label-success"}= "OK: 0"
-      %span{:class => "label label-warning"}= "Warning: 2"
-      %span{:class => "label label-danger"}= "Critical: 2"
-      %span{:class => "label label-primary"}= "Unknown: 1"
-    #bar_graph{:class => "progress"}
-      %div{:class => "progress-bar progress-bar-warning", :style => "width: 40%"}
-      %div{:class => "progress-bar progress-bar-danger", :style => "width: 40%"}
-      %div{:class => "progress-bar progress-bar-primary", :style => "width: 20%"}
-#events{:class => "col-md-9 pull-right main-content"}
-  .h4= "Events"
-  %table{:class => "table table-hover"}
-    %tr{:class => 'active'}
-      %td= "Client"
-      %td= "Check"
-      %td= "Timestamp"
-      %td= "Output"
-    %tr{:class => "danger"}
-      %td= "db1.akamai001"
-      %td= "dbcore-status"
-      %td= "2 hours ago"
-      %td= "DOWN! It appears that dbcore is not up and not available"
-    %tr{:class => "warning"}
-      %td= "db13.julep"
-      %td= "dbcore-in-lb"
-      %td= "5 hours ago"
-      %td= "db13 is not available on lb3.julep.cloudant.com and lb2.julep.cloudant.net"
-    %tr{:class => "warning"}
-      %td= "monitor.dal"
-      %td= "redis db unavailable"
-      %td= "3 days ago"
-      %td= "Redis process is not running!"
-    %tr{:class => "danger"}
-      %td= "db3.mysatori001"
-      %td= "dbcore-bacon"
-      %td= "3 months ago"
-      %td= "bacon is running on db3.mysatori001"
-    %tr{:class => "primary"}
-      %td= "db2.pearson001"
-      %td= "dbcore-bacon"
-      %td= "1 minute ago"
-      %td= "Erl_Call Unknown: Unable to connect to dbcore@localhost"
+  #stats{:class => "col-md-9 pull-right main-content"}
+    %div{:class => "panel panel-primary"}
+      %div{:class => "panel-heading"}
+        %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#stats_field"}="Stats"
+    #stats_field{:role => "stats", :class => "collapse in"}
+      %div{:class => "panel-body"}
+        #totals
+          %span{:class => "label label-success"}= "OK: 0"
+          %span{:class => "label label-warning"}= "Warning: 2"
+          %span{:class => "label label-danger"}= "Critical: 2"
+          %span{:class => "label label-primary"}= "Unknown: 1"
+        #bar_graph{:class => "progress"}
+          %div{:class => "progress-bar progress-bar-warning", :style => "width: 40%"}
+          %div{:class => "progress-bar progress-bar-danger", :style => "width: 40%"}
+          %div{:class => "progress-bar progress-bar-primary", :style => "width: 20%"}
+%div{:class => "row"}
+  #events{:class => "col-md-9 pull-right main-content"}
+    %div{:class => "panel panel-primary"}
+      %div{:class => "panel-heading"}
+        %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#events_field"}="Events"
+    #events_field{:role => "events", :class => "collapse in"}
+      %div{:class => "panel-body"}
+        %table{:class => "table table-hover"}
+          %tr{:class => 'active'}
+            %td= "Client"
+            %td= "Check"
+            %td= "Timestamp"
+            %td= "Output"
+          %tr{:class => "danger"}
+            %td= "db1.akamai001"
+            %td= "dbcore-status"
+            %td= "2 hours ago"
+            %td= "DOWN! It appears that dbcore is not up and not available"
+          %tr{:class => "warning"}
+            %td= "db13.julep"
+            %td= "dbcore-in-lb"
+            %td= "5 hours ago"
+            %td= "db13 is not available on lb3.julep.cloudant.com and lb2.julep.cloudant.net"
+          %tr{:class => "warning"}
+            %td= "monitor.dal"
+            %td= "redis db unavailable"
+            %td= "3 days ago"
+            %td= "Redis process is not running!"
+          %tr{:class => "danger"}
+            %td= "db3.mysatori001"
+            %td= "dbcore-bacon"
+            %td= "3 months ago"
+            %td= "bacon is running on db3.mysatori001"
+          %tr{:class => "primary"}
+            %td= "db2.pearson001"
+            %td= "dbcore-bacon"
+            %td= "1 minute ago"
+            %td= "Erl_Call Unknown: Unable to connect to dbcore@localhost"
 
 %script{:type => "text/javascript", :src => "/js/events.js"}
