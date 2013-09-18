@@ -1,4 +1,4 @@
-  class Api
+  class Sensu
 
     def request(opts)
       http = Net::HTTP.new(API_URL, API_PORT)
