@@ -33,6 +33,12 @@ configure :production, :development do
   CURRENT_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_CURRENTDB']}")
   HISTORY_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_HISTORYDB']}")
   
+  # connect to redis
+  API_URL = ENV['API_URL'] if ENV['API_URL']
+  API_PORT = ENV['API_PORT'] if ENV['API_PORT']
+  API_USER = ENV['API_USER'] if ENV['API_USER']
+  API_PASSWORD = ENV['API_PASSWORD'] if ENV['API_PASSWORD']
+
   UI_USERNAME = ENV['UILOGIN_USER']
   UI_PASSWORD = ENV['UILOGIN_PASSWORD']
   
