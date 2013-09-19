@@ -15,13 +15,20 @@ class Event
 
     results = CURRENT_DB.all_docs(options.merge(:include_docs => true))
 
-    { :count => results['total_rows'],
-      :events => results['rows'].collect { |r|
+    { 
+      :count => results['total_rows'], # TODO: this includes design docs
+      :events => results['rows'].reject { |r| 
+        # ignore docs that begin with _ (like design docs)
+        r['doc']['_id'][0] == '_'
+      }.collect { |r|
         # extract fields from doc
         fields = {}
-        r['doc'] # TODO
+        FIELDS.each { |k,v| 
+          fields[k] = eval("r['doc']['event']" + v.split('.').collect { |vv| "['#{vv}']" }.join) 
+        }
         Event.new(fields)
-      } }
+      } 
+    }
   end
 
   # Example: Event.search("client:*cheftest001 AND status:warning", :bookmark => 'ABCD36',
