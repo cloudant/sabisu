@@ -2,59 +2,62 @@ class Event
   # these are all the fields we care about. the key is how we want to
   # refer to it (e.g. event.client). the value is where it is stored in
   # the database under doc.event.
-  FIELDS = { 
-    :client => 'client.name', :check => 'check.name', :status => 'check.status', 
-    :occurences => 'occurrences', :action => 'action', :issued => 'check.issued', :output => 'check.output' 
+  FIELDS = {
+    :client => 'client.name', :check => 'check.name', :status => 'check.status',
+    :occurences => 'occurrences', :action => 'action', :issued => 'check.issued', :output => 'check.output'
   }
   attr_accessor(*FIELDS.keys)
-  
+
+  # return all docs
   def self.all(options = {})
-    self.search(nil, options)
+    options = { :skip => 0, :limit => nil, :sort => [] }.merge(options)
+    options.delete_if { |k,v| v.nil? || v == [] }
+
+    results = CURRENT_DB.all_docs(options.merge(:include_docs => true))
+
+    { :count => results['total_rows'],
+      :events => results['rows'].collect { |r|
+        # extract fields from doc
+        fields = {}
+        r['doc'] # TODO
+        Event.new(fields)
+      } }
   end
 
-  # Example: Event.search("client:*cheftest001 AND status:warning", :bookmark => 'ABCD36', 
+  # Example: Event.search("client:*cheftest001 AND status:warning", :bookmark => 'ABCD36',
   #                       :limit => 10, :sort => [ 'status<string>', '-client<string>', '-issued<number>' ])
   def self.search(query, options = {})
-    options = { :bookmark => nil, :start => 0, :limit => nil, :sort => [] }.merge(options)
-    raise "Cannot specify :start with searches" if query && options[:start]
-    raise "Cannot specify :bookmark when returning all events" if query.nil? && options[:bookmark]
+    options = { :bookmark => nil, :limit => nil, :sort => [] }.merge(options)
+    options.delete_if { |k,v| v.nil? || v == [] }
+    options[:sort] = options[:sort].to_s # because couchrest doesn't handle arrays correctly
 
-    db_options = { :include_docs => true }
-    db_options[:limit] = options[:limit] if options[:limit]
-    db_options[:skip] = options[:start] if options[:start]
-    db_options[:bookmark] = options[:bookmark] if options[:bookmark]
-    db_options[:sort] = options[:sort] if options[:sort] && !options[:sort].empty?
+    results = CURRENT_DB.view("_design/sabisu/_search/all_fields", options.merge(:q => query))
 
-    results = if query.nil?
-      # return all docs
-      CURRENT_DB.all_docs(db_options)
-    else
-      # perform a search
-      CURRENT_DB.view('_design/sabisu/_search/all_fields', db_options.merge(:q => query))
-    end
-puts results.inspect
-    { :count => results['total_rows'], 
+    { :count => results['total_rows'],
       :bookmark => results['bookmark'],
       :events => results['rows'].collect { |r| Event.new(r['fields']) } }
   end
 
   def self.update_design_doc
     # create search indexes
-    fields = FIELDS.collect { |k,v| 
-      "if (doc.event.#{v}) index('#{k}', doc.event.#{v}, { 'store': 'yes' });" 
+    fields = FIELDS.collect { |k,v|
+      "if (doc.event.#{v}) index('#{k}', doc.event.#{v}, { 'store': 'yes' });"
     }
-    search_indexes = { :all_fields => "function(doc) { index('default', doc._id); #{fields.join("\n")} }" }
+    search_function = "function(doc) { index('default', doc._id); #{fields.join(' ')} }"
+    search_indexes = { :all_fields => { :index => search_function } }
 
     # save the design doc only if it has changed or doesn't exist
     begin
       doc = CURRENT_DB.get('_design/sabisu')
-      if doc[:views] != search_indexes
-        CURRENT_DB.save_doc({ '_id' => '_design/sabisu', :indexes => search_indexes })
+      if doc[:indexes] != search_indexes
+        doc[:languages] = 'javascript'
+        doc[:indexes] = search_indexes
+        CURRENT_DB.save_doc(doc)
       end
     rescue RestClient::Conflict
       # ignore conflicts
     rescue RestClient::ResourceNotFound
-      CURRENT_DB.save_doc({ '_id' => '_design/sabisu', :indexes => search_indexes })
+      CURRENT_DB.save_doc({ '_id' => '_design/sabisu', :language => 'javascript', :indexes => search_indexes })
     end
   end
 
