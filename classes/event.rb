@@ -13,14 +13,13 @@ class Event
     options = { :skip => 0, :limit => nil, :sort => [] }.merge(options)
     options.delete_if { |k,v| v.nil? || v == [] }
 
-    results = CURRENT_DB.all_docs(options.merge(:include_docs => true))
+    results = CURRENT_DB.all_docs(options.merge(:include_docs => true, :start_key => '"a"'))
+
+    # TODO: sorting
 
     { 
-      :count => results['total_rows'], # TODO: this includes design docs
-      :events => results['rows'].reject { |r| 
-        # ignore docs that begin with _ (like design docs)
-        r['doc']['_id'][0] == '_'
-      }.collect { |r|
+      :count => results['total_rows'],
+      :events => results['rows'].collect { |r|
         # extract fields from doc
         fields = {}
         FIELDS.each { |k,v| 
@@ -40,6 +39,8 @@ class Event
 
     results = CURRENT_DB.view("_design/sabisu/_search/all_fields", options.merge(:q => query))
 
+    # TODO: sorting
+ 
     { :count => results['total_rows'],
       :bookmark => results['bookmark'],
       :events => results['rows'].collect { |r| Event.new(r['fields']) } }
