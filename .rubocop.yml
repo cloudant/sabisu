@@ -1,0 +1,14 @@
+Encoding:
+  Enabled: false
+
+LineLength:
+  Max: 100
+
+NumericLiterals:
+  MinDigits: 7
+
+MethodLength:
+  Max: 20
+
+CyclomaticComplexity:
+  Max: 10
