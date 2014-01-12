@@ -13,7 +13,6 @@ get '/api/events' do
   end
 end
 
-
 get '/api/events/search' do
   params = request.env['rack.request.query_hash']
 end

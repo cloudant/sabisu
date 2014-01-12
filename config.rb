@@ -2,7 +2,7 @@ configure do
   use Rack::Session::Pool, expire_after: 2592000
   set :session_secret, 'help me obi wan kenobi youre my only hope!'
   set :views, File.join(settings.root, 'templates')
-  #set :public_folder, File.join(settings.root, 'public')
+  # set :public_folder, File.join(settings.root, 'public')
   set :haml, format: :html5
 
   # enable heroku realtime logging;

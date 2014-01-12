@@ -2,7 +2,6 @@ require 'net/https'
 require 'json'
 
 class Sensu
-
   def request(opts)
     http = Net::HTTP.new(API_URL, API_PORT)
     http.read_timeout = 15
@@ -18,7 +17,7 @@ class Sensu
     when 'delete'.upcase
       req =  Net::HTTP::Delete.new(opts[:path], initheader = proxy_header)
     when 'post'.upcase
-      req =  Net::HTTP::Post.new(opts[:path], initheader = proxy_header.merge!({ 'Content-Type' => 'application/json' }))
+      req =  Net::HTTP::Post.new(opts[:path], initheader = proxy_header.merge!( 'Content-Type' => 'application/json' ))
       req.body = opts[:payload]
     end
     req.basic_auth(API_USER, API_PASSWORD) if API_USER && API_PASSWORD
@@ -59,5 +58,4 @@ class Sensu
       end
     end
   end
-
 end

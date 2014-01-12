@@ -38,7 +38,7 @@ get '/login' do
 end
 
 post '/login' do
-  if(validate(params[:username], params['password']))
+  i fvalidate(params[:username], params['password'])
     session[:logged_in] = true
     session[:username] = params[:username]
     if params[:remember_me] == 'on'

@@ -13,7 +13,7 @@ def sensu(request)
   rescue
     # do nothing
   end
-  return sensu.request(opts)
+  sensu.request(opts)
 end
 
 get '/sensu/*' do
