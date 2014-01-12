@@ -5,8 +5,8 @@ def sensu(request)
   path = tmp_path.join('/')
   puts path
   opts = {
-    :path => path,
-    :method => request.request_method
+    path: path,
+    method: request.request_method
   }
   begin
     opts[:payload] = JSON.parse(request.body.read)

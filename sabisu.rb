@@ -33,7 +33,7 @@ get '/login' do
     redirect '/events'
   else
     clear_session
-    haml :login, :locals => { :remember_me => session[:remember_me] }
+    haml :login, locals: { remember_me: session[:remember_me] }
   end
 end
 
@@ -46,7 +46,7 @@ post '/login' do
     end
     redirect '/events'
   else
-    haml :login, :locals => { :message => 'Incorrect username and/or password' }
+    haml :login, locals: { message: 'Incorrect username and/or password' }
   end
 end
 

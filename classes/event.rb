@@ -3,23 +3,23 @@ class Event
   # refer to it (e.g. event.client). the value is where it is stored in
   # the database under doc.event.
   FIELDS = {
-    :client => 'client.name', :check => 'check.name', :status => 'check.status',
-    :occurences => 'occurrences', :action => 'action', :issued => 'check.issued', :output => 'check.output'
+    client: 'client.name', check: 'check.name', status: 'check.status',
+    occurences: 'occurrences', action: 'action', issued: 'check.issued', output: 'check.output'
   }
   attr_accessor(*FIELDS.keys)
 
   # return all docs
   def self.all(options = {})
-    options = { :skip => 0, :limit => nil, :sort => [] }.merge(options)
+    options = { skip: 0, limit: nil, sort: [] }.merge(options)
     options.delete_if { |k,v| v.nil? || v == [] }
 
-    results = CURRENT_DB.all_docs(options.merge(:include_docs => true, :start_key => '"a"'))
+    results = CURRENT_DB.all_docs(options.merge(include_docs: true, start_key: '"a"'))
 
     # TODO: sorting
 
     { 
-      :count => results['total_rows'],
-      :events => results['rows'].collect { |r|
+      count: results['total_rows'],
+      events: results['rows'].collect { |r|
         # extract fields from doc
         fields = {}
         FIELDS.each { |k,v| 
@@ -33,17 +33,17 @@ class Event
   # Example: Event.search("client:*cheftest001 AND status:warning", :bookmark => 'ABCD36',
   #                       :limit => 10, :sort => [ 'status<string>', '-client<string>', '-issued<number>' ])
   def self.search(query, options = {})
-    options = { :bookmark => nil, :limit => nil, :sort => [] }.merge(options)
+    options = { bookmark: nil, limit: nil, sort: [] }.merge(options)
     options.delete_if { |k,v| v.nil? || v == [] }
     options[:sort] = options[:sort].to_s # because couchrest doesn't handle arrays correctly
 
-    results = CURRENT_DB.view('_design/sabisu/_search/all_fields', options.merge(:q => query))
+    results = CURRENT_DB.view('_design/sabisu/_search/all_fields', options.merge(q: query))
 
     # TODO: sorting
  
-    { :count => results['total_rows'],
-      :bookmark => results['bookmark'],
-      :events => results['rows'].collect { |r| Event.new(r['fields']) } }
+    { count: results['total_rows'],
+      bookmark: results['bookmark'],
+      events: results['rows'].collect { |r| Event.new(r['fields']) } }
   end
 
   def self.update_design_doc
@@ -52,7 +52,7 @@ class Event
       "if (doc.event.#{v}) index('#{k}', doc.event.#{v}, { 'store': 'yes' });"
     }
     search_function = "function(doc) { index('default', doc._id); #{fields.join(' ')} }"
-    search_indexes = { :all_fields => { :index => search_function } }
+    search_indexes = { all_fields: { index: search_function } }
 
     # save the design doc only if it has changed or doesn't exist
     begin
