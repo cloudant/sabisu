@@ -17,7 +17,10 @@ class Sensu
     when 'delete'.upcase
       req =  Net::HTTP::Delete.new(opts[:path], initheader = proxy_header)
     when 'post'.upcase
-      req =  Net::HTTP::Post.new(opts[:path], initheader = proxy_header.merge!( 'Content-Type' => 'application/json' ))
+      req =  Net::HTTP::Post.new(
+        opts[:path],
+        initheader = proxy_header.merge!('Content-Type' => 'application/json')
+      )
       req.body = opts[:payload]
     end
     req.basic_auth(API_USER, API_PASSWORD) if API_USER && API_PASSWORD
@@ -26,7 +29,6 @@ class Sensu
     rescue Timeout::Error
       puts 'HTTP request has timed out.'
       return False
-      exit
     rescue StandardError => e
       puts "An HTTP error occurred. #{e}"
       return False
@@ -54,7 +56,8 @@ class Sensu
       if command == 'health'
         puts 'Sensu is not healthy.'.color(:red)
       else
-        puts "There was an error while trying to complete your request. Response code: #{code}".color(:red)
+        puts 'There was an error while trying to complete your request. ' +
+             "Response code: #{code}".color(:red)
       end
     end
   end

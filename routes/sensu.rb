@@ -10,8 +10,10 @@ def sensu(request)
   }
   begin
     opts[:payload] = JSON.parse(request.body.read)
+  # rubocop:disable HandleExceptions
   rescue
     # do nothing
+  # rubocop:enable HandleExceptions
   end
   sensu.request(opts)
 end

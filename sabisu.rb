@@ -19,9 +19,7 @@ require_relative 'config'
 
 # URL Routing
 before '/:name' do
-  unless params[:name] == 'login'
-    forceSessionAuth
-  end
+  force_session_auth unless params[:name] == 'login'
 end
 
 get '/' do
@@ -29,7 +27,7 @@ get '/' do
 end
 
 get '/login' do
-  if is_logged_in?
+  if logged_in?
     redirect '/events'
   else
     clear_session
@@ -38,12 +36,10 @@ get '/login' do
 end
 
 post '/login' do
-  i fvalidate(params[:username], params['password'])
+  if validate(params[:username], params['password'])
     session[:logged_in] = true
     session[:username] = params[:username]
-    if params[:remember_me] == 'on'
-      session[:remember_me] = params[:username]
-    end
+    session[:remember_me] = params[:username] if params[:remember_me] == 'on'
     redirect '/events'
   else
     haml :login, locals: { message: 'Incorrect username and/or password' }

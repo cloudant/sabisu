@@ -1,3 +1,4 @@
+# class of events in sensu
 class Event
   # these are all the fields we care about. the key is how we want to
   # refer to it (e.g. event.client). the value is where it is stored in
@@ -31,7 +32,8 @@ class Event
   end
 
   # Example: Event.search("client:*cheftest001 AND status:warning", :bookmark => 'ABCD36',
-  #                       :limit => 10, :sort => [ 'status<string>', '-client<string>', '-issued<number>' ])
+  #                       :limit => 10,
+  #                       :sort => [ 'status<string>', '-client<string>', '-issued<number>' ])
   def self.search(query, options = {})
     options = { bookmark: nil, limit: nil, sort: [] }.merge(options)
     options.delete_if { |k, v| v.nil? || v == [] }
@@ -62,10 +64,16 @@ class Event
         doc[:indexes] = search_indexes
         CURRENT_DB.save_doc(doc)
       end
+    # rubocop:disable HandleExceptions
     rescue RestClient::Conflict
       # ignore conflicts
+    # rubocop:enable HandleExceptions
     rescue RestClient::ResourceNotFound
-      CURRENT_DB.save_doc( '_id' => '_design/sabisu', :language => 'javascript', :indexes => search_indexes )
+      CURRENT_DB.save_doc(
+        '_id' => '_design/sabisu',
+        :language => 'javascript',
+        :indexes => search_indexes
+      )
     end
   end
 

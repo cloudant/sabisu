@@ -7,12 +7,10 @@ get '/api/events' do
   events = Event.all(params)
   puts events
   events[:events].each do |event|
-    unless event.nil?
-      puts event
-    end
+    puts unless event.nil?
   end
 end
 
 get '/api/events/search' do
-  params = request.env['rack.request.query_hash']
+  # params = request.env['rack.request.query_hash']
 end

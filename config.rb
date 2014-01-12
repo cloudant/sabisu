@@ -1,5 +1,5 @@
 configure do
-  use Rack::Session::Pool, expire_after: 2592000
+  use Rack::Session::Pool, expire_after: 2_592_000
   set :session_secret, 'help me obi wan kenobi youre my only hope!'
   set :views, File.join(settings.root, 'templates')
   # set :public_folder, File.join(settings.root, 'public')
@@ -30,8 +30,14 @@ end
 
 configure :production, :development do
   # this is defined by Heroku in production, by your .env file in development
-  CURRENT_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_CURRENTDB']}")
-  HISTORY_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_HISTORYDB']}")
+  CURRENT_DB = CouchRest.database!(
+    "https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@" +
+    "#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_CURRENTDB']}"
+  )
+  HISTORY_DB = CouchRest.database!(
+    "https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@" +
+    "#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_HISTORYDB']}"
+  )
 
   # connect to redis
   API_URL = ENV['API_URL'] if ENV['API_URL']
