@@ -1,6 +1,7 @@
 require 'net/https'
 require 'json'
 
+# make api requests to sensu
 class Sensu
   def request(opts)
     http = Net::HTTP.new(API_URL, API_PORT)
