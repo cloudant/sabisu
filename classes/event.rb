@@ -17,16 +17,16 @@ class Event
 
     # TODO: sorting
 
-    { 
+    {
       count: results['total_rows'],
       events: results['rows'].collect { |r|
         # extract fields from doc
         fields = {}
-        FIELDS.each { |k,v| 
-          fields[k] = eval("r['doc']['event']" + v.split('.').collect { |vv| "['#{vv}']" }.join) 
+        FIELDS.each { |k,v|
+          fields[k] = eval("r['doc']['event']" + v.split('.').collect { |vv| "['#{vv}']" }.join)
         }
         Event.new(fields)
-      } 
+      }
     }
   end
 
@@ -40,7 +40,7 @@ class Event
     results = CURRENT_DB.view('_design/sabisu/_search/all_fields', options.merge(q: query))
 
     # TODO: sorting
- 
+
     { count: results['total_rows'],
       bookmark: results['bookmark'],
       events: results['rows'].collect { |r| Event.new(r['fields']) } }

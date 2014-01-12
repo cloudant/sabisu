@@ -32,7 +32,7 @@ configure :production, :development do
   # this is defined by Heroku in production, by your .env file in development
   CURRENT_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_CURRENTDB']}")
   HISTORY_DB = CouchRest.database!("https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_HISTORYDB']}")
-  
+
   # connect to redis
   API_URL = ENV['API_URL'] if ENV['API_URL']
   API_PORT = ENV['API_PORT'] if ENV['API_PORT']
@@ -41,10 +41,10 @@ configure :production, :development do
 
   UI_USERNAME = ENV['UILOGIN_USER']
   UI_PASSWORD = ENV['UILOGIN_PASSWORD']
-  
+
   # create the design doc if needed for retrieving events
   Event.update_design_doc
-  
+
   if ENV['NOAUTH']
     if ENV['NOAUTH'] == 'true'
       NOAUTH = true
