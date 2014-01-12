@@ -34,7 +34,7 @@ helpers do
 
   def protected!
     unless authorized?
-      response['WWW-Authenticate'] = %(Basic realm="Sabisu requires authentication")
+      response['WWW-Authenticate'] = "Basic realm="Sabisu requires authentication""
       throw(:halt, [401, "Not authorized\n"])
     end
   end

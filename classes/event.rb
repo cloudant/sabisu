@@ -37,7 +37,7 @@ class Event
     options.delete_if { |k,v| v.nil? || v == [] }
     options[:sort] = options[:sort].to_s # because couchrest doesn't handle arrays correctly
 
-    results = CURRENT_DB.view("_design/sabisu/_search/all_fields", options.merge(:q => query))
+    results = CURRENT_DB.view('_design/sabisu/_search/all_fields', options.merge(:q => query))
 
     # TODO: sorting
  

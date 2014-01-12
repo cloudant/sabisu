@@ -11,12 +11,12 @@ configure do
 end
 
 configure :development do
-  puts "DEVELOPMENT ENVIRONMENT!!!"
+  puts 'DEVELOPMENT ENVIRONMENT!!!'
   NOAUTH = true
 end
 
 configure :production do
-  puts "PRODUCTION ENVIRONMENT!!!"
+  puts 'PRODUCTION ENVIRONMENT!!!'
   NOAUTH = false
 
   # force ssl connections only

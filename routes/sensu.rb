@@ -19,7 +19,7 @@ end
 get '/sensu/*' do
   res = sensu(request)
   status res.code
-  headers "content-type" => "application/json"
+  headers 'content-type' => 'application/json'
   body res.body
 end
 
@@ -27,20 +27,20 @@ post '/sensu/*' do
   res = sensu(request)
   print res
   status res.code
-  headers "content-type" => "application/json"
+  headers 'content-type' => 'application/json'
   body res.body
 end
 
 put '/sensu/*' do
   res = sensu(request)
   status res.code
-  headers "content-type" => "application/json"
+  headers 'content-type' => 'application/json'
   body res.body
 end
 
 delete '/sensu/*' do
   res = sensu(request)
   status res.code
-  headers "content-type" => "application/json"
+  headers 'content-type' => 'application/json'
   body res.body
 end
