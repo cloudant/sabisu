@@ -4,6 +4,7 @@ require 'redis'
 require 'couchrest'
 require 'cgi'
 require 'json'
+require 'pp'
 
 # load shared library
 require_relative 'lib'

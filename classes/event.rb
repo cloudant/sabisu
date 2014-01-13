@@ -37,7 +37,8 @@ class Event
   def self.search(query, options = {})
     options = { bookmark: nil, limit: nil, sort: [] }.merge(options)
     options.delete_if { |k, v| v.nil? || v == [] }
-    options[:sort] = options[:sort].to_s # because couchrest doesn't handle arrays correctly
+    # because couchrest doesn't handle arrays correctly
+    options[:sort] = options[:sort].to_s unless options[:sort].nil?
 
     results = CURRENT_DB.view('_design/sabisu/_search/all_fields', options.merge(q: query))
 
@@ -51,7 +52,7 @@ class Event
   def self.update_design_doc
     # create search indexes
     fields = FIELDS.map do |k, v|
-      "if (doc.event.#{v}) index('#{k}', doc.event.#{v}, { 'store': 'yes' });"
+      "if (doc.event.#{v}){ index('#{k}', doc.event.#{v}, { 'store': 'yes' });}"
     end
     search_function = "function(doc) { index('default', doc._id); #{fields.join(' ')} }"
     search_indexes = { all_fields: { index: search_function } }
@@ -75,6 +76,18 @@ class Event
         :indexes => search_indexes
       )
     end
+  end
+
+  def to_hash
+    hash = {}
+    instance_variables.each do |var|
+      hash[var.to_s.delete("@")] = instance_variable_get(var)
+    end
+    hash
+  end
+
+  def to_json
+    JSON.pretty_generate(self.to_hash)
   end
 
   # takes a hash and maps it to the fields defined in FIELDS
