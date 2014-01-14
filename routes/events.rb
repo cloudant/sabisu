@@ -26,5 +26,5 @@ get '/api/events/search' do
   events[:events].each do |event|
     event_json << event.to_json
   end
-  event_json
+  JSON.pretty_generate(event_json)
 end

@@ -1,11 +1,12 @@
 !!! 5
-%html{:lang => "en"}
+%html{:lang => "en", 'ng-app' => "sabisu"}
   %head
-    %script{:type => "text/javascript", :src => "https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"}
-    %script{:type => "text/javascript", :src => "/js/base.js"}
-    %script{:type => "text/javascript", :src => "//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"}
-    %link{:rel => "stylesheet", :type => "text/css", :href => "/css/bootstrap.min.css"}
-    %link{:rel => "stylesheet", :type => "text/css", :href => "/css/base.css"}
+    %script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"}
+    %script{:src => "https://ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular.min.js"}
+    %script{:src => "/js/base.js"}
+    %script{:src => "//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"}
+    %link{:rel => "stylesheet", :href => "/css/bootstrap.min.css"}
+    %link{:rel => "stylesheet", :href => "/css/base.css"}
   %body
     #wrapper{:class => 'container'}
       #header
@@ -16,7 +17,7 @@
             - if logged_in?
               %form{:class => 'navbar-form navbar-left', :role => 'search'}
                 .form-group{:class => 'form-group'}
-                  %input{:type => 'text', :class => 'form-control', :placeholder => 'Filter'}
+                  %input{:style => "width: 600px", :type => 'search', :class => 'form-control', :placeholder => 'Search', :id => 'search', :value => 'client:cheftest001'}
                 %button{:type => 'submit', :class => 'btn btn-default sr-only'}
               %li
                 %a{"href" => "/events"}= "Events"
@@ -24,13 +25,13 @@
                 %a{'href' => '/logout'}= "Logout"
             - else
               %li 
-                %a{'href' => '/login'}= "Login" 
+                %a{'href' => '/login'}= "Login"  
       #content
         =yield
     #footer
       .copyright{:class => 'text-center'}
         © Copyright 
         %a{:href => "https://www.cloudant.com"}= "Cloudant, Inc."
-        2013
+        2014
         %a{:href => "http://www.apache.org/licenses/LICENSE-2.0.html"}= "Apache License, Version 2.0"
         

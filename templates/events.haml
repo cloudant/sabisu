@@ -1,82 +1,7 @@
 %link{:rel => "stylesheet", :type => "text/css", :href => "/css/events.css"}
 
 %div{:class => "row"}
-  #browse{:class => "col-md-3"}
-    %button{:type => "button", :class => "btn btn-primary btn-xs rotate collapseBrowserVisable", :id => "collapseBrowser"}
-      %span{:class => "glyphicon glyphicon-chevron-down"}
-      Browse
-      %span{:class => "glyphicon glyphicon-chevron-down"}
-
-    #browse_list{:class => "panel-group"}
-      %div{:class => "panel panel-primary"}
-        %div{:class => "panel-heading"}
-          %button{:type => "button", :class => "btn btn-primary btn-xs", "data-toggle" => "collapse", "data-target" => "#collapseOne"}="Client Name"
-        #collapseOne{:class => "panel-collapse collapse"}
-          %div{:class => "panel-body"}
-            %ul{:class => "list-group"}
-              %li{:class => "list-group-item"}
-                db1.akamai001
-                %span{:class => "badge"}
-                  5
-              %li{:class => "list-group-item"}
-                db2.akamai001
-                %span{:class => "badge"}
-                  3
-              %li{:class => "list-group-item"}
-                lb4.juelp
-                %span{:class => "badge"}
-                  8
-              %li{:class => "list-group-item"}
-                monitor.dal
-                %span{:class => "badge"}
-                  2
-      %div{:class => "panel panel-primary"}
-        %div{:class => "panel-heading"}
-          %button{:type => "button", :class => "btn btn-primary btn-xs", "data-toggle" => "collapse", "data-target" => "#collapseTwo"}="Check Name"
-        #collapseTwo{:class => "panel-collapse collapse"}
-          %div{:class => "panel-body"}
-            %ul{:class => "list-group"}
-              %li{:class => "list-group-item"}
-                dbcore-status
-                %span{:class => "badge"}
-                  2
-              %li{:class => "list-group-item"}
-                dbcore-bacon
-                %span{:class => "badge"}
-                  9
-              %li{:class => "list-group-item"}
-                disk_usage
-                %span{:class => "badge"}
-                  9
-      %div{:class => "panel panel-primary"}
-        %div{:class => "panel-heading"}
-          %button{:type => "button", :class => "btn btn-primary btn-xs", "data-toggle" => "collapse", "data-target" => "#collapseThree"}="Status"
-        #collapseThree{:class => "panel-collapse collapse"}
-          %div{:class => "panel-body"}
-            %ul{:class => "list-group"}
-              %li{:class => "list-group-item"}
-                Warning
-                %span{:class => "badge"}
-                  5
-              %li{:class => "list-group-item"}
-                Critical
-                %span{:class => "badge"}
-                  9
-              %li{:class => "list-group-item"}
-                Unknown
-                %span{:class => "badge"}
-                  6
-  #filters{:class => "col-md-9 pull-right main-content"}
-    %div{:class => "panel panel-primary"}
-      %div{:class => "panel-heading"}
-        %button{:type => "button", :class => "btn btn-primary btn-xs", "data-toggle" => "collapse", "data-target" => "#filters_field", :id => "collapseFilters"}="Filters"
-    #filters_field{:role => "filters", :class => "collapse in"}
-      %div{:class => "panel-body"}
-        %button{:type => "button", :class => "btn btn-primary"}
-          %span{:class => "glyphicon glyphicon-remove-sign"}
-          status:-ok
-
-  #stats{:class => "col-md-9 pull-right main-content"}
+  #stats{:class => "col-md-12 pull-right main-content"}
     %div{:class => "panel panel-primary"}
       %div{:class => "panel-heading"}
         %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#stats_field"}="Stats"
@@ -86,33 +11,27 @@
           %span{:class => "label label-success"}= "OK: 0"
           %span{:class => "label label-warning"}= "Warning: 2"
           %span{:class => "label label-danger"}= "Critical: 2"
-          %span{:class => "label label-primary"}= "Unknown: 1"
+          %span{:class => "label label-info"}= "Unknown: 1"
         #bar_graph{:class => "progress"}
           %div{:class => "progress-bar progress-bar-warning", :style => "width: 40%"}
           %div{:class => "progress-bar progress-bar-danger", :style => "width: 40%"}
-          %div{:class => "progress-bar progress-bar-primary", :style => "width: 20%"}
+          %div{:class => "progress-bar progress-bar-info", :style => "width: 20%"}
 %div{:class => "row"}
-  #events{:class => "col-md-9 pull-right main-content"}
+  #events{:class => "col-md-12 pull-right main-content"}
     %div{:class => "panel panel-primary"}
       %div{:class => "panel-heading"}
         %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#events_field"}="Events"
-    #events_field{:role => "events", :class => "collapse in"}
+    #events_field{:role => "events", :class => "collapse in", 'ng-controller' => 'eventsController'}
       %ul{:class => "list-group"}
-        -#%li{:class => "list-group-item"}
+        %li{:class => "list-group-item", 'ng-repeat' => 'event in events'}
           %div{:class => "row"}
-            %div{:class => "col-xs-2"}="Client"
-            %div{:class => "col-xs-2"}="Check"
-            %div{:class => "col-xs-2"}="Timestamp"
-            %div{:class => "col-xs-6"}="Output"
-        %li{:class => "list-group-item"}
-          %div{:class => "row"}
-            %div{:class => "panel panel-danger"}
-              %div{:class => "panel-heading flat-heading event_line", :panel => "13204059"}
-                %div{:class => "col-xs-2"}="db1.akamai001"
-                %div{:class => "col-xs-2"}="dbcore-status"
-                %div{:class => "col-xs-2"}="2 hours ago"
-                %div{:class => "col-xs-6"}="DOWN! It appears that dbcore is not up and not available"
-              %div{:class => "panel-body panel-collapse collapse in", :id => "13204059"}
+            %div{:class => "panel"}
+              %div{:class => "panel-heading flat-heading event_line", :panel => "{{event.id}}"}
+                %div{:class => "event-status pull-left img-rounded btn-{{event.color}}", 'ng-click' => "toggleDetails(event.id)"}= "+"
+                %div{:class => "col-xs-2 pull-left"}="{{event.client}}"
+                %div{:class => "col-xs-3 pull-left"}="{{event.check}}"
+                %div{:class => "col-xs-7 pull-left"}="{{event.short_output}} {{event.dotdotdot}}"
+              %div{:class => "panel-body panel-collapse collapse", :id => "{{event.id}}"}
                 %table{:class => "table table-striped"}
                   %tr
                     %td="Key"
@@ -121,9 +40,9 @@
                   %tr
                     %td="Client"
                     %td
-                      %button{:type => "button", :class => "btn btn-default btn-xs", :id => "silence/db1.akamai001/dbcore-status"}
+                      %button{:type => "button", :class => "btn btn-default btn-xs", :id => "silence/{{event.client}}/{{event.check}}"}
                         %span{:class => "glyphicon glyphicon-volume-off"}
-                    %td="db1.akamai001"
+                    %td="{{event.client}}"
                     
 %script{:type => "text/javascript", :src => "/js/events.js"}
 
