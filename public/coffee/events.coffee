@@ -5,12 +5,16 @@ sabisu.factory('eventsFactory', ($log, $http) ->
     factory.searchEvents = -> 
         search_query = $('#search_input').val()
         limit = $('#limit').val()
+        sort = $('#sort_by').val()
+        sort = sort + '<string>' unless sort == "issued" or sort == "status"
+        sort = "[\"#{sort}\"]"
         if search_query == ''
             $http(
                 method: 'GET'
                 url: '/api/events'
                 params:
                     limit: limit
+                    sort: sort
             )
         else
             $http(
@@ -19,6 +23,7 @@ sabisu.factory('eventsFactory', ($log, $http) ->
                 params:
                     query: search_query
                     limit: limit
+                    sort: sort
             )
     factory
 )

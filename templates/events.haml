@@ -10,6 +10,21 @@
         %form{:role => 'search'}
           .form-group{:class => 'form-group'}
             %input{:style => "width: 75%", :type => 'text', :class => 'form-control', :placeholder => 'Search', 'ng-model' => 'search_field', :value => 'client:cheftest001', :id => 'search_input'}
+            %div{:class => "pull-right"}
+              %span{}= "Sort"
+              %select{:id => 'sort_by'}
+                %option{:value => 'client', :selected => "selected"}= 'client'
+                %option{:value => '-client'}= 'client (decending)'
+                %option{:value => 'check'}= 'check'
+                %option{:value => '-check'}= 'check (decending)'
+                %option{:value => 'status'}= 'status'
+                %option{:value => '-status'}= 'status (decending)'
+                %option{:value => 'occurences'}= 'occurences'
+                %option{:value => '-occurences'}= 'occurences (decending)'
+                %option{:value => 'issued'}= 'issued'
+                %option{:value => '-issued'}= 'issued (decending)'
+                %option{:value => 'output'}= 'output'
+                %option{:value => '-output'}= 'output (decending)'
           %input{:type => 'submit', :class => 'btn btn-default sr-only', 'ng-click' => 'updateEvents()'}
 
   #stats{:class => "col-md-12 pull-right main-content"}

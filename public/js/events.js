@@ -8,15 +8,21 @@
     var factory;
     factory = {};
     factory.searchEvents = function() {
-      var limit, search_query;
+      var limit, search_query, sort;
       search_query = $('#search_input').val();
       limit = $('#limit').val();
+      sort = $('#sort_by').val();
+      if (!(sort === "issued" || sort === "status")) {
+        sort = sort + '<string>';
+      }
+      sort = "[\"" + sort + "\"]";
       if (search_query === '') {
         return $http({
           method: 'GET',
           url: '/api/events',
           params: {
-            limit: limit
+            limit: limit,
+            sort: sort
           }
         });
       } else {
@@ -25,7 +31,8 @@
           url: '/api/events/search',
           params: {
             query: search_query,
-            limit: limit
+            limit: limit,
+            sort: sort
           }
         });
       }
