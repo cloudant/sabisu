@@ -1,6 +1,17 @@
-%link{:rel => "stylesheet", :type => "text/css", :href => "/css/events.css"}
+%link{:rel => "stylesheet", :href => "/css/events.css"}
 
-%div{:class => "row"}
+%div{:class => "row", 'ng-controller' => 'eventsController'}
+  #search{:class => 'col-md-12 pull-right main-content'}
+    %div{:class => "panel panel-primary"}
+      %div{:class => "panel-heading"}
+        %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#search_field"}="Search"
+    #search_field{:role => "search", :class => "collapse in"}
+      %div{:class => "panel-body"} 
+        %form{:role => 'search'}
+          .form-group{:class => 'form-group'}
+            %input{:style => "width: 75%", :type => 'text', :class => 'form-control', :placeholder => 'Search', 'ng-model' => 'search_field', :value => 'client:cheftest001', :id => 'search_input'}
+          %input{:type => 'submit', :class => 'btn btn-default sr-only', 'ng-click' => 'updateEvents()'}
+
   #stats{:class => "col-md-12 pull-right main-content"}
     %div{:class => "panel panel-primary"}
       %div{:class => "panel-heading"}
@@ -16,13 +27,23 @@
           %div{:class => "progress-bar progress-bar-warning", :style => "width: 40%"}
           %div{:class => "progress-bar progress-bar-danger", :style => "width: 40%"}
           %div{:class => "progress-bar progress-bar-info", :style => "width: 20%"}
-%div{:class => "row"}
+
   #events{:class => "col-md-12 pull-right main-content"}
     %div{:class => "panel panel-primary"}
       %div{:class => "panel-heading"}
         %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#events_field"}="Events"
-    #events_field{:role => "events", :class => "collapse in", 'ng-controller' => 'eventsController'}
+        %div{:class => 'pull-right'}
+          %span{:class => 'view'}= "View"
+          %select{:id => 'limit'}
+            %option{:value => '10'}= '10'
+            %option{:value => '20'}= '20'
+            %option{:value => '50', :selected => "selected"}= '50'
+            %option{:value => '100'}= '100'
+            %option{:value => '200'}= '200'
+            
+    #events_field{:role => "events", :class => "collapse in"}
       %ul{:class => "list-group"}
+        %div{:class => 'text-center', 'ng-hide' => 'events.length'}= "No Events"
         %li{:class => "list-group-item", 'ng-repeat' => 'event in events'}
           %div{:class => "row"}
             %div{:class => "panel"}
@@ -45,4 +66,3 @@
                     %td="{{event.client}}"
                     
 %script{:type => "text/javascript", :src => "/js/events.js"}
-

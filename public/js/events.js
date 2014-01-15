@@ -8,13 +8,15 @@
     var factory;
     factory = {};
     factory.searchEvents = function() {
-      $log.info('searching for events');
-      if ($("#search").val() === '') {
+      var limit, search_query;
+      search_query = $('#search_input').val();
+      limit = $('#limit').val();
+      if (search_query === '') {
         return $http({
           method: 'GET',
           url: '/api/events',
           params: {
-            limit: 10
+            limit: limit
           }
         });
       } else {
@@ -22,8 +24,8 @@
           method: 'GET',
           url: '/api/events/search',
           params: {
-            query: $("#search").val(),
-            limit: 10
+            query: search_query,
+            limit: limit
           }
         });
       }
@@ -32,40 +34,45 @@
   });
 
   sabisu.controller('eventsController', function($scope, $log, eventsFactory) {
-    var updateEvents;
     $scope.events = [];
-    updateEvents = function() {
+    $scope.updateEvents = function() {
       return eventsFactory.searchEvents().success(function(data, status, headers, config) {
-        var color, event, events, _i, _len;
+        var color, event, events, _i, _len, _ref;
         color = ['success', 'warning', 'danger', 'info'];
         events = [];
-        for (_i = 0, _len = data.length; _i < _len; _i++) {
-          event = data[_i];
-          event = angular.fromJson(event);
-          event['id'] = Math.floor(Math.random() * 100000000000);
-          event['color'] = color[event['status']];
-          if (event['color'] == null) {
-            event['color'] = color[0];
-          }
-          event['rel_time'] = "2 hours ago";
-          event['dotdotdot'] = '';
-          event['short_output'] = '';
-          if (event['output'] != null) {
-            event['short_output'] = event['output'].slice(0, 101);
-            if (event['output'].length > 100) {
-              event['dotdotdot'] = '...';
-            }
-          }
-          events.push(event);
+        if ('bookmark' in data) {
+          $scope.bookmark = data['bookmark'];
         }
-        $log.info('got events');
-        $log.info(events);
-        return $scope.events = events;
+        if ('count' in data) {
+          $scope.count = data['count'];
+        }
+        if ('events' in data) {
+          _ref = data['events'];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            event = _ref[_i];
+            event = angular.fromJson(event);
+            event['id'] = Math.floor(Math.random() * 100000000000);
+            event['color'] = color[event['status']];
+            if (event['color'] == null) {
+              event['color'] = color[0];
+            }
+            event['rel_time'] = "2 hours ago";
+            event['dotdotdot'] = '';
+            event['short_output'] = '';
+            if (event['output'] != null) {
+              event['short_output'] = event['output'].slice(0, 101);
+              if (event['output'].length > 100) {
+                event['dotdotdot'] = '...';
+              }
+            }
+            events.push(event);
+          }
+          return $scope.events = events;
+        }
       });
     };
-    updateEvents();
+    $scope.updateEvents();
     return $scope.toggleDetails = function(id) {
-      $log.info("toggle " + id);
       return $("#" + id).collapse('toggle');
     };
   });
