@@ -30,8 +30,11 @@ sabisu.factory('eventsFactory', ($log, $http) ->
 
 sabisu.controller('eventsController', ($scope, $log, eventsFactory) ->
     $scope.events = []
+    $scope.events_spin = false
 
     $scope.updateEvents = ->
+        $scope.events = []
+        $scope.events_spin = true
         eventsFactory.searchEvents().success( (data, status, headers, config) ->
             color = [ 'success', 'warning', 'danger', 'info' ]
             events = []
@@ -51,8 +54,9 @@ sabisu.controller('eventsController', ($scope, $log, eventsFactory) ->
                         if event['output'].length > 100
                             event['dotdotdot'] = '...'
                     events.push event
-                    
+                $scope.events_spin = false
                 $scope.events = events
+                
         )
     $scope.updateEvents()
 

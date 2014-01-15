@@ -42,7 +42,10 @@
 
   sabisu.controller('eventsController', function($scope, $log, eventsFactory) {
     $scope.events = [];
+    $scope.events_spin = false;
     $scope.updateEvents = function() {
+      $scope.events = [];
+      $scope.events_spin = true;
       return eventsFactory.searchEvents().success(function(data, status, headers, config) {
         var color, event, events, _i, _len, _ref;
         color = ['success', 'warning', 'danger', 'info'];
@@ -74,6 +77,7 @@
             }
             events.push(event);
           }
+          $scope.events_spin = false;
           return $scope.events = events;
         }
       });
