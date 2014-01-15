@@ -52,7 +52,7 @@ class Event
   def self.update_design_doc
     # create search indexes
     fields = FIELDS.map do |k, v|
-      "if (doc.event.#{v}){ index('#{k}', doc.event.#{v}, { 'store': 'yes' });}"
+      "if (typeof(doc.event.#{v}) !== 'undefined' && doc.event.#{v} != null){ index('#{k}', doc.event.#{v}, { 'store': 'yes' });}"
     end
     search_function = "function(doc) { index('default', doc._id); #{fields.join(' ')} }"
     search_indexes = { all_fields: { index: search_function } }
