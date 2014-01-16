@@ -4,6 +4,10 @@
 
   sabisu = angular.module('sabisu', []);
 
+  sabisu.config(function($locationProvider) {
+    return $locationProvider.html5Mode(true);
+  });
+
   sabisu.factory('eventsFactory', function($log, $http) {
     var factory;
     factory = {};
@@ -57,6 +61,9 @@
     $scope.updateEvents = function() {
       $scope.events = [];
       $scope.events_spin = true;
+      $location.search('query', $scope.search_field);
+      $location.search('sort', $scope.sort);
+      $location.search('limit', $scope.limit);
       return eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
         var color, event, events, _i, _len, _ref;
         color = ['success', 'warning', 'danger', 'info'];

@@ -12,15 +12,15 @@
             %input{:style => "width: 75%", :type => 'text', :class => 'form-control', :placeholder => 'Search', 'ng-model' => 'search_field', :id => 'search_input'}
             %div{:class => "pull-right"}
               %span{}= "Sort"
-              %select{:id => 'sort_by', 'ng-model' => 'sort'}
-                %option{:value => 'client', :selected => "selected"}= 'client'
+              %select{:id => 'sort', 'ng-model' => 'sort'}
+                %option{:value => 'client'}= 'client'
                 %option{:value => '-client'}= 'client (decending)'
                 %option{:value => 'check'}= 'check'
                 %option{:value => '-check'}= 'check (decending)'
                 %option{:value => 'status'}= 'status'
                 %option{:value => '-status'}= 'status (decending)'
-                %option{:value => 'occurences'}= 'occurences'
-                %option{:value => '-occurences'}= 'occurences (decending)'
+                %option{:value => 'issued', :selected => "selected"}= 'age'
+                %option{:value => '-issued'}= 'age (decending)'
                 %option{:value => 'issued'}= 'issued'
                 %option{:value => '-issued'}= 'issued (decending)'
                 %option{:value => 'output'}= 'output'

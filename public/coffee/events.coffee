@@ -1,5 +1,9 @@
 sabisu = angular.module('sabisu', [])
 
+sabisu.config( ($locationProvider) ->
+    $locationProvider.html5Mode(true)
+)
+
 sabisu.factory('eventsFactory', ($log, $http) ->
     factory = {}
     factory.searchEvents = (search_query, sort, limit) ->
@@ -46,8 +50,15 @@ sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory) -
         $scope.limit = '50'
 
     $scope.updateEvents = ->
+        # clear any currently displayed events
         $scope.events = []
+        # start progress bar
         $scope.events_spin = true
+        # set url paramaters with query terms etc
+        $location.search('query', $scope.search_field)
+        $location.search('sort', $scope.sort)
+        $location.search('limit', $scope.limit)
+        # get events
         eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success( (data, status, headers, config) ->
             color = [ 'success', 'warning', 'danger', 'info' ]
             events = []
@@ -67,9 +78,9 @@ sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory) -
                         if event['output'].length > 100
                             event['dotdotdot'] = '...'
                     events.push event
+                # hide progress bar
                 $scope.events_spin = false
                 $scope.events = events
-                
         )
     $scope.updateEvents()
 

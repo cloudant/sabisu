@@ -13,15 +13,29 @@
         .nav{:class => 'navbar navbar-default', :role => "navigation"}
           .navbar-header
             %a{:class => 'navbar-brand', "href" => "/"}= "Sabisu"
-          %ul{:class => 'nav navbar-nav pull-right'}
+          %ul{:class => 'nav navbar-nav navbar-right'}
             - if logged_in?
+              %li{:class => 'dropdown'}
+                %a{"href" => "#", :target => '_self', :class => 'droptown-toggle', 'data-toggle' => 'dropdown'}
+                  Events
+                  %b{:class => "caret"}
+                %ul{:class => 'dropdown-menu'}
+                  %li{:class => 'dropdown-header'}= 'All'
+                  %li
+                    %a{"href" => "/events?sort=age&limit=50&query=", :target => '_self'}= "Recent"
+                  %li
+                    %a{"href" => "/events?sort=-age&limit=50&query=", :target => '_self'}= "Old"
+                  %li{:class => 'divider'}
+                  %li{:class => 'dropdown-header'}= 'Problems'
+                  %li
+                    %a{"href" => "/events?sort=age&limit=50&query=status:[1 TO 3]", :target => '_self'}= "Recent"
+                  %li
+                    %a{"href" => "/events?sort=-age&limit=50&query=status:[1 TO 3]", :target => '_self'}= "Old"
               %li
-                %a{"href" => "/events"}= "Events"
-              %li
-                %a{'href' => '/logout'}= "Logout"
+                %a{'href' => '/logout', :target => '_self'}= "Logout"
             - else
               %li 
-                %a{'href' => '/login'}= "Login"  
+                %a{'href' => '/login', :target => '_self'}= "Login"  
       #content
         =yield
     #footer
