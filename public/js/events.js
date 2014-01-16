@@ -7,11 +7,7 @@
   sabisu.factory('eventsFactory', function($log, $http) {
     var factory;
     factory = {};
-    factory.searchEvents = function() {
-      var limit, search_query, sort;
-      search_query = $('#search_input').val();
-      limit = $('#limit').val();
-      sort = $('#sort_by').val();
+    factory.searchEvents = function(search_query, sort, limit) {
       if (!(sort === "issued" || sort === "status")) {
         sort = sort + '<string>';
       }
@@ -40,13 +36,28 @@
     return factory;
   });
 
-  sabisu.controller('eventsController', function($scope, $log, eventsFactory) {
+  sabisu.controller('eventsController', function($scope, $log, $location, eventsFactory) {
     $scope.events = [];
     $scope.events_spin = false;
+    if ($location.search().query != null) {
+      $scope.search_field = $location.search().query;
+    } else {
+      $scope.search_field = '';
+    }
+    if ($location.search().sort != null) {
+      $scope.sort = $location.search().sort;
+    } else {
+      $scope.sort = 'client';
+    }
+    if ($location.search().limit != null) {
+      $scope.limit = $location.search().limit;
+    } else {
+      $scope.limit = '50';
+    }
     $scope.updateEvents = function() {
       $scope.events = [];
       $scope.events_spin = true;
-      return eventsFactory.searchEvents().success(function(data, status, headers, config) {
+      return eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
         var color, event, events, _i, _len, _ref;
         color = ['success', 'warning', 'danger', 'info'];
         events = [];

@@ -2,10 +2,7 @@ sabisu = angular.module('sabisu', [])
 
 sabisu.factory('eventsFactory', ($log, $http) ->
     factory = {}
-    factory.searchEvents = -> 
-        search_query = $('#search_input').val()
-        limit = $('#limit').val()
-        sort = $('#sort_by').val()
+    factory.searchEvents = (search_query, sort, limit) ->
         sort = sort + '<string>' unless sort == "issued" or sort == "status"
         sort = "[\"#{sort}\"]"
         if search_query == ''
@@ -28,14 +25,30 @@ sabisu.factory('eventsFactory', ($log, $http) ->
     factory
 )
 
-sabisu.controller('eventsController', ($scope, $log, eventsFactory) ->
+sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory) ->
     $scope.events = []
     $scope.events_spin = false
+
+    # load url parameters
+    if $location.search().query?
+        $scope.search_field = $location.search().query
+    else
+        $scope.search_field = ''
+
+    if $location.search().sort?
+        $scope.sort = $location.search().sort
+    else
+        $scope.sort = 'client'
+
+    if $location.search().limit?
+        $scope.limit = $location.search().limit
+    else
+        $scope.limit = '50'
 
     $scope.updateEvents = ->
         $scope.events = []
         $scope.events_spin = true
-        eventsFactory.searchEvents().success( (data, status, headers, config) ->
+        eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success( (data, status, headers, config) ->
             color = [ 'success', 'warning', 'danger', 'info' ]
             events = []
             $scope.bookmark = data['bookmark'] if 'bookmark' of data

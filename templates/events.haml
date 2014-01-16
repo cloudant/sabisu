@@ -9,10 +9,10 @@
       %div{:class => "panel-body"} 
         %form{:role => 'search'}
           .form-group{:class => 'form-group'}
-            %input{:style => "width: 75%", :type => 'text', :class => 'form-control', :placeholder => 'Search', 'ng-model' => 'search_field', :value => 'client:cheftest001', :id => 'search_input'}
+            %input{:style => "width: 75%", :type => 'text', :class => 'form-control', :placeholder => 'Search', 'ng-model' => 'search_field', :id => 'search_input'}
             %div{:class => "pull-right"}
               %span{}= "Sort"
-              %select{:id => 'sort_by'}
+              %select{:id => 'sort_by', 'ng-model' => 'sort'}
                 %option{:value => 'client', :selected => "selected"}= 'client'
                 %option{:value => '-client'}= 'client (decending)'
                 %option{:value => 'check'}= 'check'
@@ -49,7 +49,7 @@
         %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#events_field"}="Events"
         %div{:class => 'pull-right'}
           %span{:class => 'view'}= "View"
-          %select{:id => 'limit'}
+          %select{:id => 'limit', 'ng-model' => 'limit'}
             %option{:value => '10'}= '10'
             %option{:value => '20'}= '20'
             %option{:value => '50', :selected => "selected"}= '50'
