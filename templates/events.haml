@@ -9,10 +9,12 @@
       %div{:class => "panel-body"} 
         %form{:role => 'search'}
           .form-group{:class => 'form-group'}
-            %input{:style => "width: 75%", :type => 'text', :class => 'form-control', :placeholder => 'Search', 'ng-model' => 'search_field', :id => 'search_input'}
-            %div{:class => "pull-right"}
+            %input{:type => 'text', :class => 'form-control', :placeholder => 'Search', 'ng-model' => 'search_field', :id => 'search_input'}
+            %small{:class => 'help-block'}
+              %a{'data-toggle' => 'modal', 'data-target' => '#howdoisearch'}= "How do I search?"
+            %div{:class => "pull-left"}
               %span{}= "Sort"
-              %select{:id => 'sort', 'ng-model' => 'sort'}
+              %select{:id => 'sort', 'ng-model' => 'sort', :class => 'form-control'}
                 %option{:value => 'client'}= 'client'
                 %option{:value => '-client'}= 'client (decending)'
                 %option{:value => 'check'}= 'check'
@@ -25,7 +27,7 @@
                 %option{:value => '-issued'}= 'issued (decending)'
                 %option{:value => 'output'}= 'output'
                 %option{:value => '-output'}= 'output (decending)'
-          %input{:type => 'submit', :class => 'btn btn-default sr-only', 'ng-click' => 'updateEvents()'}
+          %input{:type => 'submit', :class => 'btn btn-success pull-right', 'ng-click' => 'updateEvents()'}
 
   #stats{:class => "col-md-12 pull-right main-content"}
     %div{:class => "panel panel-primary"}
@@ -43,7 +45,7 @@
           %div{:class => "progress-bar progress-bar-danger", :style => "width: 40%"}
           %div{:class => "progress-bar progress-bar-info", :style => "width: 20%"}
 
-  #events{:class => "col-md-12 pull-right main-content"}
+  #events{:class => "col-md-12 pull-right main-content", :style => "margin-bottom: 100px"}
     %div{:class => "panel panel-primary"}
       %div{:class => "panel-heading"}
         %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#events_field"}="Events"
@@ -61,7 +63,7 @@
         %div{:class => 'progress progress-striped active', 'ng-show' => 'events_spin', :style => 'margin-top: 50px;'}
           %div{:class => 'progress-bar progress-bar-success', :role => 'progressbar', 'aria-valuenow' => '100', 'aria-valuemin' => '0', 'aria-valuemax' => '100', :style => 'width: 100%'}
             %span{:class => 'sr-only'}= "getting events..."
-        %div{:class => 'text-center', 'ng-hide' => 'events.length'}= "No Events"
+        %div{:class => 'text-center', 'ng-hide' => 'events.length || events_spin'}= "No Events"
         %li{:class => "list-group-item", 'ng-repeat' => 'event in events'}
           %div{:class => "row"}
             %div{:class => "panel"}
@@ -82,5 +84,62 @@
                       %button{:type => "button", :class => "btn btn-default btn-xs", :id => "silence/{{event.client}}/{{event.check}}"}
                         %span{:class => "glyphicon glyphicon-volume-off"}
                     %td="{{event.client}}"
-                    
+
+
+%div{:class => 'modal fade', :id => 'howdoisearch'}
+  %div{:class => 'modal-dialog'}
+    %div{:class => 'modal-content'}
+      %div{:class => 'modal-header'}
+        %button{:type => "button", :class => "close", 'data-dismiss' => "modal", 'aria-hidden' => "true"}
+        %h4{:class => 'modal-title'}= "How Do I Search?"
+      %div{:class => 'modal-body'}
+        %h4="Query Syntax"
+        %p
+          The Cloudant search query syntax is based on the
+          %a{:href => 'http://lucene.apache.org/core/4_2_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package_description'}="Lucene"
+          syntax. Search queries take the form of "name:value" (unless the name is omitted, in which case they hit the default field as we demonstrated in the first example, above).
+        %p
+          Queries over multiple fields can be logically combined and groups and fields can be grouped. The available logical operators are: "AND", "+", "OR", "NOT" and "-", and are case sensitive. Range queries can run over strings or numbers.
+        %p
+          If you want a fuzzy search you can run a query with "~" to find terms like the search term, for instance "look~" will find terms book and took.
+        %p
+          You can also increase the importance of a search term by using the boost character "^". This makes matches containing the term more relevant, e.g. cloudant "data layer"^4 will make results containing "data layer" 4 times more relevant. The default boost value is 1. Boost values must be positive, but can be less than 1 (e.g. 0.5 to reduce importance).
+        %p
+          Wild card searches are supported, for both single ("?") and multiple ("*") character searches. "dat?" would match date and data, "dat*" would match date, data, database, dates etc. Wildcards must come after a search term, you cannot do a query like "*base".
+
+        %p
+          The following characters require escaping if you want to search on them
+
+        %p{:class => 'well well-sm'}
+          + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
+
+        %h4="Examples"
+        %table{:class => "table table-striped"}
+          %tr
+            %td="Desired Result"
+            %td="Query"
+          %tr
+            %td="For clients starting with 'web'"
+            %td="client:web*"
+          %tr
+            %td="For checks ending with 'process'"
+            %td="check:process"
+          %tr
+            %td="For statuses warning or critical"
+            %td="status:[1 TO 2]"
+          %tr
+            %td="For 'web' clients and critical"
+            %td="client:web* AND status:2"
+          %tr
+            %td="For 'web' or 'dbs' and status is unknown"
+            %td="client:(web* OR db*) AND status:3"
+          %tr
+            %td="Full text search for 'failure'"
+            %td="failure"
+          %tr
+            %td="Events since Jan 1, 2014"
+            %td="issued:[1388534400 TO Infinity]"
+      %div{:class => 'modal-footer'}
+        %button{:type => 'button', :class => 'btn btn-default', 'data-dismiss' => 'modal'}= "Close"
+
 %script{:type => "text/javascript", :src => "/js/events.js"}
