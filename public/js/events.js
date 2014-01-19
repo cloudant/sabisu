@@ -8,6 +8,12 @@
     return $locationProvider.html5Mode(true);
   });
 
+  sabisu.filter('joinBy', function() {
+    return function(input, delimiter) {
+      return (input || []).join(delimiter || ',');
+    };
+  });
+
   sabisu.factory('eventsFactory', function($log, $http) {
     var factory;
     factory = {};
@@ -22,7 +28,8 @@
           url: '/api/events',
           params: {
             limit: limit,
-            sort: sort
+            sort: sort,
+            include_docs: true
           }
         });
       } else {
@@ -32,7 +39,8 @@
           params: {
             query: search_query,
             limit: limit,
-            sort: sort
+            sort: sort,
+            include_docs: true
           }
         });
       }
@@ -43,6 +51,7 @@
   sabisu.controller('eventsController', function($scope, $log, $location, eventsFactory) {
     $scope.events = [];
     $scope.events_spin = false;
+    $scope.bulk = 'show';
     if ($location.search().query != null) {
       $scope.search_field = $location.search().query;
     } else {
@@ -67,6 +76,7 @@
       return eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
         var color, event, events, _i, _len, _ref;
         color = ['success', 'warning', 'danger', 'info'];
+        status = ['OK', 'Warning', 'Critical', 'Unknown'];
         events = [];
         if ('bookmark' in data) {
           $scope.bookmark = data['bookmark'];
@@ -80,19 +90,10 @@
             event = _ref[_i];
             event = angular.fromJson(event);
             event['id'] = Math.floor(Math.random() * 100000000000);
-            event['color'] = color[event['status']];
-            if (event['color'] == null) {
-              event['color'] = color[0];
-            }
+            event['color'] = color[event['check']['status']];
+            event['wstatus'] = status[event['check']['status']];
             event['rel_time'] = "2 hours ago";
-            event['dotdotdot'] = '';
-            event['short_output'] = '';
-            if (event['output'] != null) {
-              event['short_output'] = event['output'].slice(0, 101);
-              if (event['output'].length > 100) {
-                event['dotdotdot'] = '...';
-              }
-            }
+            event['check']['issued'] = Date(event['check']['issued'] * 1000);
             events.push(event);
           }
           $scope.events_spin = false;
@@ -101,6 +102,26 @@
       });
     };
     $scope.updateEvents();
+    $scope.bulkToggleDetails = function() {
+      var event, _i, _len, _ref, _results;
+      _ref = $scope.events;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        event = _ref[_i];
+        _results.push($("#" + event['id']).collapse($scope.bulk));
+      }
+      return _results;
+    };
+    $('.collapse').on('hide.bs.collapse', function() {
+      $scope.bulk = 'show';
+      $(this).parent().find('.toggleBtn').removeClass('glyphicon-collapse-up');
+      return $(this).parent().find('.toggleBtn').addClass('glyphicon-collapse-down');
+    });
+    $('.collapse').on('show.bs.collapse', function() {
+      $scope.bulk = 'hide';
+      $(this).parent().find('.toggleBtn').removeClass('glyphicon-collapse-down');
+      return $(this).parent().find('.toggleBtn').addClass('glyphicon-collapse-up');
+    });
     return $scope.toggleDetails = function(id) {
       return $("#" + id).collapse('toggle');
     };

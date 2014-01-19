@@ -16,17 +16,10 @@ class Event
 
     results = CURRENT_DB.all_docs(options.merge(include_docs: true, start_key: '"a"'))
 
-    # TODO: sorting
-
     {
       count: results['total_rows'],
       events: results['rows'].map do |r|
-        # extract fields from doc
-        fields = {}
-        FIELDS.each do |k, v|
-          fields[k] = eval("r['doc']['event']" + v.split('.').map { |vv| "['#{vv}']" }.join)
-        end
-        Event.new(fields)
+        r['doc']['event']
       end
     }
   end
@@ -42,11 +35,9 @@ class Event
 
     results = CURRENT_DB.view('_design/sabisu/_search/all_fields', options.merge(q: query))
 
-    # TODO: sorting
-
     { count: results['total_rows'],
       bookmark: results['bookmark'],
-      events: results['rows'].map { |r| Event.new(r['fields']) } }
+      events: results['rows'].map { |r| r['doc']['event'] } }
   end
 
   def self.update_design_doc
@@ -54,7 +45,7 @@ class Event
     fields = FIELDS.map do |k, v|
       "
   if (typeof(doc.event.#{v}) !== 'undefined' && doc.event.#{v} !== null){
-    index('#{k}', doc.event.#{v}, { 'store': 'yes' });
+    index('#{k}', doc.event.#{v});
   };"
     end
     search_function = "

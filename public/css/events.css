@@ -16,6 +16,32 @@ li.list-group-item {
 	height: auto;
 	position: relative;
 	overflow: hidden;
+	background-color: #EEE;
+}
+
+.attr_title {
+	font-size: 11px;
+}
+
+.attr_value {
+	font-size: 14px;
+}
+
+.event_title {
+	width: 75%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.output {
+	background-color: lightgoldenrodyellow;
+	padding: 10px;
+	width: 100%;
+}
+
+.panel-body {
+	padding: 0px;
 }
 
 .event-status {

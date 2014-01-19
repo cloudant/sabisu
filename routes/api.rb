@@ -1,9 +1,6 @@
 get '/api/events' do
   params = request.env['rack.request.query_hash']
   events = Event.all(params)
-  events[:events].map! do |event|
-    event.to_json
-  end
   JSON.pretty_generate(events)
 end
 
@@ -17,8 +14,5 @@ get '/api/events/search' do
     return 'Must supply \'query\' parameter'
   end
   events = Event.search(query, params)
-  events[:events].map! do |event|
-    event.to_json
-  end
   JSON.pretty_generate(events)
 end
