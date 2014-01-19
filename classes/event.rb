@@ -43,10 +43,11 @@ class Event
   def self.update_design_doc
     # create search indexes
     fields = FIELDS.map do |k, v|
+      facet = k == 'output' ? '' : ", { 'facet': true }"
       "
   if (typeof(doc.event.#{v}) !== 'undefined' && doc.event.#{v} !== null){
-    index('#{k}', doc.event.#{v});
-  };"
+    index('#{k}', doc.event.#{v}#{facet});
+  }"
     end
     search_function = "
 function(doc) {
