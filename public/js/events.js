@@ -18,32 +18,22 @@
     var factory;
     factory = {};
     factory.searchEvents = function(search_query, sort, limit) {
-      if (!(sort === "issued" || sort === "status")) {
+      if (!(sort === "issued" || sort === "status" || sort === "occurences")) {
         sort = sort + '<string>';
       }
       sort = "[\"" + sort + "\"]";
       if (search_query === '') {
-        return $http({
-          method: 'GET',
-          url: '/api/events',
-          params: {
-            limit: limit,
-            sort: sort,
-            include_docs: true
-          }
-        });
-      } else {
-        return $http({
-          method: 'GET',
-          url: '/api/events/search',
-          params: {
-            query: search_query,
-            limit: limit,
-            sort: sort,
-            include_docs: true
-          }
-        });
+        search_query = '*:*';
       }
+      return $http({
+        method: 'GET',
+        url: '/api/events/search',
+        params: {
+          query: search_query,
+          limit: limit,
+          sort: sort
+        }
+      });
     };
     return factory;
   });
@@ -74,7 +64,7 @@
       $location.search('sort', $scope.sort);
       $location.search('limit', $scope.limit);
       return eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
-        var color, event, events, _i, _len, _ref;
+        var checks, color, ctx, d, event, events, k, labels, statuses, statuses_data, v, values, _i, _len, _ref;
         color = ['success', 'warning', 'danger', 'info'];
         status = ['OK', 'Warning', 'Critical', 'Unknown'];
         events = [];
@@ -84,11 +74,64 @@
         if ('count' in data) {
           $scope.count = data['count'];
         }
-        if ('events' in data) {
-          _ref = data['events'];
+        if ('ranges' in data) {
+          statuses = data['ranges']['status'];
+          $('#stats_status').find('#totals').find('.label-success').text("OK: " + statuses['OK']);
+          $('#stats_status').find('#totals').find('.label-warning').text("Warning: " + statuses['Warning']);
+          $('#stats_status').find('#totals').find('.label-danger').text("Critical: " + statuses['Critical']);
+          $('#stats_status').find('#totals').find('.label-info').text("Unknown: " + statuses['Unknown']);
+          statuses_data = [
+            {
+              value: statuses['OK'],
+              color: "#18bc9c",
+              label: 'OK',
+              labelColor: 'white'
+            }, {
+              value: statuses['Warning'],
+              color: "#f39c12",
+              label: 'Warning',
+              labelColor: 'white'
+            }, {
+              value: statuses['Critical'],
+              color: "#e74c3c",
+              label: 'Critical',
+              labelColor: 'white'
+            }, {
+              value: statuses['Unknown'],
+              color: "#3498db",
+              label: 'Unknown',
+              labelColor: 'white'
+            }
+          ];
+          ctx = $('#chart_pie_status').get(0).getContext('2d');
+          new Chart(ctx).Pie(statuses_data);
+        }
+        if ('counts' in data) {
+          checks = data['counts']['check'];
+          labels = [];
+          values = [];
+          for (k in checks) {
+            v = checks[k];
+            labels.push(k);
+            values.push(v);
+          }
+          d = {
+            labels: labels,
+            datasets: [
+              {
+                fillColor: "rgba(220,220,220,0.5)",
+                strokeColor: "rgba(220,220,220,1)",
+                data: values
+              }
+            ]
+          };
+          ctx = $('#chart_bar_check').get(0).getContext('2d');
+        }
+        if ('rows' in data) {
+          _ref = data['rows'];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             event = _ref[_i];
-            event = angular.fromJson(event);
+            event = event['doc']['event'];
             event['id'] = Math.floor(Math.random() * 100000000000);
             event['color'] = color[event['check']['status']];
             event['wstatus'] = status[event['check']['status']];

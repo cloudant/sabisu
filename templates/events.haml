@@ -1,4 +1,5 @@
 %link{:rel => "stylesheet", :href => "/css/events.css"}
+%script{:src => "/js/chart.js"}
 
 %div{:class => "row", 'ng-controller' => 'eventsController'}
   #search{:class => 'col-md-12 pull-right main-content'}
@@ -35,15 +36,15 @@
         %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#stats_field"}="Stats"
     #stats_field{:role => "stats", :class => "collapse in"}
       %div{:class => "panel-body"}
-        #totals
-          %span{:class => "label label-success"}= "OK: 0"
-          %span{:class => "label label-warning"}= "Warning: 2"
-          %span{:class => "label label-danger"}= "Critical: 2"
-          %span{:class => "label label-info"}= "Unknown: 1"
-        #bar_graph{:class => "progress"}
-          %div{:class => "progress-bar progress-bar-warning", :style => "width: 40%"}
-          %div{:class => "progress-bar progress-bar-danger", :style => "width: 40%"}
-          %div{:class => "progress-bar progress-bar-info", :style => "width: 20%"}
+        %div{:id => 'stats_status', :class => 'text-center'}
+          #totals
+            %span{:class => "label label-success"}= " - "
+            %span{:class => "label label-warning"}= " - "
+            %span{:class => "label label-danger"}= " - "
+            %span{:class => "label label-info"}= " - "
+          %canvas{:id => 'chart_pie_status', :class => ''}
+        %div{:id => 'stats_check', :class => 'text-center'}
+          %canvas{:id => 'chart_bar_check', :style => 'width: 400px; height: 600px;', :class => ''}
 
   #events{:class => "col-md-8 pull-right main-content", :style => "margin-bottom: 100px"}
     %div{:class => "panel panel-primary"}

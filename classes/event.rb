@@ -15,39 +15,40 @@ class Event
     options.delete_if { |k, v| v.nil? || v == [] }
 
     results = CURRENT_DB.all_docs(options.merge(include_docs: true, start_key: '"a"'))
-
-    {
-      count: results['total_rows'],
-      events: results['rows'].map do |r|
-        r['doc']['event']
-      end
-    }
   end
 
   # Example: Event.search("client:*cheftest001 AND status:warning", :bookmark => 'ABCD36',
   #                       :limit => 10,
   #                       :sort => [ 'status<string>', '-client<string>', '-issued<number>' ])
   def self.search(query, options = {})
-    options = { bookmark: nil, limit: nil, sort: [] }.merge(options)
+    # define facet range params for status attribute
+    ranges = '{"status":{"OK":"[0 TO 0]","Warning":"[1 TO 1]","Critical":"[2 TO 2]","Unknown":"[3 TO 3]"}}'
+    # define facet count param
+    counts = %w[ check client ]
+    options = { bookmark: nil, limit: nil, sort: [], include_docs: true, ranges: ranges, counts: counts }.merge(options)
     options.delete_if { |k, v| v.nil? || v == [] }
     # because couchrest doesn't handle arrays correctly
+    options[:counts] = options[:counts].to_s unless options[:counts].nil?
     options[:sort] = options[:sort].to_s unless options[:sort].nil?
 
     results = CURRENT_DB.view('_design/sabisu/_search/all_fields', options.merge(q: query))
-
-    { count: results['total_rows'],
-      bookmark: results['bookmark'],
-      events: results['rows'].map { |r| r['doc']['event'] } }
   end
 
   def self.update_design_doc
     # create search indexes
+    facet = %w[ status check client occurences ]
     fields = FIELDS.map do |k, v|
-      facet = k == 'output' ? '' : ", { 'facet': true }"
-      "
+      if facet.include?(k.to_s)
+        "
   if (typeof(doc.event.#{v}) !== 'undefined' && doc.event.#{v} !== null){
-    index('#{k}', doc.event.#{v}#{facet});
+    index('#{k}', doc.event.#{v}, { 'facet': true });
   }"
+      else
+        "
+  if (typeof(doc.event.#{v}) !== 'undefined' && doc.event.#{v} !== null){
+    index('#{k}', doc.event.#{v});
+  }"
+      end
     end
     search_function = "
 function(doc) {
