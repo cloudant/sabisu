@@ -53,3 +53,7 @@ li.list-group-item {
 	vertical-align: middle;
 }
 
+#stats_field .table {
+	font-size: 11px;
+}
+

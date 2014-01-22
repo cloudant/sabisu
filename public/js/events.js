@@ -39,6 +39,8 @@
   });
 
   sabisu.controller('eventsController', function($scope, $log, $location, eventsFactory) {
+    $scope.checks = [];
+    $scope.clients = [];
     $scope.events = [];
     $scope.events_spin = false;
     $scope.bulk = 'show';
@@ -64,7 +66,7 @@
       $location.search('sort', $scope.sort);
       $location.search('limit', $scope.limit);
       return eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
-        var checks, color, ctx, d, event, events, k, labels, statuses, statuses_data, v, values, _i, _len, _ref;
+        var checks, color, ctx, datapoints, event, events, k, statuses, statuses_data, v, _i, _len, _ref;
         color = ['success', 'warning', 'danger', 'info'];
         status = ['OK', 'Warning', 'Critical', 'Unknown'];
         events = [];
@@ -108,24 +110,25 @@
         }
         if ('counts' in data) {
           checks = data['counts']['check'];
-          labels = [];
-          values = [];
+          datapoints = [];
           for (k in checks) {
             v = checks[k];
-            labels.push(k);
-            values.push(v);
+            datapoints.push([k, v]);
           }
-          d = {
-            labels: labels,
-            datasets: [
-              {
-                fillColor: "rgba(220,220,220,0.5)",
-                strokeColor: "rgba(220,220,220,1)",
-                data: values
-              }
-            ]
-          };
-          ctx = $('#chart_bar_check').get(0).getContext('2d');
+          datapoints.sort(function(a, b) {
+            return a[1] - b[1];
+          });
+          $scope.checks = datapoints.reverse();
+          checks = data['counts']['client'];
+          datapoints = [];
+          for (k in checks) {
+            v = checks[k];
+            datapoints.push([k, v]);
+          }
+          datapoints.sort(function(a, b) {
+            return a[1] - b[1];
+          });
+          $scope.clients = datapoints.reverse();
         }
         if ('rows' in data) {
           _ref = data['rows'];

@@ -35,16 +35,37 @@
       %div{:class => "panel-heading"}
         %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#stats_field"}="Stats"
     #stats_field{:role => "stats", :class => "collapse in"}
-      %div{:class => "panel-body"}
-        %div{:id => 'stats_status', :class => 'text-center'}
+      %div{:class => "panel-body", 'ng-hide' => 'events_spin'}
+        %div{:id => 'stats_status', :class => 'text-center', 'ng-hide' => 'events_spin'}
           #totals
             %span{:class => "label label-success"}= " - "
             %span{:class => "label label-warning"}= " - "
             %span{:class => "label label-danger"}= " - "
             %span{:class => "label label-info"}= " - "
           %canvas{:id => 'chart_pie_status', :class => ''}
-        %div{:id => 'stats_check', :class => 'text-center'}
-          %canvas{:id => 'chart_bar_check', :style => 'width: 400px; height: 600px;', :class => ''}
+        %div{:id => 'stats_check'}
+          %h5="Check Stats"
+          %table{:class => 'table table-striped', 'ng-hide' => 'events_spin'}
+            %tr
+              %td="Check Name"
+              %td="Quantity"
+            %tr{'ng-repeat' => 'check in checks'}
+              %td
+                {{check[0]}}
+              %td
+                {{check[1]}}
+        %div{:id => 'stats_client'}
+          %h5="Client Stats"
+          %table{:class => 'table table-striped', 'ng-hide' => 'events_spin'}
+            %tr
+              %td="Client Name"
+              %td="Quantity"
+            %tr{'ng-repeat' => 'client in clients'}
+              %td
+                {{client[0]}}
+              %td
+                {{client[1]}}
+            
 
   #events{:class => "col-md-8 pull-right main-content", :style => "margin-bottom: 100px"}
     %div{:class => "panel panel-primary"}

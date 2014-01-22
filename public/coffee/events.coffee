@@ -27,6 +27,8 @@ sabisu.factory('eventsFactory', ($log, $http) ->
 )
 
 sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory) ->
+    $scope.checks = []
+    $scope.clients = []
     $scope.events = []
     $scope.events_spin = false
     $scope.bulk = 'show'
@@ -98,24 +100,25 @@ sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory) -
                 ctx = $('#chart_pie_status').get(0).getContext('2d')
                 new Chart(ctx).Pie(statuses_data)
             if 'counts' of data
+                # get check counts
                 checks = data['counts']['check']
-                labels = []
-                values = []
+                datapoints = []
                 for k,v of checks
-                    labels.push k
-                    values.push v
-                d = {
-                    labels: labels
-                    datasets: [
-                        {
-                            fillColor: "rgba(220,220,220,0.5)"
-                            strokeColor: "rgba(220,220,220,1)"
-                            data: values
-                        }
-                    ]
-                }
-                ctx = $('#chart_bar_check').get(0).getContext('2d')
-                # new Chart(ctx).Bar(d)
+                    datapoints.push [k, v]
+                datapoints.sort( (a, b) ->
+                    a[1] - b[1]
+                )
+                $scope.checks = datapoints.reverse()
+
+                # get client counts
+                checks = data['counts']['client']
+                datapoints = []
+                for k,v of checks
+                    datapoints.push [k, v]
+                datapoints.sort( (a, b) ->
+                    a[1] - b[1]
+                )
+                $scope.clients = datapoints.reverse()
             if 'rows' of data
                 for event in data['rows']
                     event = event['doc']['event']
