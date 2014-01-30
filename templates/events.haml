@@ -113,26 +113,32 @@
                       %a{"href" => "#", :target => '_self'}= "Dropdown link"
                 %div{:class => 'col-md-6 pull-left'}
                   %dl{:class => 'dl-horizontal'}
-                    %dt{:class => 'attr_title'}="issued"
-                    %dd{:class => 'attr_value'}
-                      {{ event.check.issued | date:'short' }}
-                    %dt{:class => 'attr_title'}="interval"
-                    %dd{:class => 'attr_value'}
-                      {{event.check.interval}}
-                    %dt{:class => 'attr_title'}="occurences"
-                    %dd{:class => 'attr_value'}
-                      {{event.occurrences}}
+                    %div{'ng-show' => 'event.check.issued'}
+                      %dt{:class => 'attr_title'}="issued"
+                      %dd{:class => 'attr_value'}
+                        {{ event.check.issued | date:'short' }}
+                    %div{'ng-show' => 'event.check.interval'}
+                      %dt{:class => 'attr_title'}="interval"
+                      %dd{:class => 'attr_value'}
+                        {{event.check.interval}}
+                    %div{'ng-show' => 'event.occurrences'}
+                      %dt{:class => 'attr_title'}="occurences"
+                      %dd{:class => 'attr_value'}
+                        {{event.occurrences}}
                 %div{:class => 'col-md-6 pull-right'}
                   %dl{:class => 'dl-horizontal'}
-                    %dt{:class => 'attr_title', 'ng-hide' => 'event.check.state_change'}="state change"
-                    %dd{:class => 'attr_value'}
-                      {{event.check.state_change | date:'short'}}
-                    %dt{:class => 'attr_title'}="subscribers"
-                    %dd{:class => 'attr_value'}
-                      {{event.check.subscribers | joinBy:', '}}
-                    %dt{:class => 'attr_title'}="handlers"
-                    %dd{:class => 'attr_value'}
-                      {{event.check.handlers  | joinBy:', '}}
+                    %div{'ng-show' => 'event.check.state_change'}
+                      %dt{:class => 'attr_title'}="state change"
+                      %dd{:class => 'attr_value'}
+                        {{event.check.state_change | date:'short'}}
+                    %div{'ng-show' => 'event.check.subscribers'}
+                      %dt{:class => 'attr_title'}="subscribers"
+                      %dd{:class => 'attr_value'}
+                        {{event.check.subscribers | joinBy:', '}}
+                    %div{'ng-show' => 'event.check.handlers'}
+                      %dt{:class => 'attr_title'}="handlers"
+                      %dd{:class => 'attr_value'}
+                        {{event.check.handlers  | joinBy:', '}}
                 %br
                 %br
                 %br
