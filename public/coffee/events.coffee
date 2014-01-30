@@ -179,8 +179,9 @@ sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory, s
 
     # expand/contract all events
     $scope.bulkToggleDetails = ->
+        mySwitch = $scope.bulk
         for event in $scope.events
-            $("#" + event['id']).collapse($scope.bulk)
+            $("#" + event['id']).collapse(mySwitch)
 
     # on hide switch glyhicon
     $('.collapse').on('hide.bs.collapse', ->
@@ -188,7 +189,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory, s
         $(@).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-up')
         $(@).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-down')
     )
-    # on shide switch glyhicon
+    # on show switch glyhicon
     $('.collapse').on('show.bs.collapse', ->
         $scope.bulk = 'hide'
         $(@).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-down')

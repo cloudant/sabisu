@@ -223,12 +223,13 @@
     };
     $scope.updateEvents();
     $scope.bulkToggleDetails = function() {
-      var event, _i, _len, _ref, _results;
+      var event, mySwitch, _i, _len, _ref, _results;
+      mySwitch = $scope.bulk;
       _ref = $scope.events;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         event = _ref[_i];
-        _results.push($("#" + event['id']).collapse($scope.bulk));
+        _results.push($("#" + event['id']).collapse(mySwitch));
       }
       return _results;
     };
