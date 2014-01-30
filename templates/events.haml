@@ -96,7 +96,10 @@
                   %h4
                     %span{:class => "label label-{{event.color}} pull-right"}="{{event.wstatus}}"
                 %h5{:class => "event_title pull-left"}
-                  {{event.client.name}} / {{event.check.name}}
+                  %span{'ng-show' => 'event.client.silenced', :class => 'glyphicon glyphicon-volume-off'}
+                  {{event.client.name}} / 
+                  %span{'ng-show' => 'event.check.silenced', :class => 'glyphicon glyphicon-volume-off'}
+                  {{event.check.name}}
                   %small{:class => 'text-muted muted-output'}
                     \- {{event.check.output}}
                 %h5

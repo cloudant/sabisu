@@ -44,10 +44,21 @@
     return factory;
   });
 
-  sabisu.controller('eventsController', function($scope, $log, $location, eventsFactory) {
+  sabisu.factory('stashesFactory', function($log, $http) {
+    var factory;
+    factory = {};
+    factory.stashes = function() {
+      return $http({
+        method: 'GET',
+        url: '/sensu/stashes'
+      });
+    };
+    return factory;
+  });
+
+  sabisu.controller('eventsController', function($scope, $log, $location, eventsFactory, stashesFactory) {
     $scope.checks = [];
     $scope.clients = [];
-    $scope.events = [];
     $scope.events_spin = false;
     $scope.bulk = 'show';
     if ($location.search().query != null) {
@@ -65,6 +76,59 @@
     } else {
       $scope.limit = '50';
     }
+    $scope.updateStashes = function() {
+      $scope.stashes = [];
+      return stashesFactory.stashes().success(function(data, status, headers, config) {
+        var check, client, event, parts, stash, _i, _j, _len, _len1, _ref, _results;
+        for (_i = 0, _len = data.length; _i < _len; _i++) {
+          stash = data[_i];
+          if (stash['path'].match(/^silence\//)) {
+            $scope.stashes.push(stash);
+          }
+        }
+        _ref = $scope.stashes;
+        _results = [];
+        for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+          stash = _ref[_j];
+          parts = stash['path'].split('/', 3);
+          client = parts[1];
+          if (parts.length > 2) {
+            check = parts[2];
+          } else {
+            check = null;
+          }
+          _results.push((function() {
+            var _base, _base1, _k, _len2, _ref1, _results1;
+            _ref1 = $scope.events;
+            _results1 = [];
+            for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+              event = _ref1[_k];
+              if ((_base = event.client).silenced == null) {
+                _base.silenced = false;
+              }
+              if ((_base1 = event.check).silenced == null) {
+                _base1.silenced = false;
+              }
+              if (client === event.client.name) {
+                if (check === null) {
+                  _results1.push(event.client.silenced = true);
+                } else {
+                  if (check === event.check.name) {
+                    _results1.push(event.check.silenced = true);
+                  } else {
+                    _results1.push(void 0);
+                  }
+                }
+              } else {
+                _results1.push(void 0);
+              }
+            }
+            return _results1;
+          })());
+        }
+        return _results;
+      });
+    };
     $scope.updateEvents = function() {
       $scope.events = [];
       $scope.events_spin = true;
@@ -146,8 +210,12 @@
             event['wstatus'] = status[event['check']['status']];
             event['rel_time'] = "2 hours ago";
             event['check']['issued'] = event['check']['issued'] * 1000;
+            if (event['check']['state_change'] != null) {
+              event['check']['state_change'] = event['check']['state_change'] * 1000;
+            }
             events.push(event);
           }
+          $scope.updateStashes();
           $scope.events_spin = false;
           return $scope.events = events;
         }

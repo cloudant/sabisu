@@ -6,7 +6,8 @@ def sensu(request)
   puts path
   opts = {
     path: path,
-    method: request.request_method
+    method: request.request_method,
+    ssl: true
   }
   begin
     opts[:payload] = JSON.parse(request.body.read)

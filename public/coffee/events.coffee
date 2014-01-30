@@ -31,10 +31,19 @@ sabisu.factory('eventsFactory', ($log, $http) ->
     factory
 )
 
-sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory) ->
+sabisu.factory('stashesFactory', ($log, $http) ->
+    factory = {}
+    factory.stashes = ->
+        $http(
+            method: 'GET'
+            url: '/sensu/stashes'
+        )
+    factory
+)
+
+sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory, stashesFactory) ->
     $scope.checks = []
     $scope.clients = []
-    $scope.events = []
     $scope.events_spin = false
     $scope.bulk = 'show'
 
@@ -54,6 +63,32 @@ sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory) -
     else
         $scope.limit = '50'
 
+    $scope.updateStashes = ->
+        $scope.stashes = []
+        stashesFactory.stashes().success( (data, status, headers, config) ->
+            for stash in data
+                # drop all non-silence stashes
+                if stash['path'].match(/^silence\//)
+                    $scope.stashes.push stash
+
+            for stash in $scope.stashes
+                parts = stash['path'].split('/', 3)
+                client = parts[1]
+                if parts.length > 2
+                    check = parts[2]
+                else
+                    check = null
+                for event in $scope.events
+                    event.client.silenced ?= false
+                    event.check.silenced ?= false
+                    if client == event.client.name
+                        if check == null
+                            event.client.silenced = true
+                        else
+                            if check == event.check.name
+                                event.check.silenced = true
+        )
+                
     $scope.updateEvents = ->
         # clear any currently displayed events
         $scope.events = []
@@ -132,8 +167,10 @@ sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory) -
                     event['wstatus'] = status[event['check']['status']]
                     event['rel_time'] = "2 hours ago"
                     event['check']['issued'] = event['check']['issued'] * 1000
-                    #event['check']['state_change'] = Date.parse(event['check']['state_change'])
+                    if event['check']['state_change']?
+                        event['check']['state_change'] = event['check']['state_change'] * 1000
                     events.push event
+                $scope.updateStashes()
                 # hide progress bar
                 $scope.events_spin = false
                 $scope.events = events
