@@ -8,6 +8,12 @@
     return $locationProvider.html5Mode(true);
   });
 
+  sabisu.filter('slice', function() {
+    return function(arr, start, end) {
+      return arr.slice(start, end);
+    };
+  });
+
   sabisu.filter('joinBy', function() {
     return function(input, delimiter) {
       return (input || []).join(delimiter || ',');
@@ -139,7 +145,7 @@
             event['color'] = color[event['check']['status']];
             event['wstatus'] = status[event['check']['status']];
             event['rel_time'] = "2 hours ago";
-            event['check']['issued'] = Date(event['check']['issued'] * 1000);
+            event['check']['issued'] = event['check']['issued'] * 1000;
             events.push(event);
           }
           $scope.events_spin = false;
@@ -160,13 +166,13 @@
     };
     $('.collapse').on('hide.bs.collapse', function() {
       $scope.bulk = 'show';
-      $(this).parent().find('.toggleBtn').removeClass('glyphicon-collapse-up');
-      return $(this).parent().find('.toggleBtn').addClass('glyphicon-collapse-down');
+      $(this).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-up');
+      return $(this).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-down');
     });
     $('.collapse').on('show.bs.collapse', function() {
       $scope.bulk = 'hide';
-      $(this).parent().find('.toggleBtn').removeClass('glyphicon-collapse-down');
-      return $(this).parent().find('.toggleBtn').addClass('glyphicon-collapse-up');
+      $(this).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-down');
+      return $(this).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-up');
     });
     return $scope.toggleDetails = function(id) {
       return $("#" + id).collapse('toggle');

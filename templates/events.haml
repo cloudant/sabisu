@@ -22,8 +22,8 @@
                 %option{:value => '-check'}= 'check (decending)'
                 %option{:value => 'status'}= 'status'
                 %option{:value => '-status'}= 'status (decending)'
-                %option{:value => 'issued', :selected => "selected"}= 'age'
-                %option{:value => '-issued'}= 'age (decending)'
+                %option{:value => 'age', :selected => "selected"}= 'age'
+                %option{:value => '-age'}= 'age (decending)'
                 %option{:value => 'issued'}= 'issued'
                 %option{:value => '-issued'}= 'issued (decending)'
                 %option{:value => 'output'}= 'output'
@@ -49,7 +49,7 @@
             %tr
               %td="Check Name"
               %td="Quantity"
-            %tr{'ng-repeat' => 'check in checks'}
+            %tr{'ng-repeat' => 'check in checks | slice:0:10'}
               %td
                 {{check[0]}}
               %td
@@ -60,7 +60,7 @@
             %tr
               %td="Client Name"
               %td="Quantity"
-            %tr{'ng-repeat' => 'client in clients'}
+            %tr{'ng-repeat' => 'client in clients | slice:0:10'}
               %td
                 {{client[0]}}
               %td
@@ -99,14 +99,23 @@
                   {{event.client.name}} / {{event.check.name}}
                   %small{:class => 'text-muted muted-output'}
                     \- {{event.check.output}}
-                %h4
-                  %span{:class => 'glyphicon glyphicon-collapse-down pull-right toggleBtn', 'ng-click' => "toggleDetails(event.id)"}
+                %h5
+                  %span{:class => 'glyphicon glyphicon-collapse-down toggleBtnIcon pull-right', 'ng-click' => "toggleDetails(event.id)"}
               %div{:class => "panel-body panel-collapse collapse", :id => "{{event.id}}"}
+                %div{:class => 'dropdown actions pull-right'}
+                  %button{:class => 'btn btn-xs dropdown-toggle', 'data-toggle' => 'dropdown'}
+                    Actions
+                    %span{:class => "caret"}
+                  %ul{:class => 'dropdown-menu'}
+                    %li
+                      %a{"href" => "#", :target => '_self'}= "Dropdown link"
+                    %li
+                      %a{"href" => "#", :target => '_self'}= "Dropdown link"
                 %div{:class => 'col-md-6 pull-left'}
                   %dl{:class => 'dl-horizontal'}
                     %dt{:class => 'attr_title'}="issued"
                     %dd{:class => 'attr_value'}
-                      {{event.check.issued | date:'medium'}}
+                      {{ event.check.issued | date:'short' }}
                     %dt{:class => 'attr_title'}="interval"
                     %dd{:class => 'attr_value'}
                       {{event.check.interval}}
@@ -117,7 +126,7 @@
                   %dl{:class => 'dl-horizontal'}
                     %dt{:class => 'attr_title', 'ng-hide' => 'event.check.state_change'}="state change"
                     %dd{:class => 'attr_value'}
-                      {{event.check.state_change | date:'medium'}}
+                      {{event.check.state_change | date:'short'}}
                     %dt{:class => 'attr_title'}="subscribers"
                     %dd{:class => 'attr_value'}
                       {{event.check.subscribers | joinBy:', '}}

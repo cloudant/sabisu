@@ -17,6 +17,7 @@ li.list-group-item {
 	position: relative;
 	overflow: hidden;
 	background-color: #EEE;
+	z-index: 1;
 }
 
 .attr_title {
@@ -28,10 +29,14 @@ li.list-group-item {
 }
 
 .event_title {
-	width: 75%;
+	width: 78%;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.dropdown-menu {
+	z-index: 2000;
 }
 
 .output {
@@ -62,7 +67,18 @@ li.list-group-item {
 	font-size: 11px;
 }
 
-.toggleBtn {
+.toggleBtnIcon {
 	cursor: pointer;
+	margin-right: 10px;
+}
+
+.action {
+	position: absolute;
+}
+
+button.btn.btn-xs.dropdown-toggle {
+	position: relative;
+	right: 0;
+	top: 0;
 }
 

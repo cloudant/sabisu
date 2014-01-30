@@ -4,6 +4,11 @@ sabisu.config( ($locationProvider) ->
     $locationProvider.html5Mode(true)
 )
 
+sabisu.filter('slice', ->
+    (arr, start, end) ->
+        arr.slice(start,end)
+)
+
 sabisu.filter('joinBy', ->
     (input, delimiter) ->
         (input || []).join(delimiter || ',')
@@ -126,7 +131,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory) -
                     event['color'] = color[event['check']['status']]
                     event['wstatus'] = status[event['check']['status']]
                     event['rel_time'] = "2 hours ago"
-                    event['check']['issued'] = Date(event['check']['issued'] * 1000)
+                    event['check']['issued'] = event['check']['issued'] * 1000
                     #event['check']['state_change'] = Date.parse(event['check']['state_change'])
                     events.push event
                 # hide progress bar
@@ -143,14 +148,14 @@ sabisu.controller('eventsController', ($scope, $log, $location, eventsFactory) -
     # on hide switch glyhicon
     $('.collapse').on('hide.bs.collapse', ->
         $scope.bulk = 'show'
-        $(@).parent().find('.toggleBtn').removeClass('glyphicon-collapse-up')
-        $(@).parent().find('.toggleBtn').addClass('glyphicon-collapse-down')
+        $(@).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-up')
+        $(@).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-down')
     )
     # on shide switch glyhicon
     $('.collapse').on('show.bs.collapse', ->
         $scope.bulk = 'hide'
-        $(@).parent().find('.toggleBtn').removeClass('glyphicon-collapse-down')
-        $(@).parent().find('.toggleBtn').addClass('glyphicon-collapse-up')
+        $(@).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-down')
+        $(@).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-up')
     )
 
     # toggle expand/contract event
