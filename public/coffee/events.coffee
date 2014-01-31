@@ -75,28 +75,22 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
 <dl class="dl-horizontal">
   <dt>Created</dt>
   <dd>#{$filter('date')((stash['content']['timestamp'] * 1000), "short")}</dd>
-</dl>
 """
             if stash['content']['author']?
                 html += """
-<dl class="dl-horizontal">
   <dt>Author</dt>
   <dd>#{stash['content']['author']}</dd>
-</dl>
 """
             if stash['content']['expires']?
                 html += """
-<dl class="dl-horizontal text-danger">
-  <dt>Expires in</dt>
-  <dd>#{stash['content']['expires']}</dd>
-</dl>
+  <dt class="text-danger">Expires in</dt>
+  <dd class="text-danger">#{stash['content']['expires']}</dd>
 """
             if stash['content']['on_resolve']?
                 html += """
-<dl class="dl-horizontal text-success">
-  <dt>Delete on resolve</dt>
-</dl>
+  <dt class="text-success">Delete on resolve</dt>
 """
+            html += "</dl>"
             if stash['content']['comment']?
                 html += """
 <dl>

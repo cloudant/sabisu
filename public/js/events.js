@@ -86,17 +86,18 @@
         stash['content']['expires'] = "8 hours";
         html = '<div class="silence_window">';
         if (stash['content']['timestamp'] != null) {
-          html = "<dl class=\"dl-horizontal\">\n  <dt>Created</dt>\n  <dd>" + ($filter('date')(stash['content']['timestamp'] * 1000, "short")) + "</dd>\n</dl>";
+          html = "<dl class=\"dl-horizontal\">\n  <dt>Created</dt>\n  <dd>" + ($filter('date')(stash['content']['timestamp'] * 1000, "short")) + "</dd>";
         }
         if (stash['content']['author'] != null) {
-          html += "<dl class=\"dl-horizontal\">\n  <dt>Author</dt>\n  <dd>" + stash['content']['author'] + "</dd>\n</dl>";
+          html += "<dt>Author</dt>\n<dd>" + stash['content']['author'] + "</dd>";
         }
         if (stash['content']['expires'] != null) {
-          html += "<dl class=\"dl-horizontal text-danger\">\n  <dt>Expires in</dt>\n  <dd>" + stash['content']['expires'] + "</dd>\n</dl>";
+          html += "<dt class=\"text-danger\">Expires in</dt>\n<dd class=\"text-danger\">" + stash['content']['expires'] + "</dd>";
         }
         if (stash['content']['on_resolve'] != null) {
-          html += "<dl class=\"dl-horizontal text-success\">\n  <dt>Delete on resolve</dt>\n</dl>";
+          html += "<dt class=\"text-success\">Delete on resolve</dt>";
         }
+        html += "</dl>";
         if (stash['content']['comment'] != null) {
           html += "<dl>\n  <dt>Comment</dt>\n  <dd>" + stash['content']['comment'] + "</dd>\n</dl>";
         }
