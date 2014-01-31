@@ -72,6 +72,10 @@ li.list-group-item {
 	margin-right: 10px;
 }
 
+.silenceBtn {
+    cursor: pointer;
+}
+
 .action {
 	position: absolute;
 }
@@ -82,3 +86,16 @@ button.btn.btn-xs.dropdown-toggle {
 	top: 0;
 }
 
+.popover {
+    min-width: 400px;
+}
+
+div.popover-content {
+	margin-bottom: 40px;
+}
+
+button.deleteSilenceBtn {
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+}

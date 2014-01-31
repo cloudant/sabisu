@@ -96,9 +96,9 @@
                   %h4
                     %span{:class => "label label-{{event.color}} pull-right"}="{{event.wstatus}}"
                 %h5{:class => "event_title pull-left"}
-                  %span{'ng-show' => 'event.client.silenced', :class => 'glyphicon glyphicon-volume-off'}
+                  %span{'ng-show' => 'event.client.silenced', :class => 'silenceBtn glyphicon glyphicon-volume-off', 'data-toggle' => 'popover', 'data-content' => '{{event.client.silence_html}}'}
                   {{event.client.name}} / 
-                  %span{'ng-show' => 'event.check.silenced', :class => 'glyphicon glyphicon-volume-off'}
+                  %span{'ng-show' => 'event.check.silenced', :class => 'silenceBtn glyphicon glyphicon-volume-off', 'data-toggle' => 'popover', 'data-content' => '{{event.check.silence_html}}'}
                   {{event.check.name}}
                   %small{:class => 'text-muted muted-output'}
                     \- {{event.check.output}}
@@ -106,7 +106,7 @@
                   %span{:class => 'glyphicon glyphicon-collapse-down toggleBtnIcon pull-right', 'ng-click' => "toggleDetails(event.id)"}
               %div{:class => "panel-body panel-collapse collapse", :id => "{{event.id}}"}
                 %div{:class => 'dropdown actions pull-right'}
-                  %button{:class => 'btn btn-xs dropdown-toggle', 'data-toggle' => 'dropdown'}
+                  %button{:class => 'btn btn-link dropdown-toggle', 'data-toggle' => 'dropdown'}
                     Actions
                     %span{:class => "caret"}
                   %ul{:class => 'dropdown-menu'}

@@ -56,7 +56,7 @@
     return factory;
   });
 
-  sabisu.controller('eventsController', function($scope, $log, $location, eventsFactory, stashesFactory) {
+  sabisu.controller('eventsController', function($scope, $log, $location, $filter, eventsFactory, stashesFactory) {
     $scope.checks = [];
     $scope.clients = [];
     $scope.events_spin = false;
@@ -77,9 +77,34 @@
       $scope.limit = '50';
     }
     $scope.updateStashes = function() {
+      var buildSilencePopover;
       $scope.stashes = [];
+      buildSilencePopover = function(stash) {
+        var html;
+        stash['content']['author'] = "cbarraford";
+        stash['content']['comment'] = "herp herp derp";
+        stash['content']['expires'] = "8 hours";
+        html = '<div class="silence_window">';
+        if (stash['content']['timestamp'] != null) {
+          html = "<dl class=\"dl-horizontal\">\n  <dt>Created</dt>\n  <dd>" + ($filter('date')(stash['content']['timestamp'] * 1000, "short")) + "</dd>\n</dl>";
+        }
+        if (stash['content']['author'] != null) {
+          html += "<dl class=\"dl-horizontal\">\n  <dt>Author</dt>\n  <dd>" + stash['content']['author'] + "</dd>\n</dl>";
+        }
+        if (stash['content']['expires'] != null) {
+          html += "<dl class=\"dl-horizontal text-danger\">\n  <dt>Expires in</dt>\n  <dd>" + stash['content']['expires'] + "</dd>\n</dl>";
+        }
+        if (stash['content']['on_resolve'] != null) {
+          html += "<dl class=\"dl-horizontal text-success\">\n  <dt>Delete on resolve</dt>\n</dl>";
+        }
+        if (stash['content']['comment'] != null) {
+          html += "<dl>\n  <dt>Comment</dt>\n  <dd>" + stash['content']['comment'] + "</dd>\n</dl>";
+        }
+        html += "<button type=\"button\" class=\"deleteSilenceBtn btn btn-danger btn-sm pull-right\">\n    <span class=\"glyphicon glyphicon-remove\"></span> Delete\n</button>";
+        return html += "</div>";
+      };
       return stashesFactory.stashes().success(function(data, status, headers, config) {
-        var check, client, event, parts, stash, _i, _j, _len, _len1, _ref, _results;
+        var check, client, event, parts, stash, _base, _base1, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
         for (_i = 0, _len = data.length; _i < _len; _i++) {
           stash = data[_i];
           if (stash['path'].match(/^silence\//)) {
@@ -87,7 +112,6 @@
           }
         }
         _ref = $scope.stashes;
-        _results = [];
         for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
           stash = _ref[_j];
           parts = stash['path'].split('/', 3);
@@ -97,37 +121,40 @@
           } else {
             check = null;
           }
-          _results.push((function() {
-            var _base, _base1, _k, _len2, _ref1, _results1;
-            _ref1 = $scope.events;
-            _results1 = [];
-            for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
-              event = _ref1[_k];
-              if ((_base = event.client).silenced == null) {
-                _base.silenced = false;
-              }
-              if ((_base1 = event.check).silenced == null) {
-                _base1.silenced = false;
-              }
-              if (client === event.client.name) {
-                if (check === null) {
-                  _results1.push(event.client.silenced = true);
-                } else {
-                  if (check === event.check.name) {
-                    _results1.push(event.check.silenced = true);
-                  } else {
-                    _results1.push(void 0);
-                  }
-                }
+          _ref1 = $scope.events;
+          for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+            event = _ref1[_k];
+            if ((_base = event.client).silenced == null) {
+              _base.silenced = false;
+            }
+            if ((_base1 = event.check).silenced == null) {
+              _base1.silenced = false;
+            }
+            if (client === event.client.name) {
+              if (check === null) {
+                event.client.silenced = true;
+                event.client.silence_html = buildSilencePopover(stash);
               } else {
-                _results1.push(void 0);
+                if (check === event.check.name) {
+                  event.check.silenced = true;
+                  event.check.silence_html = buildSilencePopover(stash);
+                }
               }
             }
-            return _results1;
-          })());
+          }
         }
-        return _results;
+        return $('.silenceBtn').popover({
+          trigger: 'click',
+          html: true,
+          placement: 'top',
+          container: 'body',
+          title: "Silence Details <button type=\"button\" class=\"btn btn-link btn-xs pull-right\"><span class=\"glyphicon glyphicon-remove\"></span>close</button>"
+        });
       });
+    };
+    $scope.closePopovers = function() {
+      $log.info('closing popovers');
+      return $('.silenceBtn').popover('hide');
     };
     $scope.updateEvents = function() {
       $scope.events = [];
@@ -243,8 +270,12 @@
       $(this).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-down');
       return $(this).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-up');
     });
-    return $scope.toggleDetails = function(id) {
+    $scope.toggleDetails = function(id) {
       return $("#" + id).collapse('toggle');
+    };
+    return $scope.togglePopover = function() {
+      $(this).popover();
+      return $(this).popover('toggle');
     };
   });
 
