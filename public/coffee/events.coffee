@@ -34,9 +34,17 @@ sabisu.factory('eventsFactory', ($log, $http) ->
 sabisu.factory('stashesFactory', ($log, $http) ->
     factory = {}
     factory.stashes = ->
-        $http(
-            method: 'GET'
-            url: '/sensu/stashes'
+        $http.get(
+            '/sensu/stashes'
+        )
+    factory.saveStash = (stash) ->
+        $http.post(
+            "/sensu/stashes",
+            stash
+        )
+    factory.deleteStash = (path) ->
+        $http.delete(
+            "/sensu/stashes/#{path}"
         )
     factory
 )
@@ -136,11 +144,98 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                 container: 'body'
                 title: """Silence Details <button type="button" class="btn btn-link btn-xs pull-right"><span class="glyphicon glyphicon-remove"></span>close</button>"""
             )
+            $('.glyphicon-question-sign').tooltip(
+            )
         )
 
     $scope.closePopovers = ->
-        $log.info 'closing popovers'
         $('.silenceBtn').popover('hide')
+
+    $scope.updateSilencePath = (path) ->
+        $scope.silencePath = path
+
+    $scope.saveSilence = ->
+        valid = true
+        # check that input fields are valid
+        author = $('#author').val()
+        if author == ''
+            $('.silence_author').removeClass('has-success')
+            $('.silence_author').addClass('has-error')
+            valid = false
+        else
+            $('.silence_author').removeClass('has-error') 
+            $('.silence_author').addClass('has-success')
+        comment = $('#comment').val()
+        if comment == ''
+            $('.silence_comment').removeClass('has-success')
+            $('.silence_comment').addClass('has-error')
+            valid = false
+        else
+            $('.silence_comment').removeClass('has-error')
+            $('.silence_comment').addClass('has-success')
+
+        timer_val = $('#timer_val').val()
+        expiration = $('input[name=expiration]:checked', '#silence_form').val()
+        if expiration == 'timer'
+            re = new RegExp('^\\d*(m|h|d|w)$')
+            if re.test(timer_val)
+                $('.silence_timer_val').removeClass('has-error')
+                $('.silence_timer_val').addClass('has-success')
+            else
+                $('.silence_timer_val').removeClass('has-success')
+                $('.silence_timer_val').addClass('has-error')
+                valid = false
+        else
+            $('.silence_timer_val').removeClass('has-error')
+            $('.silence_timer_val').removeClass('has-success')
+
+        # convert timer_val from shorthand to number of total seconds
+        timerToSec = (val) ->
+            q = new RegExp('^\\d.*')
+            u = new RegExp('[a-z]$')
+            conversion =
+                m: 60
+                h: 60 * 60
+                d: 60 * 60 * 24
+                w: 60 * 60 * 24 * 7
+            quantity = val.match(q)[0]
+            unit = val.match(u)[0]
+            quantity * conversion[unit]
+
+        # if field validity checks are good, save it
+        if valid
+            $log.info "Saving stash"
+            stash = {}
+            stash['path'] = "silence/" + $scope.silencePath
+            stash['content'] = {}
+            stash['content']['timestamp'] = Math.round( (new Date().getTime()) / 1000)
+            stash['content']['author'] = author
+            stash['content']['comment'] = comment
+            stash['content']['expiration'] = expiration
+            stash['content']['expires'] = timerToSec(timer_val) if expiration == 'timer'
+            $log.info stash
+            stashesFactory.saveStash(stash).success( (data, status, headers, config) ->
+                $log.info "Success."
+                # clean the modal
+                author = $('#author').val()
+                $('.silence_author').removeClass('has-success')
+                $('.silence_author').removeClass('has-error')
+                comment = $('#comment').val()
+                $('.silence_comment').removeClass('has-success')
+                $('.silence_comment').removeClass('has-error')
+                timer_val = $('#timer_val').val()
+                expiration = $('input[name=expiration]:checked', '#silence_form').val()
+                $('.silence_timer_val').removeClass('has-error')
+                $('.silence_timer_val').removeClass('has-success')
+                # close the modal
+                $('#silence_window').modal('hide')
+            ).error( (data, status, headers, config) ->
+                $log.error "Failure."
+                alert "Failed to silence: (#{status}) #{data}"
+            )
+
+    $scope.deleteSilence = (path) ->
+        stashesFactory.deleteStash(path)
 
     $scope.updateEvents = ->
         # clear any currently displayed events

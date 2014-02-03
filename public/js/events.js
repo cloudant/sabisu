@@ -48,10 +48,13 @@
     var factory;
     factory = {};
     factory.stashes = function() {
-      return $http({
-        method: 'GET',
-        url: '/sensu/stashes'
-      });
+      return $http.get('/sensu/stashes');
+    };
+    factory.saveStash = function(stash) {
+      return $http.post("/sensu/stashes", stash);
+    };
+    factory.deleteStash = function(path) {
+      return $http["delete"]("/sensu/stashes/" + path);
     };
     return factory;
   });
@@ -144,18 +147,107 @@
             }
           }
         }
-        return $('.silenceBtn').popover({
+        $('.silenceBtn').popover({
           trigger: 'click',
           html: true,
           placement: 'top',
           container: 'body',
           title: "Silence Details <button type=\"button\" class=\"btn btn-link btn-xs pull-right\"><span class=\"glyphicon glyphicon-remove\"></span>close</button>"
         });
+        return $('.glyphicon-question-sign').tooltip();
       });
     };
     $scope.closePopovers = function() {
-      $log.info('closing popovers');
       return $('.silenceBtn').popover('hide');
+    };
+    $scope.updateSilencePath = function(path) {
+      return $scope.silencePath = path;
+    };
+    $scope.saveSilence = function() {
+      var author, comment, expiration, re, stash, timerToSec, timer_val, valid;
+      valid = true;
+      author = $('#author').val();
+      if (author === '') {
+        $('.silence_author').removeClass('has-success');
+        $('.silence_author').addClass('has-error');
+        valid = false;
+      } else {
+        $('.silence_author').removeClass('has-error');
+        $('.silence_author').addClass('has-success');
+      }
+      comment = $('#comment').val();
+      if (comment === '') {
+        $('.silence_comment').removeClass('has-success');
+        $('.silence_comment').addClass('has-error');
+        valid = false;
+      } else {
+        $('.silence_comment').removeClass('has-error');
+        $('.silence_comment').addClass('has-success');
+      }
+      timer_val = $('#timer_val').val();
+      expiration = $('input[name=expiration]:checked', '#silence_form').val();
+      if (expiration === 'timer') {
+        re = new RegExp('^\\d*(m|h|d|w)$');
+        if (re.test(timer_val)) {
+          $('.silence_timer_val').removeClass('has-error');
+          $('.silence_timer_val').addClass('has-success');
+        } else {
+          $('.silence_timer_val').removeClass('has-success');
+          $('.silence_timer_val').addClass('has-error');
+          valid = false;
+        }
+      } else {
+        $('.silence_timer_val').removeClass('has-error');
+        $('.silence_timer_val').removeClass('has-success');
+      }
+      timerToSec = function(val) {
+        var conversion, q, quantity, u, unit;
+        q = new RegExp('^\\d.*');
+        u = new RegExp('[a-z]$');
+        conversion = {
+          m: 60,
+          h: 60 * 60,
+          d: 60 * 60 * 24,
+          w: 60 * 60 * 24 * 7
+        };
+        quantity = val.match(q)[0];
+        unit = val.match(u)[0];
+        return quantity * conversion[unit];
+      };
+      if (valid) {
+        $log.info("Saving stash");
+        stash = {};
+        stash['path'] = "silence/" + $scope.silencePath;
+        stash['content'] = {};
+        stash['content']['timestamp'] = Math.round((new Date().getTime()) / 1000);
+        stash['content']['author'] = author;
+        stash['content']['comment'] = comment;
+        stash['content']['expiration'] = expiration;
+        if (expiration === 'timer') {
+          stash['content']['expires'] = timerToSec(timer_val);
+        }
+        $log.info(stash);
+        return stashesFactory.saveStash(stash).success(function(data, status, headers, config) {
+          $log.info("Success.");
+          author = $('#author').val();
+          $('.silence_author').removeClass('has-success');
+          $('.silence_author').removeClass('has-error');
+          comment = $('#comment').val();
+          $('.silence_comment').removeClass('has-success');
+          $('.silence_comment').removeClass('has-error');
+          timer_val = $('#timer_val').val();
+          expiration = $('input[name=expiration]:checked', '#silence_form').val();
+          $('.silence_timer_val').removeClass('has-error');
+          $('.silence_timer_val').removeClass('has-success');
+          return $('#silence_window').modal('hide');
+        }).error(function(data, status, headers, config) {
+          $log.error("Failure.");
+          return alert("Failed to silence: (" + status + ") " + data);
+        });
+      }
+    };
+    $scope.deleteSilence = function(path) {
+      return stashesFactory.deleteStash(path);
     };
     $scope.updateEvents = function() {
       $scope.events = [];

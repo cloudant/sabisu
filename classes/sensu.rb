@@ -22,7 +22,7 @@ class Sensu
         opts[:path],
         initheader = proxy_header.merge!('Content-Type' => 'application/json')
       )
-      req.body = opts[:payload]
+      req.body = opts[:payload].to_json
     end
     req.basic_auth(API_USER, API_PASSWORD) if API_USER && API_PASSWORD
     begin

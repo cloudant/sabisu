@@ -110,10 +110,14 @@
                     Actions
                     %span{:class => "caret"}
                   %ul{:class => 'dropdown-menu'}
+                    %li{:class => 'disabled'}
+                      %a{"href" => "#", 'ng-click' => '#'}= "Resolve"
+                    %li{:class => 'divider'}
+                    %li{:class => 'dropdown-header'}="Silence"
                     %li
-                      %a{"href" => "#", :target => '_self'}= "Dropdown link"
+                      %a{"href" => "#", 'ng-click' => 'updateSilencePath(event.client.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'}= "Client"
                     %li
-                      %a{"href" => "#", :target => '_self'}= "Dropdown link"
+                      %a{"href" => "#", 'ng-click' => 'updateSilencePath(event.client.name + "/" + event.check.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'}= "Check"
                 %div{:class => 'col-md-6 pull-left'}
                   %dl{:class => 'dl-horizontal'}
                     %div{'ng-show' => 'event.check.issued'}
@@ -147,6 +151,45 @@
                 %br
                 %div{:class => 'col-md-12 pull-left output'}
                   {{event.check.output}}
+  %div{:class => 'modal fade', :id => 'silence_window'}
+    %div{:class => 'modal-dialog'}
+      %div{:class => 'modal-content'}
+        %div{:class => 'modal-header'}
+          %button{:type => "button", :class => "close pull-right", 'data-dismiss' => "modal", 'aria-hidden' => "true"}
+          %h4{:class => 'modal-title'}= "Silence {{silencePath}}"
+        %div{:class => 'modal-body'}
+          %form{:class => 'form-horizontal', :role => 'form', :id => 'silence_form'}
+            %div{:class => 'form-group silence_author has-feedback'}
+              %label{:for => 'author', :class => 'col-sm-2 control-label'}= "Author*"
+              %div{:class => 'col-sm-10'}
+                %input{:type => 'text', :class => 'form-control', :id => 'author', :placeholder => 'Joe Smith'}
+            %div{:class => 'form-group silence_comment has-feedback'}
+              %label{:for => 'comment', :class => 'col-sm-2 control-label'}= "Comment*"
+              %div{:class => 'col-sm-10'}
+                %textarea{:class => 'form-control', :id => 'comment', :placeholder => 'Enter comments here', :rows => '3'}
+            %div{:class => 'form-group'}
+              %label{:for => 'expires', :class => 'col-sm-2 control-label'}="Expiration*"
+              %div{:class => 'col-sm-10'}
+                %div{:class => 'radio'}
+                  %label
+                    %input{:type => 'radio', :name => 'expiration', :id => 'resolve', :value => 'resolve', :checked => ''}
+                    On resolve
+                    %span{:class => 'glyphicon glyphicon-question-sign', 'data-toggle' => 'tooltip', 'data-placement' => 'right', :title => '"On resolve" will cause this silence to be deleted once the check clears for check, clients require all checks to clear. A minimum of 1 hour is enforced.'}
+                %div{:class => 'radio'}
+                  %label
+                    %input{:type => 'radio', :name => 'expiration', :id => 'timer', :value => 'timer'}
+                    %span{:class => 'pull-left'}="Timer"
+                    %div{:class => 'col-sm-3 silence_timer_val has-feedback'}
+                      %input{:type => 'text', :name => 'expirationl', :id => 'timer_val', :class => 'input-sm form-control', :placeholder => ''}
+                    %span{:class => 'glyphicon glyphicon-question-sign', 'data-toggle' => 'tooltip', 'data-placement' => 'right', :title => '"Timer" will cause this silence to be deleted in a predetermined time span. The expires value should be inputted as a number followed by a single character. m = minutes, h = hours, d = days, w = weeks. (examples 15m, 2h, 1d, 5w)'}
+                %div{:class => 'radio'}
+                  %label
+                    %input{:type => 'radio', :name => 'expiration', :id => 'never', :value => 'never'}
+                    Never
+                    %span{:class => 'glyphicon glyphicon-question-sign', 'data-toggle' => 'tooltip', 'data-placement' => 'right', :title => '"Never" will cause this silence to, surprise surprise, never expire. It will remain silence until yourself or someone else manually deletes the silence. It is highly discourage to permanently silence anything. Its extremely rare that that is ever the correct action.'}
+          %div{:class => 'modal-footer'}
+            %button{:type => 'submit', :class => 'btn btn-default pull-right', 'ng-click' => 'saveSilence()'}= "Create"
+
 %div{:class => 'modal fade', :id => 'howdoisearch'}
   %div{:class => 'modal-dialog'}
     %div{:class => 'modal-content'}
