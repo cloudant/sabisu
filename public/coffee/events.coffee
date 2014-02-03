@@ -204,7 +204,6 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
 
         # if field validity checks are good, save it
         if valid
-            $log.info "Saving stash"
             stash = {}
             stash['path'] = "silence/" + $scope.silencePath
             stash['content'] = {}
@@ -213,9 +212,9 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             stash['content']['comment'] = comment
             stash['content']['expiration'] = expiration
             stash['content']['expires'] = timerToSec(timer_val) if expiration == 'timer'
-            $log.info stash
             stashesFactory.saveStash(stash).success( (data, status, headers, config) ->
-                $log.info "Success."
+                # update stashes displayed
+                $scope.updateStashes()
                 # clean the modal
                 author = $('#author').val()
                 $('.silence_author').removeClass('has-success')
@@ -230,7 +229,6 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                 # close the modal
                 $('#silence_window').modal('hide')
             ).error( (data, status, headers, config) ->
-                $log.error "Failure."
                 alert "Failed to silence: (#{status}) #{data}"
             )
 

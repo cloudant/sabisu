@@ -215,7 +215,6 @@
         return quantity * conversion[unit];
       };
       if (valid) {
-        $log.info("Saving stash");
         stash = {};
         stash['path'] = "silence/" + $scope.silencePath;
         stash['content'] = {};
@@ -226,9 +225,8 @@
         if (expiration === 'timer') {
           stash['content']['expires'] = timerToSec(timer_val);
         }
-        $log.info(stash);
         return stashesFactory.saveStash(stash).success(function(data, status, headers, config) {
-          $log.info("Success.");
+          $scope.updateStashes();
           author = $('#author').val();
           $('.silence_author').removeClass('has-success');
           $('.silence_author').removeClass('has-error');
@@ -241,7 +239,6 @@
           $('.silence_timer_val').removeClass('has-success');
           return $('#silence_window').modal('hide');
         }).error(function(data, status, headers, config) {
-          $log.error("Failure.");
           return alert("Failed to silence: (" + status + ") " + data);
         });
       }
