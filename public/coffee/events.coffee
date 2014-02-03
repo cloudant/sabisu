@@ -111,7 +111,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
 </dl>
 """
             html += """
-<button type="button" class="deleteSilenceBtn btn btn-danger btn-sm pull-right" ng-click="deleteSilence(#{stash['path']})">
+<button type="button" class="deleteSilenceBtn btn btn-danger btn-sm pull-right" onclick="angular.element($('#eventsController')).scope().deleteSilence('#{stash['path']}')">
     <span class="glyphicon glyphicon-remove"></span> Delete
 </button>
 """
@@ -137,10 +137,12 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                         if check == null
                             event.client.silenced = true
                             event.client.silence_html = buildSilencePopover(stash)
+                            break
                         else
                             if check == event.check.name
                                 event.check.silenced = true
                                 event.check.silence_html = buildSilencePopover(stash)
+                                break
             $('.silenceBtn').popover(
                 trigger: 'click'
                 html: true
@@ -254,8 +256,9 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     $scope.deleteSilence = (path) ->
         $log.info 'delete silence'
         stashesFactory.deleteStash(path).success( (data, status, headers, config) ->
+            $log.info "success."
             $scope.updateStashes()
-            $scope.closePopovers
+            $scope.closePopovers()
         ).error( (data, status, headers, config) ->
             alert "Failed to delete silence"
         )

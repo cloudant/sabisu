@@ -105,7 +105,7 @@
         if (stash['content']['comment'] != null) {
           html += "<dl>\n  <dt>Comment</dt>\n  <dd>" + stash['content']['comment'] + "</dd>\n</dl>";
         }
-        html += "<button type=\"button\" class=\"deleteSilenceBtn btn btn-danger btn-sm pull-right\" ng-click=\"deleteSilence(" + stash['path'] + ")\">\n    <span class=\"glyphicon glyphicon-remove\"></span> Delete\n</button>";
+        html += "<button type=\"button\" class=\"deleteSilenceBtn btn btn-danger btn-sm pull-right\" onclick=\"angular.element($('#eventsController')).scope().deleteSilence('" + stash['path'] + "')\">\n    <span class=\"glyphicon glyphicon-remove\"></span> Delete\n</button>";
         return html += "</div>";
       };
       return stashesFactory.stashes().success(function(data, status, headers, config) {
@@ -139,10 +139,12 @@
               if (check === null) {
                 event.client.silenced = true;
                 event.client.silence_html = buildSilencePopover(stash);
+                break;
               } else {
                 if (check === event.check.name) {
                   event.check.silenced = true;
                   event.check.silence_html = buildSilencePopover(stash);
+                  break;
                 }
               }
             }
@@ -258,8 +260,9 @@
     $scope.deleteSilence = function(path) {
       $log.info('delete silence');
       return stashesFactory.deleteStash(path).success(function(data, status, headers, config) {
+        $log.info("success.");
         $scope.updateStashes();
-        return $scope.closePopovers;
+        return $scope.closePopovers();
       }).error(function(data, status, headers, config) {
         return alert("Failed to delete silence");
       });
