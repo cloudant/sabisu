@@ -83,10 +83,7 @@
       var buildSilencePopover;
       $scope.stashes = [];
       buildSilencePopover = function(stash) {
-        var html;
-        stash['content']['author'] = "cbarraford";
-        stash['content']['comment'] = "herp herp derp";
-        stash['content']['expires'] = "8 hours";
+        var html, rel_time;
         html = '<div class="silence_window">';
         if (stash['content']['timestamp'] != null) {
           html = "<dl class=\"dl-horizontal\">\n  <dt>Created</dt>\n  <dd>" + ($filter('date')(stash['content']['timestamp'] * 1000, "short")) + "</dd>";
@@ -95,16 +92,20 @@
           html += "<dt>Author</dt>\n<dd>" + stash['content']['author'] + "</dd>";
         }
         if (stash['content']['expires'] != null) {
-          html += "<dt class=\"text-danger\">Expires in</dt>\n<dd class=\"text-danger\">" + stash['content']['expires'] + "</dd>";
+          rel_time = moment.unix(parseInt(stash['content']['expires'])).fromNow();
+          html += "<dt class=\"text-warning\">Expires</dt>\n<dd class=\"text-warning\">" + rel_time + "</dd>";
         }
-        if (stash['content']['on_resolve'] != null) {
-          html += "<dt class=\"text-success\">Delete on resolve</dt>";
+        if (stash['content']['expiration'] === 'resolve') {
+          html += "<dt class=\"text-success\">Expires</dt>\n<dd class=\"text-success\">On resolve</dt>";
+        }
+        if (stash['content']['expiration'] === 'never') {
+          html += "<dt class=\"text-danger\">Expires</dt>\n<dd class=\"text-danger\">Never</dt>";
         }
         html += "</dl>";
         if (stash['content']['comment'] != null) {
           html += "<dl>\n  <dt>Comment</dt>\n  <dd>" + stash['content']['comment'] + "</dd>\n</dl>";
         }
-        html += "<button type=\"button\" class=\"deleteSilenceBtn btn btn-danger btn-sm pull-right\">\n    <span class=\"glyphicon glyphicon-remove\"></span> Delete\n</button>";
+        html += "<button type=\"button\" class=\"deleteSilenceBtn btn btn-danger btn-sm pull-right\" ng-click=\"deleteSilence(" + stash['path'] + ")\">\n    <span class=\"glyphicon glyphicon-remove\"></span> Delete\n</button>";
         return html += "</div>";
       };
       return stashesFactory.stashes().success(function(data, status, headers, config) {
@@ -152,7 +153,18 @@
           html: true,
           placement: 'top',
           container: 'body',
-          title: "Silence Details <button type=\"button\" class=\"btn btn-link btn-xs pull-right\"><span class=\"glyphicon glyphicon-remove\"></span>close</button>"
+          title: "Silence Details <button type=\"button\" class=\"btn btn-link btn-xs pull-right close_popover\" onclick=\"$('.silenceBtn').popover('hide')\"><span class=\"glyphicon glyphicon-remove\"></span>close</button>"
+        });
+        $('.close_popover').click(function() {
+          $log.info('closing');
+          return $('.silenceBtn').popover('hide');
+        });
+        $('body').on('click', function(e) {
+          return $('[data-toggle="popover"]').each(function() {
+            if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+              return $(this).popover('hide');
+            }
+          });
         });
         return $('.glyphicon-question-sign').tooltip();
       });
@@ -202,7 +214,7 @@
       }
       timerToSec = function(val) {
         var conversion, q, quantity, u, unit;
-        q = new RegExp('^\\d.*');
+        q = new RegExp('^\\d*');
         u = new RegExp('[a-z]$');
         conversion = {
           m: 60,
@@ -223,7 +235,7 @@
         stash['content']['comment'] = comment;
         stash['content']['expiration'] = expiration;
         if (expiration === 'timer') {
-          stash['content']['expires'] = timerToSec(timer_val);
+          stash['content']['expires'] = (Math.round((new Date().getTime()) / 1000)) + timerToSec(timer_val);
         }
         return stashesFactory.saveStash(stash).success(function(data, status, headers, config) {
           $scope.updateStashes();
@@ -244,7 +256,13 @@
       }
     };
     $scope.deleteSilence = function(path) {
-      return stashesFactory.deleteStash(path);
+      $log.info('delete silence');
+      return stashesFactory.deleteStash(path).success(function(data, status, headers, config) {
+        $scope.updateStashes();
+        return $scope.closePopovers;
+      }).error(function(data, status, headers, config) {
+        return alert("Failed to delete silence");
+      });
     };
     $scope.updateEvents = function() {
       $scope.events = [];

@@ -74,9 +74,6 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     $scope.updateStashes = ->
         $scope.stashes = []
         buildSilencePopover = (stash) ->
-            stash['content']['author'] = "cbarraford"
-            stash['content']['comment'] = "herp herp derp"
-            stash['content']['expires'] = "8 hours"
             html = '<div class="silence_window">'
             if stash['content']['timestamp']?
                 html = """
@@ -90,13 +87,20 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
   <dd>#{stash['content']['author']}</dd>
 """
             if stash['content']['expires']?
+                rel_time = moment.unix(parseInt(stash['content']['expires'])).fromNow()
                 html += """
-  <dt class="text-danger">Expires in</dt>
-  <dd class="text-danger">#{stash['content']['expires']}</dd>
+  <dt class="text-warning">Expires</dt>
+  <dd class="text-warning">#{rel_time}</dd>
 """
-            if stash['content']['on_resolve']?
+            if stash['content']['expiration'] == 'resolve'
                 html += """
-  <dt class="text-success">Delete on resolve</dt>
+  <dt class="text-success">Expires</dt>
+  <dd class="text-success">On resolve</dt>
+"""
+            if stash['content']['expiration'] == 'never'
+                html += """
+  <dt class="text-danger">Expires</dt>
+  <dd class="text-danger">Never</dt>
 """
             html += "</dl>"
             if stash['content']['comment']?
@@ -107,7 +111,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
 </dl>
 """
             html += """
-<button type="button" class="deleteSilenceBtn btn btn-danger btn-sm pull-right">
+<button type="button" class="deleteSilenceBtn btn btn-danger btn-sm pull-right" ng-click="deleteSilence(#{stash['path']})">
     <span class="glyphicon glyphicon-remove"></span> Delete
 </button>
 """
@@ -142,8 +146,22 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                 html: true
                 placement: 'top'
                 container: 'body'
-                title: """Silence Details <button type="button" class="btn btn-link btn-xs pull-right"><span class="glyphicon glyphicon-remove"></span>close</button>"""
+                title: """Silence Details <button type="button" class="btn btn-link btn-xs pull-right close_popover" onclick="$('.silenceBtn').popover('hide')"><span class="glyphicon glyphicon-remove"></span>close</button>"""
             )
+
+            $('.close_popover').click( ->
+                $log.info 'closing'
+                $('.silenceBtn').popover('hide')
+            )
+
+            # if they click outside the popover, close it
+            $('body').on('click', (e) ->
+                $('[data-toggle="popover"]').each( ->
+                    if (!$(@).is(e.target) && $(@).has(e.target).length == 0 && $('.popover').has(e.target).length == 0)
+                        $(@).popover('hide')
+                )
+            )
+
             $('.glyphicon-question-sign').tooltip(
             )
         )
@@ -191,7 +209,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
 
         # convert timer_val from shorthand to number of total seconds
         timerToSec = (val) ->
-            q = new RegExp('^\\d.*')
+            q = new RegExp('^\\d*')
             u = new RegExp('[a-z]$')
             conversion =
                 m: 60
@@ -211,7 +229,8 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             stash['content']['author'] = author
             stash['content']['comment'] = comment
             stash['content']['expiration'] = expiration
-            stash['content']['expires'] = timerToSec(timer_val) if expiration == 'timer'
+            if expiration == 'timer'
+                stash['content']['expires'] = (Math.round( (new Date().getTime()) / 1000)) + timerToSec(timer_val)
             stashesFactory.saveStash(stash).success( (data, status, headers, config) ->
                 # update stashes displayed
                 $scope.updateStashes()
@@ -233,7 +252,13 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             )
 
     $scope.deleteSilence = (path) ->
-        stashesFactory.deleteStash(path)
+        $log.info 'delete silence'
+        stashesFactory.deleteStash(path).success( (data, status, headers, config) ->
+            $scope.updateStashes()
+            $scope.closePopovers
+        ).error( (data, status, headers, config) ->
+            alert "Failed to delete silence"
+        )
 
     $scope.updateEvents = ->
         # clear any currently displayed events
