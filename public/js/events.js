@@ -109,16 +109,32 @@
         return html += "</div>";
       };
       return stashesFactory.stashes().success(function(data, status, headers, config) {
-        var check, client, event, parts, stash, _base, _base1, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
+        var check, client, event, parts, stash, _base, _base1, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2;
         for (_i = 0, _len = data.length; _i < _len; _i++) {
           stash = data[_i];
           if (stash['path'].match(/^silence\//)) {
             $scope.stashes.push(stash);
           }
         }
-        _ref = $scope.stashes;
+        _ref = $scope.events;
         for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-          stash = _ref[_j];
+          event = _ref[_j];
+          if (event.client.silenced != null) {
+            delete event.client.silenced;
+          }
+          if (event.client.silence_html != null) {
+            delete event.client.silence_html;
+          }
+          if (event.check.silenced != null) {
+            delete event.check.silenced;
+          }
+          if (event.check.silence_html != null) {
+            delete event.check.silence_html;
+          }
+        }
+        _ref1 = $scope.stashes;
+        for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+          stash = _ref1[_k];
           parts = stash['path'].split('/', 3);
           client = parts[1];
           if (parts.length > 2) {
@@ -126,9 +142,9 @@
           } else {
             check = null;
           }
-          _ref1 = $scope.events;
-          for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
-            event = _ref1[_k];
+          _ref2 = $scope.events;
+          for (_l = 0, _len3 = _ref2.length; _l < _len3; _l++) {
+            event = _ref2[_l];
             if ((_base = event.client).silenced == null) {
               _base.silenced = false;
             }
@@ -158,7 +174,6 @@
           title: "Silence Details <button type=\"button\" class=\"btn btn-link btn-xs pull-right close_popover\" onclick=\"$('.silenceBtn').popover('hide')\"><span class=\"glyphicon glyphicon-remove\"></span>close</button>"
         });
         $('.close_popover').click(function() {
-          $log.info('closing');
           return $('.silenceBtn').popover('hide');
         });
         $('body').on('click', function(e) {
@@ -258,9 +273,7 @@
       }
     };
     $scope.deleteSilence = function(path) {
-      $log.info('delete silence');
       return stashesFactory.deleteStash(path).success(function(data, status, headers, config) {
-        $log.info("success.");
         $scope.updateStashes();
         return $scope.closePopovers();
       }).error(function(data, status, headers, config) {

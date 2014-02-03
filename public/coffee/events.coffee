@@ -123,6 +123,13 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                 if stash['path'].match(/^silence\//)
                     $scope.stashes.push stash
 
+            # clear old stash data if exists
+            for event in $scope.events
+                delete event.client.silenced if event.client.silenced?
+                delete event.client.silence_html if event.client.silence_html?
+                delete event.check.silenced if event.check.silenced?
+                delete event.check.silence_html if event.check.silence_html?
+
             for stash in $scope.stashes
                 parts = stash['path'].split('/', 3)
                 client = parts[1]
@@ -152,7 +159,6 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             )
 
             $('.close_popover').click( ->
-                $log.info 'closing'
                 $('.silenceBtn').popover('hide')
             )
 
@@ -254,9 +260,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             )
 
     $scope.deleteSilence = (path) ->
-        $log.info 'delete silence'
         stashesFactory.deleteStash(path).success( (data, status, headers, config) ->
-            $log.info "success."
             $scope.updateStashes()
             $scope.closePopovers()
         ).error( (data, status, headers, config) ->
