@@ -28,6 +28,11 @@ sabisu.factory('eventsFactory', ($log, $http) ->
                 limit: limit
                 sort: sort
         )
+    factory.resolveEvent = (client, check) ->
+        $http.post(
+            '/sensu/event/resolve',
+            { client: client, check: check }
+        )
     factory
 )
 
@@ -265,6 +270,13 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             $scope.closePopovers()
         ).error( (data, status, headers, config) ->
             alert "Failed to delete silence"
+        )
+
+    $scope.resolveEvent = (client, check) ->
+        eventsFactory.resolveEvent(client, check).success( (data, status, headers, config) ->
+            $scope.updateEvents()
+        ).error( (data, status, headers, config) ->
+            alert "Faild to resolve event: #{client}/#{check}"
         )
 
     $scope.updateEvents = ->

@@ -110,8 +110,8 @@
                     Actions
                     %span{:class => "caret"}
                   %ul{:class => 'dropdown-menu'}
-                    %li{:class => 'disabled'}
-                      %a{"href" => "#", 'ng-click' => '#'}= "Resolve"
+                    %li
+                      %a{"href" => "#", 'ng-click' => 'resolveEvent(event.client.name, event.check.name)'}= "Resolve"
                     %li{:class => 'divider'}
                     %li{:class => 'dropdown-header'}="Silence"
                     %li

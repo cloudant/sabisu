@@ -41,6 +41,12 @@
         }
       });
     };
+    factory.resolveEvent = function(client, check) {
+      return $http.post('/sensu/event/resolve', {
+        client: client,
+        check: check
+      });
+    };
     return factory;
   });
 
@@ -278,6 +284,13 @@
         return $scope.closePopovers();
       }).error(function(data, status, headers, config) {
         return alert("Failed to delete silence");
+      });
+    };
+    $scope.resolveEvent = function(client, check) {
+      return eventsFactory.resolveEvent(client, check).success(function(data, status, headers, config) {
+        return $scope.updateEvents();
+      }).error(function(data, status, headers, config) {
+        return alert("Faild to resolve event: " + client + "/" + check);
       });
     };
     $scope.updateEvents = function() {
