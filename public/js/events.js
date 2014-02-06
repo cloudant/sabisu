@@ -328,7 +328,6 @@
       if (!($scope.events.length > 0)) {
         $scope.events_spin = true;
       }
-      $scope.events = [];
       $location.search('query', $scope.search_field);
       $location.search('sort', $scope.sort);
       $location.search('limit', $scope.limit);
@@ -433,6 +432,7 @@
           $scope.last_seq = data['last_seq'];
           $log.info($scope.last_seq);
           $log.info(data['results'][0]['id']);
+          $scope.updateEvents();
           return $scope.changes();
         }).error(function(data, status, headers, config) {
           return $log.error("failed changes request (" + status + ") - " + data);

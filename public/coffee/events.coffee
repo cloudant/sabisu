@@ -303,8 +303,6 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     $scope.updateEvents = ->
         # start progress bar
         $scope.events_spin = true unless $scope.events.length > 0
-        # clear any currently displayed events
-        $scope.events = []
         # set url paramaters with query terms etc
         $location.search('query', $scope.search_field)
         $location.search('sort', $scope.sort)
@@ -398,7 +396,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                 $scope.last_seq = data['last_seq']
                 $log.info $scope.last_seq
                 $log.info data['results'][0]['id']
-                # $scope.updateEvents()
+                $scope.updateEvents()
                 # start a new changes feed (intentional infinite loop)
                 $scope.changes()
             ).error( (data, status, headers, config) ->
