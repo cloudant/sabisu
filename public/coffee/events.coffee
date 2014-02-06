@@ -17,7 +17,10 @@ sabisu.filter('joinBy', ->
 sabisu.factory('eventsFactory', ($log, $http) ->
     factory = {}
     factory.searchEvents = (search_query, sort, limit) ->
-        sort = sort + '<string>' unless sort == "issued" or sort == "status" or sort == "occurences"
+        sort = 'issued' if sort == 'age'
+        sort = '-issued' if sort == '-age'
+        int_types = ['issued', '-issued', 'status', '-status', 'occurences', '-occurences']
+        sort = sort + '<string>' unless sort in int_types
         sort = "[\"#{sort}\"]"
         search_query = '*:*' if search_query == ''
         $http(
