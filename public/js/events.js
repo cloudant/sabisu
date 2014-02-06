@@ -42,9 +42,30 @@
       });
     };
     factory.resolveEvent = function(client, check) {
-      return $http.post('/sensu/event/resolve', {
-        client: client,
-        check: check
+      return $http({
+        method: 'POST',
+        url: '/sensu/event/resolve',
+        data: {
+          client: client,
+          check: check
+        }
+      });
+    };
+    factory.changes = function(params) {
+      return $http({
+        method: 'GET',
+        url: '/api/changes',
+        params: params
+      });
+    };
+    factory.last_sequence = function() {
+      return $http({
+        method: 'GET',
+        url: '/api/changes',
+        params: {
+          limit: 1,
+          descending: true
+        }
       });
     };
     return factory;
@@ -68,6 +89,7 @@
   sabisu.controller('eventsController', function($scope, $log, $location, $filter, eventsFactory, stashesFactory) {
     $scope.checks = [];
     $scope.clients = [];
+    $scope.events = [];
     $scope.events_spin = false;
     $scope.bulk = 'show';
     if ($location.search().query != null) {
@@ -294,8 +316,10 @@
       });
     };
     $scope.updateEvents = function() {
+      if (!($scope.events.length > 0)) {
+        $scope.events_spin = true;
+      }
       $scope.events = [];
-      $scope.events_spin = true;
       $location.search('query', $scope.search_field);
       $location.search('sort', $scope.sort);
       $location.search('limit', $scope.limit);
@@ -386,6 +410,34 @@
       });
     };
     $scope.updateEvents();
+    $scope.changes = function() {
+      var params;
+      $log.info("STARTING CHANGES FEED");
+      params = {
+        feed: 'longpoll',
+        heartbeat: 10000
+      };
+      if ($scope.last_seq != null) {
+        params['since'] = $scope.last_seq;
+        $log.info(params);
+        return eventsFactory.changes(params).success(function(data, status, headers, config) {
+          $scope.last_seq = data['last_seq'];
+          $log.info($scope.last_seq);
+          $log.info(data['results'][0]['id']);
+          return $scope.changes();
+        }).error(function(data, status, headers, config) {
+          return $log.error("failed changes request (" + status + ") - " + data);
+        });
+      }
+    };
+    $scope.get_sequence = function() {
+      return eventsFactory.last_sequence().success(function(data, status, headers, config) {
+        $scope.last_seq = data['last_seq'];
+        $log.info($scope.last_seq);
+        return $scope.changes();
+      });
+    };
+    $scope.get_sequence();
     $scope.bulkToggleDetails = function() {
       var event, mySwitch, _i, _len, _ref, _results;
       mySwitch = $scope.bulk;

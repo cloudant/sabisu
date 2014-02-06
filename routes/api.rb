@@ -6,7 +6,6 @@ end
 
 get '/api/events/search' do
   params = request.env['rack.request.query_hash']
-  pp params
   if params.key?('query')
     query = params['query']
     params.delete('query')
@@ -15,4 +14,9 @@ get '/api/events/search' do
   end
   events = Event.search(query, params)
   JSON.pretty_generate(events)
+end
+
+get '/api/changes' do
+  params = request.env['rack.request.query_hash']
+  JSON.pretty_generate(CURRENT_DB.changes(params))
 end

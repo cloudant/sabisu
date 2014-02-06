@@ -29,9 +29,26 @@ sabisu.factory('eventsFactory', ($log, $http) ->
                 sort: sort
         )
     factory.resolveEvent = (client, check) ->
-        $http.post(
-            '/sensu/event/resolve',
-            { client: client, check: check }
+        $http(
+            method: 'POST'
+            url: '/sensu/event/resolve'
+            data:
+                client: client
+                check: check
+        )
+    factory.changes = (params) ->
+        $http(
+            method: 'GET'
+            url: '/api/changes'
+            params: params
+        )
+    factory.last_sequence = ->
+        $http(
+            method: 'GET'
+            url: '/api/changes'
+            params:
+                limit: 1
+                descending: true
         )
     factory
 )
@@ -57,6 +74,7 @@ sabisu.factory('stashesFactory', ($log, $http) ->
 sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsFactory, stashesFactory) ->
     $scope.checks = []
     $scope.clients = []
+    $scope.events = []
     $scope.events_spin = false
     $scope.bulk = 'show'
 
@@ -280,10 +298,10 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
         )
 
     $scope.updateEvents = ->
+        # start progress bar
+        $scope.events_spin = true unless $scope.events.length > 0
         # clear any currently displayed events
         $scope.events = []
-        # start progress bar
-        $scope.events_spin = true
         # set url paramaters with query terms etc
         $location.search('query', $scope.search_field)
         $location.search('sort', $scope.sort)
@@ -366,6 +384,32 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                 $scope.events = events
         )
     $scope.updateEvents()
+
+    $scope.changes = ->
+        $log.info "STARTING CHANGES FEED"
+        params = { feed: 'longpoll', heartbeat: 10000 }
+        if $scope.last_seq?
+            params['since'] = $scope.last_seq
+            $log.info params
+            eventsFactory.changes(params).success( (data, status, headers, config) ->
+                $scope.last_seq = data['last_seq']
+                $log.info $scope.last_seq
+                $log.info data['results'][0]['id']
+                # $scope.updateEvents()
+                # start a new changes feed (intentional infinite loop)
+                $scope.changes()
+            ).error( (data, status, headers, config) ->
+                $log.error "failed changes request (#{status}) - #{data}"
+            )
+
+    $scope.get_sequence = ->
+        eventsFactory.last_sequence().success( (data, status, headers, config) ->
+            $scope.last_seq = data['last_seq']
+            $log.info $scope.last_seq
+            $scope.changes()
+        )
+
+    $scope.get_sequence()
 
     # expand/contract all events
     $scope.bulkToggleDetails = ->
