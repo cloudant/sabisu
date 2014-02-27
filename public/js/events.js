@@ -332,7 +332,7 @@
       $location.search('sort', $scope.sort);
       $location.search('limit', $scope.limit);
       return eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
-        var checks, color, ctx, datapoints, event, events, k, statuses, statuses_data, v, _i, _len, _ref;
+        var checks, color, datapoints, event, events, k, statuses, statuses_data, v, _i, _len, _ref;
         color = ['success', 'warning', 'danger', 'info'];
         status = ['OK', 'Warning', 'Critical', 'Unknown'];
         events = [];
@@ -371,8 +371,6 @@
               labelColor: 'white'
             }
           ];
-          ctx = $('#chart_pie_status').get(0).getContext('2d');
-          new Chart(ctx).Pie(statuses_data);
         }
         if ('counts' in data) {
           checks = data['counts']['check'];
@@ -435,7 +433,8 @@
           $scope.updateEvents();
           return $scope.changes();
         }).error(function(data, status, headers, config) {
-          return $log.error("failed changes request (" + status + ") - " + data);
+          $log.error("failed changes request (" + status + ") - " + data);
+          return $scope.changes();
         });
       }
     };

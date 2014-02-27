@@ -25,15 +25,7 @@ class Sensu
       req.body = opts[:payload].to_json
     end
     req.basic_auth(API_USER, API_PASSWORD) if API_USER && API_PASSWORD
-    begin
-      http.request(req)
-    rescue Timeout::Error
-      puts 'HTTP request has timed out.'
-      return False
-    rescue StandardError => e
-      puts "An HTTP error occurred. #{e}"
-      return False
-    end
+    http.request(req)
   end
 
   def response(code, body, command = nil)

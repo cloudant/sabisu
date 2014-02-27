@@ -346,8 +346,8 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                         labelColor: 'white'
                     }
                 ]
-                ctx = $('#chart_pie_status').get(0).getContext('2d')
-                new Chart(ctx).Pie(statuses_data)
+                # ctx = $('#chart_pie_status').get(0).getContext('2d')
+                # new Chart(ctx).Pie(statuses_data, {animation: false})
             if 'counts' of data
                 # get check counts
                 checks = data['counts']['check']
@@ -401,6 +401,8 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                 $scope.changes()
             ).error( (data, status, headers, config) ->
                 $log.error "failed changes request (#{status}) - #{data}"
+                # start a new changes feed (intentional infinite loop)
+                $scope.changes()
             )
 
     $scope.get_sequence = ->
