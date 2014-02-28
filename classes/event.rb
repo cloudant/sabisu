@@ -110,8 +110,34 @@ function(doc) {
     end
     ##############################################
 
-    Hash[(cloudant_events.to_a | sensu_events.to_a) - (cloudant_events.to_a & sensu_events.to_a)]
-    
+    # stale = Hash[(cloudant_events.to_a | sensu_events.to_a) - (cloudant_events.to_a & sensu_events.to_a)]
+    stale = cloudant_events.deep_diff(sensu_events)
+
+    # get list of cloudant docs to be deleted (marked as recovered by sensu)
+    # this is done by iterating over the deep_diff and finding places where
+    # there is no sensu alert for a client/check (ie nil)
+    if params.key?('clear_recovered') && params['clear_recovered'].to_s == 'true'
+      clear_list = cloudant_events_tmp.each.map do |event|
+        client = event['doc']['event']['client']['name']
+        check = event['doc']['event']['check']['name']
+        { client: client, check: check } unless sensu_events.key?(client) && sensu_events[client].key?(check)
+      end.compact
+
+      # delete those cloudant docs
+      clear_list.each do |event|
+        pp "Deleting #{event[:client]}/#{event[:check]}"
+        begin
+          doc = CURRENT_DB.get("#{event[:client]}/#{event[:check]}")
+          doc.destroy
+        rescue RestClient::Conflict
+          # there been a conflict, skip it
+        rescue RestClient::ResourceNotFound
+          # looks like its already deleted, noop
+        end
+      end
+    end
+
+    stale
   end
 
   def to_hash
@@ -130,4 +156,22 @@ function(doc) {
   def initialize(fields)
     fields.each { |k, v| send("#{k}=", v) } if fields
   end
+end
+
+class Hash
+ 
+  def deep_diff(b)
+    a = self
+    (a.keys | b.keys).inject({}) do |diff, k|
+      if a[k] != b[k]
+        if a[k].respond_to?(:deep_diff) && b[k].respond_to?(:deep_diff)
+          diff[k] = a[k].deep_diff(b[k])
+        else
+          diff[k] = [a[k], b[k]]
+        end
+      end
+      diff
+    end
+  end
+ 
 end
