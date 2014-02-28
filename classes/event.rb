@@ -78,6 +78,42 @@ function(doc) {
     end
   end
 
+  def self.stale(params)
+    # get cloudant events and put them into a hash
+    cloudant_events = {}
+    cloudant_events_tmp = self.all()['rows']
+    cloudant_events_tmp.each do |event|
+      event = event['doc']['event']
+      client = event['client']['name']
+      check = event['check']['name']
+      cloudant_events[client] = {} unless cloudant_events.key?(client)
+      cloudant_events[client][check] = {
+        status: event['check']['status'],
+        output: event['check']['output']
+      }
+    end
+    ##############################################
+
+    # get sensu event and put them into a hash
+    sensu = Sensu.new
+    rawdata = sensu.request({ method: 'GET', ssl: true, path: '/events'})
+    sensu_events_tmp = JSON.parse(rawdata.body)
+    sensu_events = {}
+    sensu_events_tmp.each do |event|
+      client = event['client']
+      check = event['check']
+      sensu_events[client] = {} unless sensu_events.key?(client)
+      sensu_events[client][check] = {
+        status: event['status'],
+        output: event['output']
+      }
+    end
+    ##############################################
+
+    Hash[(cloudant_events.to_a | sensu_events.to_a) - (cloudant_events.to_a & sensu_events.to_a)]
+    
+  end
+
   def to_hash
     hash = {}
     instance_variables.each do |var|

@@ -16,6 +16,12 @@ get '/api/events/search' do
   JSON.pretty_generate(events)
 end
 
+get '/api/events/stale' do
+  params = request.env['rack.request.query_hash']
+  stale = Event.stale(params)
+  JSON.pretty_generate({ stale: stale})
+end
+
 get '/api/changes' do
   params = request.env['rack.request.query_hash']
   JSON.pretty_generate(CURRENT_DB.changes(params))
