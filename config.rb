@@ -20,8 +20,8 @@ configure :production do
   NOAUTH = false
 
   # force ssl connections only
-  require 'rack-ssl-enforcer'
-  use Rack::SslEnforcer
+  #require 'rack-ssl-enforcer'
+  #use Rack::SslEnforcer
 
   # don't show exceptions
   set :raise_errors, Proc.new { false }

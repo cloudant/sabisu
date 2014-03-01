@@ -27,12 +27,12 @@
     factory.searchEvents = function(search_query, sort, limit) {
       var int_types;
       if (sort === 'age') {
-        sort = 'issued';
+        sort = 'state_change';
       }
       if (sort === '-age') {
-        sort = '-issued';
+        sort = '-state_change';
       }
-      int_types = ['issued', '-issued', 'status', '-status', 'occurences', '-occurences'];
+      int_types = ['issued', '-issued', 'state_change', '-state_change', 'status', '-status', 'occurences', '-occurences'];
       if (__indexOf.call(int_types, sort) < 0) {
         sort = sort + '<string>';
       }

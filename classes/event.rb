@@ -4,7 +4,7 @@ class Event
   # refer to it (e.g. event.client). the value is where it is stored in
   # the database under doc.event.
   FIELDS = {
-    client: 'client.name', check: 'check.name', status: 'check.status',
+    client: 'client.name', check: 'check.name', status: 'check.status', state_change: 'check.state_change',
     occurences: 'occurrences', action: 'action', issued: 'check.issued', output: 'check.output'
   }
   attr_accessor(*FIELDS.keys)
