@@ -116,35 +116,34 @@
     } else {
       $scope.limit = '50';
     }
+    $scope.buildSilencePopover = function(stash) {
+      var html, rel_time;
+      html = '<div class="silence_window">';
+      if (stash['content']['timestamp'] != null) {
+        html = "<dl class=\"dl-horizontal\">\n<dt>Created</dt>\n<dd>" + ($filter('date')(stash['content']['timestamp'] * 1000, "short")) + "</dd>";
+      }
+      if (stash['content']['author'] != null) {
+        html += "<dt>Author</dt>\n<dd>" + stash['content']['author'] + "</dd>";
+      }
+      if (stash['content']['expires'] != null) {
+        rel_time = moment.unix(parseInt(stash['content']['expires'])).fromNow();
+        html += "<dt class=\"text-warning\">Expires</dt>\n<dd class=\"text-warning\">" + rel_time + "</dd>";
+      }
+      if (stash['content']['expiration'] === 'resolve') {
+        html += "<dt class=\"text-success\">Expires</dt>\n<dd class=\"text-success\">On resolve</dt>";
+      }
+      if (stash['content']['expiration'] === 'never') {
+        html += "<dt class=\"text-danger\">Expires</dt>\n<dd class=\"text-danger\">Never</dt>";
+      }
+      html += "</dl>";
+      if (stash['content']['comment'] != null) {
+        html += "<dl>\n<dt>Comment</dt>\n<dd>" + stash['content']['comment'] + "</dd>\n</dl>";
+      }
+      html += "<button type=\"button\" class=\"deleteSilenceBtn btn btn-danger btn-sm pull-right\" onclick=\"angular.element($('#eventsController')).scope().deleteSilence('" + stash['path'] + "')\">\n<span class=\"glyphicon glyphicon-remove\"></span> Delete\n</button>";
+      return html += "</div>";
+    };
     $scope.updateStashes = function() {
-      var buildSilencePopover;
       $scope.stashes = [];
-      buildSilencePopover = function(stash) {
-        var html, rel_time;
-        html = '<div class="silence_window">';
-        if (stash['content']['timestamp'] != null) {
-          html = "<dl class=\"dl-horizontal\">\n  <dt>Created</dt>\n  <dd>" + ($filter('date')(stash['content']['timestamp'] * 1000, "short")) + "</dd>";
-        }
-        if (stash['content']['author'] != null) {
-          html += "<dt>Author</dt>\n<dd>" + stash['content']['author'] + "</dd>";
-        }
-        if (stash['content']['expires'] != null) {
-          rel_time = moment.unix(parseInt(stash['content']['expires'])).fromNow();
-          html += "<dt class=\"text-warning\">Expires</dt>\n<dd class=\"text-warning\">" + rel_time + "</dd>";
-        }
-        if (stash['content']['expiration'] === 'resolve') {
-          html += "<dt class=\"text-success\">Expires</dt>\n<dd class=\"text-success\">On resolve</dt>";
-        }
-        if (stash['content']['expiration'] === 'never') {
-          html += "<dt class=\"text-danger\">Expires</dt>\n<dd class=\"text-danger\">Never</dt>";
-        }
-        html += "</dl>";
-        if (stash['content']['comment'] != null) {
-          html += "<dl>\n  <dt>Comment</dt>\n  <dd>" + stash['content']['comment'] + "</dd>\n</dl>";
-        }
-        html += "<button type=\"button\" class=\"deleteSilenceBtn btn btn-danger btn-sm pull-right\" onclick=\"angular.element($('#eventsController')).scope().deleteSilence('" + stash['path'] + "')\">\n    <span class=\"glyphicon glyphicon-remove\"></span> Delete\n</button>";
-        return html += "</div>";
-      };
       return stashesFactory.stashes().success(function(data, status, headers, config) {
         var check, client, event, parts, stash, _base, _base1, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2;
         for (_i = 0, _len = data.length; _i < _len; _i++) {
@@ -191,12 +190,12 @@
             if (client === event.client.name) {
               if (check === null) {
                 event.client.silenced = true;
-                event.client.silence_html = buildSilencePopover(stash);
+                event.client.silence_html = $scope.buildSilencePopover(stash);
                 break;
               } else {
                 if (check === event.check.name) {
                   event.check.silenced = true;
-                  event.check.silence_html = buildSilencePopover(stash);
+                  event.check.silence_html = $scope.buildSilencePopover(stash);
                   break;
                 }
               }
@@ -332,7 +331,7 @@
       $location.search('sort', $scope.sort);
       $location.search('limit', $scope.limit);
       return eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
-        var checks, color, datapoints, event, events, k, statuses, statuses_data, v, _i, _len, _ref;
+        var check, checks, client, color, datapoints, event, events, k, parts, stash, statuses, statuses_data, v, _base, _base1, _i, _j, _len, _len1, _ref, _ref1;
         color = ['success', 'warning', 'danger', 'info'];
         status = ['OK', 'Warning', 'Critical', 'Unknown'];
         events = [];
@@ -407,6 +406,34 @@
             if (event['check']['state_change'] != null) {
               event['check']['state_change'] = event['check']['state_change'] * 1000;
             }
+            if ((_base = event.client).silenced == null) {
+              _base.silenced = false;
+            }
+            if ((_base1 = event.check).silenced == null) {
+              _base1.silenced = false;
+            }
+            if ($scope.stashes != null) {
+              _ref1 = $scope.stashes;
+              for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+                stash = _ref1[_j];
+                parts = stash['path'].split('/', 3);
+                client = parts[1];
+                if (parts.length > 2) {
+                  check = parts[2];
+                } else {
+                  check = null;
+                }
+                if (client === event.client.name) {
+                  if (check === null) {
+                    event.client.silenced = true;
+                    event.client.silence_html = $scope.buildSilencePopover(stash);
+                  } else if (check === event.check.name) {
+                    event.check.silenced = true;
+                    event.check.silence_html = $scope.buildSilencePopover(stash);
+                  }
+                }
+              }
+            }
             events.push(event);
           }
           $scope.updateStashes();
@@ -425,11 +452,8 @@
       };
       if ($scope.last_seq != null) {
         params['since'] = $scope.last_seq;
-        $log.info(params);
         return eventsFactory.changes(params).success(function(data, status, headers, config) {
           $scope.last_seq = data['last_seq'];
-          $log.info($scope.last_seq);
-          $log.info(data['results'][0]['id']);
           $scope.updateEvents();
           return $scope.changes();
         }).error(function(data, status, headers, config) {

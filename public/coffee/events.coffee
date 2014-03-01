@@ -97,52 +97,52 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     else
         $scope.limit = '50'
 
-    $scope.updateStashes = ->
-        $scope.stashes = []
-        buildSilencePopover = (stash) ->
-            html = '<div class="silence_window">'
-            if stash['content']['timestamp']?
-                html = """
+    $scope.buildSilencePopover = (stash) ->
+        html = '<div class="silence_window">'
+        if stash['content']['timestamp']?
+            html = """
 <dl class="dl-horizontal">
-  <dt>Created</dt>
-  <dd>#{$filter('date')((stash['content']['timestamp'] * 1000), "short")}</dd>
+<dt>Created</dt>
+<dd>#{$filter('date')((stash['content']['timestamp'] * 1000), "short")}</dd>
 """
-            if stash['content']['author']?
-                html += """
-  <dt>Author</dt>
-  <dd>#{stash['content']['author']}</dd>
+        if stash['content']['author']?
+            html += """
+<dt>Author</dt>
+<dd>#{stash['content']['author']}</dd>
 """
-            if stash['content']['expires']?
-                rel_time = moment.unix(parseInt(stash['content']['expires'])).fromNow()
-                html += """
-  <dt class="text-warning">Expires</dt>
-  <dd class="text-warning">#{rel_time}</dd>
+        if stash['content']['expires']?
+            rel_time = moment.unix(parseInt(stash['content']['expires'])).fromNow()
+            html += """
+<dt class="text-warning">Expires</dt>
+<dd class="text-warning">#{rel_time}</dd>
 """
-            if stash['content']['expiration'] == 'resolve'
-                html += """
-  <dt class="text-success">Expires</dt>
-  <dd class="text-success">On resolve</dt>
+        if stash['content']['expiration'] == 'resolve'
+            html += """
+<dt class="text-success">Expires</dt>
+<dd class="text-success">On resolve</dt>
 """
-            if stash['content']['expiration'] == 'never'
-                html += """
-  <dt class="text-danger">Expires</dt>
-  <dd class="text-danger">Never</dt>
+        if stash['content']['expiration'] == 'never'
+            html += """
+<dt class="text-danger">Expires</dt>
+<dd class="text-danger">Never</dt>
 """
-            html += "</dl>"
-            if stash['content']['comment']?
-                html += """
+        html += "</dl>"
+        if stash['content']['comment']?
+            html += """
 <dl>
-  <dt>Comment</dt>
-  <dd>#{stash['content']['comment']}</dd>
+<dt>Comment</dt>
+<dd>#{stash['content']['comment']}</dd>
 </dl>
 """
-            html += """
+        html += """
 <button type="button" class="deleteSilenceBtn btn btn-danger btn-sm pull-right" onclick="angular.element($('#eventsController')).scope().deleteSilence('#{stash['path']}')">
-    <span class="glyphicon glyphicon-remove"></span> Delete
+<span class="glyphicon glyphicon-remove"></span> Delete
 </button>
 """
-            html += "</div>"
+        html += "</div>"
 
+    $scope.updateStashes = ->
+        $scope.stashes = []
         stashesFactory.stashes().success( (data, status, headers, config) ->
             for stash in data
                 # drop all non-silence stashes
@@ -169,12 +169,12 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                     if client == event.client.name
                         if check == null
                             event.client.silenced = true
-                            event.client.silence_html = buildSilencePopover(stash)
+                            event.client.silence_html = $scope.buildSilencePopover(stash)
                             break
                         else
                             if check == event.check.name
                                 event.check.silenced = true
-                                event.check.silence_html = buildSilencePopover(stash)
+                                event.check.silence_html = $scope.buildSilencePopover(stash)
                                 break
             $('.silenceBtn').popover(
                 trigger: 'click'
@@ -378,6 +378,24 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                     event['check']['issued'] = event['check']['issued'] * 1000
                     if event['check']['state_change']?
                         event['check']['state_change'] = event['check']['state_change'] * 1000
+                    # add silence info
+                    event.client.silenced ?= false
+                    event.check.silenced ?= false
+                    if $scope.stashes?
+                        for stash in $scope.stashes
+                            parts = stash['path'].split('/', 3)
+                            client = parts[1]
+                            if parts.length > 2
+                                check = parts[2]
+                            else
+                                check = null
+                            if client == event.client.name
+                                if check == null
+                                    event.client.silenced = true
+                                    event.client.silence_html = $scope.buildSilencePopover(stash)
+                                else if check == event.check.name
+                                    event.check.silenced = true
+                                    event.check.silence_html = $scope.buildSilencePopover(stash)
                     events.push event
                 $scope.updateStashes()
                 # hide progress bar
@@ -391,11 +409,8 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
         params = { feed: 'longpoll', heartbeat: 10000 }
         if $scope.last_seq?
             params['since'] = $scope.last_seq
-            $log.info params
             eventsFactory.changes(params).success( (data, status, headers, config) ->
                 $scope.last_seq = data['last_seq']
-                $log.info $scope.last_seq
-                $log.info data['results'][0]['id']
                 $scope.updateEvents()
                 # start a new changes feed (intentional infinite loop)
                 $scope.changes()
