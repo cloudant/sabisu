@@ -125,8 +125,8 @@
       if (stash['content']['author'] != null) {
         html += "<dt>Author</dt>\n<dd>" + stash['content']['author'] + "</dd>";
       }
-      if (stash['content']['expires'] != null) {
-        rel_time = moment.unix(parseInt(stash['content']['expires'])).fromNow();
+      if (stash['expire'] != null) {
+        rel_time = moment.unix(parseInt(stash['content']['timestamp']) + parseInt(stash['expire'])).fromNow();
         html += "<dt class=\"text-warning\">Expires</dt>\n<dd class=\"text-warning\">" + rel_time + "</dd>";
       }
       if (stash['content']['expiration'] === 'resolve') {
@@ -273,7 +273,7 @@
         stash['content']['comment'] = comment;
         stash['content']['expiration'] = expiration;
         if (expiration === 'timer') {
-          stash['content']['expires'] = (Math.round((new Date().getTime()) / 1000)) + timerToSec(timer_val);
+          stash['expire'] = timerToSec(timer_val);
         }
         return stashesFactory.saveStash(stash).success(function(data, status, headers, config) {
           $scope.updateStashes();

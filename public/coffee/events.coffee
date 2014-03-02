@@ -110,8 +110,8 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
 <dt>Author</dt>
 <dd>#{stash['content']['author']}</dd>
 """
-        if stash['content']['expires']?
-            rel_time = moment.unix(parseInt(stash['content']['expires'])).fromNow()
+        if stash['expire']?
+            rel_time = moment.unix(parseInt(stash['content']['timestamp']) + parseInt(stash['expire'])).fromNow()
             html += """
 <dt class="text-warning">Expires</dt>
 <dd class="text-warning">#{rel_time}</dd>
@@ -257,7 +257,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             stash['content']['comment'] = comment
             stash['content']['expiration'] = expiration
             if expiration == 'timer'
-                stash['content']['expires'] = (Math.round( (new Date().getTime()) / 1000)) + timerToSec(timer_val)
+                stash['expire'] = timerToSec(timer_val)
             stashesFactory.saveStash(stash).success( (data, status, headers, config) ->
                 # update stashes displayed
                 $scope.updateStashes()
