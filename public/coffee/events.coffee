@@ -142,20 +142,13 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
         html += "</div>"
 
     $scope.updateStashes = ->
-        $scope.stashes = []
         stashesFactory.stashes().success( (data, status, headers, config) ->
+            stashes = []
             for stash in data
                 # drop all non-silence stashes
                 if stash['path'].match(/^silence\//)
-                    $scope.stashes.push stash
-
-            # clear old stash data if exists
-            for event in $scope.events
-                delete event.client.silenced if event.client.silenced?
-                delete event.client.silence_html if event.client.silence_html?
-                delete event.check.silenced if event.check.silenced?
-                delete event.check.silence_html if event.check.silence_html?
-
+                    stashes.push stash
+            $scope.stashes = stashes
             for stash in $scope.stashes
                 parts = stash['path'].split('/', 3)
                 client = parts[1]
@@ -371,7 +364,8 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             if 'rows' of data
                 for event in data['rows']
                     event = event['doc']['event']
-                    event['id'] = Math.floor(Math.random() * 100000000000)
+                    id = "#{event['client']['name']}/#{event['check']['name']}"
+                    event['id'] = CryptoJS.MD5(id).toString(CryptoJS.enc.Base64)
                     event['color'] = color[event['check']['status']]
                     event['wstatus'] = status[event['check']['status']]
                     event['rel_time'] = "2 hours ago"
@@ -397,15 +391,15 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                                     event.check.silenced = true
                                     event.check.silence_html = $scope.buildSilencePopover(stash)
                     events.push event
-                $scope.updateStashes()
                 # hide progress bar
                 $scope.events_spin = false
                 $scope.events = events
+                $scope.updateStashes()
         )
     $scope.updateEvents()
 
     $scope.changes = ->
-        $log.info "STARTING CHANGES FEED"
+        $log.info "STARTING _CHANGES FEED"
         params = { feed: 'longpoll', heartbeat: 10000 }
         if $scope.last_seq?
             params['since'] = $scope.last_seq
@@ -430,7 +424,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     # disabling get_sequence to disable real-time updates
     # real-time updates is an experimental feature that is
     # not ready for prime time.
-    # $scope.get_sequence()
+    $scope.get_sequence()
 
     # expand/contract all events
     $scope.bulkToggleDetails = ->

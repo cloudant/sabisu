@@ -143,34 +143,19 @@
       return html += "</div>";
     };
     $scope.updateStashes = function() {
-      $scope.stashes = [];
       return stashesFactory.stashes().success(function(data, status, headers, config) {
-        var check, client, event, parts, stash, _base, _base1, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2;
+        var check, client, event, parts, stash, stashes, _base, _base1, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
+        stashes = [];
         for (_i = 0, _len = data.length; _i < _len; _i++) {
           stash = data[_i];
           if (stash['path'].match(/^silence\//)) {
-            $scope.stashes.push(stash);
+            stashes.push(stash);
           }
         }
-        _ref = $scope.events;
+        $scope.stashes = stashes;
+        _ref = $scope.stashes;
         for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-          event = _ref[_j];
-          if (event.client.silenced != null) {
-            delete event.client.silenced;
-          }
-          if (event.client.silence_html != null) {
-            delete event.client.silence_html;
-          }
-          if (event.check.silenced != null) {
-            delete event.check.silenced;
-          }
-          if (event.check.silence_html != null) {
-            delete event.check.silence_html;
-          }
-        }
-        _ref1 = $scope.stashes;
-        for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
-          stash = _ref1[_k];
+          stash = _ref[_j];
           parts = stash['path'].split('/', 3);
           client = parts[1];
           if (parts.length > 2) {
@@ -178,9 +163,9 @@
           } else {
             check = null;
           }
-          _ref2 = $scope.events;
-          for (_l = 0, _len3 = _ref2.length; _l < _len3; _l++) {
-            event = _ref2[_l];
+          _ref1 = $scope.events;
+          for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+            event = _ref1[_k];
             if ((_base = event.client).silenced == null) {
               _base.silenced = false;
             }
@@ -331,7 +316,7 @@
       $location.search('sort', $scope.sort);
       $location.search('limit', $scope.limit);
       return eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
-        var check, checks, client, color, datapoints, event, events, k, parts, stash, statuses, statuses_data, v, _base, _base1, _i, _j, _len, _len1, _ref, _ref1;
+        var check, checks, client, color, datapoints, event, events, id, k, parts, stash, statuses, statuses_data, v, _base, _base1, _i, _j, _len, _len1, _ref, _ref1;
         color = ['success', 'warning', 'danger', 'info'];
         status = ['OK', 'Warning', 'Critical', 'Unknown'];
         events = [];
@@ -398,7 +383,8 @@
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             event = _ref[_i];
             event = event['doc']['event'];
-            event['id'] = Math.floor(Math.random() * 100000000000);
+            id = "" + event['client']['name'] + "/" + event['check']['name'];
+            event['id'] = CryptoJS.MD5(id).toString(CryptoJS.enc.Base64);
             event['color'] = color[event['check']['status']];
             event['wstatus'] = status[event['check']['status']];
             event['rel_time'] = "2 hours ago";
@@ -436,16 +422,16 @@
             }
             events.push(event);
           }
-          $scope.updateStashes();
           $scope.events_spin = false;
-          return $scope.events = events;
+          $scope.events = events;
+          return $scope.updateStashes();
         }
       });
     };
     $scope.updateEvents();
     $scope.changes = function() {
       var params;
-      $log.info("STARTING CHANGES FEED");
+      $log.info("STARTING _CHANGES FEED");
       params = {
         feed: 'longpoll',
         heartbeat: 10000
@@ -469,6 +455,7 @@
         return $scope.changes();
       });
     };
+    $scope.get_sequence();
     $scope.bulkToggleDetails = function() {
       var event, mySwitch, _i, _len, _ref, _results;
       mySwitch = $scope.bulk;
