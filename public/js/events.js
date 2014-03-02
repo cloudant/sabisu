@@ -101,6 +101,15 @@
     $scope.events = [];
     $scope.events_spin = false;
     $scope.bulk = 'show';
+    $scope.isActive = true;
+    $(window).on('focus', function() {
+      $scope.isActive = true;
+      $scope.updateEvents();
+      return $scope.changes();
+    });
+    $(window).on('blur', function() {
+      return $scope.isActive = false;
+    });
     if ($location.search().query != null) {
       $scope.search_field = $location.search().query;
     } else {
@@ -441,10 +450,14 @@
         return eventsFactory.changes(params).success(function(data, status, headers, config) {
           $scope.last_seq = data['last_seq'];
           $scope.updateEvents();
-          return $scope.changes();
+          if ($scope.isActive === true) {
+            return $scope.changes();
+          }
         }).error(function(data, status, headers, config) {
           $log.error("failed changes request (" + status + ") - " + data);
-          return $scope.changes();
+          if ($scope.isActive === true) {
+            return $scope.changes();
+          }
         });
       }
     };

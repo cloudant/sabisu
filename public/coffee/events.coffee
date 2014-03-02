@@ -80,6 +80,18 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     $scope.events = []
     $scope.events_spin = false
     $scope.bulk = 'show'
+    $scope.isActive = true
+
+    # track if window is focused or not
+    # only update UI when focused
+    $(window).on('focus', ->
+        $scope.isActive = true
+        $scope.updateEvents()
+        $scope.changes()
+    )
+    $(window).on('blur', ->
+        $scope.isActive = false
+    )
 
     # load url parameters
     if $location.search().query?
@@ -407,11 +419,11 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                 $scope.last_seq = data['last_seq']
                 $scope.updateEvents()
                 # start a new changes feed (intentional infinite loop)
-                $scope.changes()
+                $scope.changes() if $scope.isActive == true
             ).error( (data, status, headers, config) ->
                 $log.error "failed changes request (#{status}) - #{data}"
                 # start a new changes feed (intentional infinite loop)
-                $scope.changes()
+                $scope.changes() if $scope.isActive == true
             )
 
     $scope.get_sequence = ->
