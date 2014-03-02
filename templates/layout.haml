@@ -24,9 +24,9 @@
                 %ul{:class => 'dropdown-menu'}
                   %li{:class => 'dropdown-header'}= 'Problems'
                   %li
-                    %a{"href" => "/events?sort=-age&limit=50&query=status:[1 TO 3]", :target => '_self'}= "Recent"
+                    %a{"href" => "/events?sort=-age&limit=50&query=", :target => '_self'}= "Recent"
                   %li
-                    %a{"href" => "/events?sort=age&limit=50&query=status:[1 TO 3]", :target => '_self'}= "Old"
+                    %a{"href" => "/events?sort=age&limit=50&query=", :target => '_self'}= "Old"
               %li
                 %a{'href' => '/logout', :target => '_self'}= "Logout"
             - else

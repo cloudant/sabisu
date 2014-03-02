@@ -469,7 +469,6 @@
         return $scope.changes();
       });
     };
-    $scope.get_sequence();
     $scope.bulkToggleDetails = function() {
       var event, mySwitch, _i, _len, _ref, _results;
       mySwitch = $scope.bulk;

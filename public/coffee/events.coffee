@@ -427,7 +427,10 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             $scope.changes()
         )
 
-    $scope.get_sequence()
+    # disabling get_sequence to disable real-time updates
+    # real-time updates is an experimental feature that is
+    # not ready for prime time.
+    # $scope.get_sequence()
 
     # expand/contract all events
     $scope.bulkToggleDetails = ->
