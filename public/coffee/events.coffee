@@ -90,7 +90,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     if $location.search().sort?
         $scope.sort = $location.search().sort
     else
-        $scope.sort = 'client'
+        $scope.sort = '-age'
 
     if $location.search().limit?
         $scope.limit = $location.search().limit

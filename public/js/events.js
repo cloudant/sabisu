@@ -109,7 +109,7 @@
     if ($location.search().sort != null) {
       $scope.sort = $location.search().sort;
     } else {
-      $scope.sort = 'client';
+      $scope.sort = '-age';
     }
     if ($location.search().limit != null) {
       $scope.limit = $location.search().limit;
