@@ -47,9 +47,9 @@
               %td="Check Name"
               %td="Quantity"
             %tr{'ng-repeat' => 'check in checks | slice:0:10'}
-              %td
+              %td{:class => 'col-md-3'}
                 {{check[0]}}
-              %td
+              %td{:class => 'col-md-1 text-center'}
                 {{check[1]}}
         %div{:id => 'stats_client'}
           %h5="Client Stats"
@@ -58,9 +58,9 @@
               %td="Client Name"
               %td="Quantity"
             %tr{'ng-repeat' => 'client in clients | slice:0:10'}
-              %td
+              %td{:class => 'col-md-3'}
                 {{client[0]}}
-              %td
+              %td{:class => 'col-md-1 text-center'}
                 {{client[1]}}
             
 
