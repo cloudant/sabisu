@@ -102,6 +102,7 @@
     $scope.events_spin = false;
     $scope.bulk = 'show';
     $scope.isActive = true;
+    $scope.showDetails = [];
     $(window).on('focus', function() {
       $scope.isActive = true;
       $scope.updateEvents();
@@ -483,17 +484,30 @@
       return _results;
     };
     $('.collapse').on('hide.bs.collapse', function() {
-      $scope.bulk = 'show';
-      $(this).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-up');
-      return $(this).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-down');
+      return $scope.bulk = 'show';
     });
     $('.collapse').on('show.bs.collapse', function() {
-      $scope.bulk = 'hide';
-      $(this).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-down');
-      return $(this).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-up');
+      return $scope.bulk = 'hide';
     });
     $scope.toggleDetails = function(id) {
-      return $("#" + id).collapse('toggle');
+      var i;
+      if (!$("#" + id).hasClass('in')) {
+        $("#" + id).collapse('show');
+        if ($scope.showDetails.indexOf(id) === -1) {
+          $scope.showDetails.push(id);
+        }
+        $("#" + id).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-down');
+        $("#" + id).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-up');
+      } else {
+        $("#" + id).collapse('hide');
+        i = $scope.showDetails.indexOf(id);
+        if (i !== -1) {
+          $scope.showDetails.splice(i, 1);
+        }
+        $("#" + id).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-up');
+        $("#" + id).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-down');
+      }
+      return $log.info($scope.showDetails);
     };
     return $scope.togglePopover = function() {
       $(this).popover();

@@ -75,12 +75,14 @@ sabisu.factory('stashesFactory', ($log, $http) ->
 )
 
 sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsFactory, stashesFactory) ->
+    # init vars
     $scope.checks = []
     $scope.clients = []
     $scope.events = []
     $scope.events_spin = false
     $scope.bulk = 'show'
     $scope.isActive = true
+    $scope.showDetails = []
 
     # track if window is focused or not
     # only update UI when focused
@@ -448,19 +450,28 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     # on hide switch glyhicon
     $('.collapse').on('hide.bs.collapse', ->
         $scope.bulk = 'show'
-        $(@).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-up')
-        $(@).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-down')
     )
     # on show switch glyhicon
     $('.collapse').on('show.bs.collapse', ->
         $scope.bulk = 'hide'
-        $(@).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-down')
-        $(@).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-up')
     )
 
     # toggle expand/contract event
     $scope.toggleDetails = (id) ->
-        $("#" + id).collapse('toggle')
+        if not $("#" + id).hasClass('in')
+            $("#" + id).collapse('show')
+            $scope.showDetails.push id if $scope.showDetails.indexOf(id) == -1
+            # flip the button
+            $("#" + id).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-down')
+            $("#" + id).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-up')
+        else
+            $("#" + id).collapse('hide')
+            i = $scope.showDetails.indexOf(id)
+            $scope.showDetails.splice(i, 1) if i != -1
+            # flip the button
+            $("#" + id).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-up')
+            $("#" + id).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-down')
+        $log.info($scope.showDetails)
 
     $scope.togglePopover = ->
         $(@).popover()
