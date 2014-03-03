@@ -103,6 +103,9 @@
     $scope.bulk = 'show';
     $scope.isActive = true;
     $scope.showDetails = [];
+    $scope.previous_events_ranges = {};
+    $scope.previous_events_counts = {};
+    $scope.previous_events_events = {};
     $(window).on('focus', function() {
       $scope.isActive = true;
       $scope.updateEvents();
@@ -326,7 +329,7 @@
       $location.search('sort', $scope.sort);
       $location.search('limit', $scope.limit);
       return eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
-        var check, checks, client, color, datapoints, event, events, id, k, parts, stash, statuses, statuses_data, v, _base, _base1, _i, _j, _len, _len1, _ref, _ref1;
+        var check, checks, client, color, datapoints, event, events, id, k, parts, stash, statuses, v, _base, _base1, _i, _j, _len, _len1, _ref, _ref1;
         color = ['success', 'warning', 'danger', 'info'];
         status = ['OK', 'Warning', 'Critical', 'Unknown'];
         events = [];
@@ -336,37 +339,16 @@
         if ('count' in data) {
           $scope.count = data['count'];
         }
-        if ('ranges' in data) {
+        if ('ranges' in data && !angular.equals($scope.previous_events_ranges, data['ranges']['status'])) {
           statuses = data['ranges']['status'];
+          $scope.previous_events_ranges = statuses;
           $('#stats_status').find('#totals').find('.label-success').text("OK: " + statuses['OK']);
           $('#stats_status').find('#totals').find('.label-warning').text("Warning: " + statuses['Warning']);
           $('#stats_status').find('#totals').find('.label-danger').text("Critical: " + statuses['Critical']);
           $('#stats_status').find('#totals').find('.label-info').text("Unknown: " + statuses['Unknown']);
-          statuses_data = [
-            {
-              value: statuses['OK'],
-              color: "#18bc9c",
-              label: 'OK',
-              labelColor: 'white'
-            }, {
-              value: statuses['Warning'],
-              color: "#f39c12",
-              label: 'Warning',
-              labelColor: 'white'
-            }, {
-              value: statuses['Critical'],
-              color: "#e74c3c",
-              label: 'Critical',
-              labelColor: 'white'
-            }, {
-              value: statuses['Unknown'],
-              color: "#3498db",
-              label: 'Unknown',
-              labelColor: 'white'
-            }
-          ];
         }
-        if ('counts' in data) {
+        if ('counts' in data && !angular.equals($scope.previous_events_counts, data['counts'])) {
+          $scope.previous_events_counts = data['counts'];
           checks = data['counts']['check'];
           datapoints = [];
           for (k in checks) {
@@ -388,7 +370,8 @@
           });
           $scope.clients = datapoints.reverse();
         }
-        if ('rows' in data) {
+        if ('rows' in data && !angular.equals($scope.previous_events_events, data['rows'])) {
+          $scope.previous_events_events = angular.copy(data['rows']);
           _ref = data['rows'];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             event = _ref[_i];

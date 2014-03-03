@@ -83,6 +83,9 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     $scope.bulk = 'show'
     $scope.isActive = true
     $scope.showDetails = []
+    $scope.previous_events_ranges = {}
+    $scope.previous_events_counts = {}
+    $scope.previous_events_events = {}
 
     # track if window is focused or not
     # only update UI when focused
@@ -321,41 +324,15 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             events = []
             $scope.bookmark = data['bookmark'] if 'bookmark' of data
             $scope.count = data['count'] if 'count' of data
-            if 'ranges' of data
+            if 'ranges' of data and not angular.equals($scope.previous_events_ranges,data['ranges']['status'])
                 statuses = data['ranges']['status']
+                $scope.previous_events_ranges = statuses
                 $('#stats_status').find('#totals').find('.label-success').text("OK: " + statuses['OK'])
                 $('#stats_status').find('#totals').find('.label-warning').text("Warning: " + statuses['Warning'])
                 $('#stats_status').find('#totals').find('.label-danger').text("Critical: " + statuses['Critical'])
                 $('#stats_status').find('#totals').find('.label-info').text("Unknown: " + statuses['Unknown'])
-                statuses_data = [
-                    {
-                        value: statuses['OK']
-                        color: "#18bc9c"
-                        label: 'OK'
-                        labelColor: 'white'
-                    },
-                    {
-                        value: statuses['Warning']
-                        color: "#f39c12"
-                        label: 'Warning'
-                        labelColor: 'white'
-                    }
-                    {
-                        value: statuses['Critical']
-                        color: "#e74c3c"
-                        label: 'Critical'
-                        labelColor: 'white'
-                    },
-                    {
-                        value: statuses['Unknown']
-                        color: "#3498db"
-                        label: 'Unknown'
-                        labelColor: 'white'
-                    }
-                ]
-                # ctx = $('#chart_pie_status').get(0).getContext('2d')
-                # new Chart(ctx).Pie(statuses_data, {animation: false})
-            if 'counts' of data
+            if 'counts' of data and not angular.equals($scope.previous_events_counts,data['counts'])
+                $scope.previous_events_counts = data['counts']
                 # get check counts
                 checks = data['counts']['check']
                 datapoints = []
@@ -375,7 +352,8 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                     a[1] - b[1]
                 )
                 $scope.clients = datapoints.reverse()
-            if 'rows' of data
+            if 'rows' of data and not angular.equals($scope.previous_events_events, data['rows'])
+                $scope.previous_events_events = angular.copy(data['rows'])
                 for event in data['rows']
                     event = event['doc']['event']
                     id = "#{event['client']['name']}/#{event['check']['name']}"
