@@ -432,8 +432,10 @@
             events.push(event);
           }
           $scope.events_spin = false;
-          $scope.events = events;
-          return $scope.updateStashes();
+          if (!angular.equals($scope.events, events)) {
+            $scope.events = events;
+            return $scope.updateStashes();
+          }
         }
       });
     };

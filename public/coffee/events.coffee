@@ -405,8 +405,9 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                     events.push event
                 # hide progress bar
                 $scope.events_spin = false
-                $scope.events = events
-                $scope.updateStashes()
+                if not angular.equals($scope.events, events)
+                    $scope.events = events
+                    $scope.updateStashes()
         )
     $scope.updateEvents()
 
