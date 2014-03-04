@@ -329,7 +329,7 @@
       $location.search('sort', $scope.sort);
       $location.search('limit', $scope.limit);
       return eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
-        var check, checks, client, color, datapoints, event, events, id, k, parts, stash, statuses, v, _base, _base1, _i, _j, _len, _len1, _ref, _ref1;
+        var check, checks, client, color, datapoints, event, events, id, k, parts, stash, statuses, v, _base, _base1, _i, _j, _len, _len1, _ref, _ref1, _ref2;
         color = ['success', 'warning', 'danger', 'info'];
         status = ['OK', 'Warning', 'Critical', 'Unknown'];
         events = [];
@@ -378,9 +378,14 @@
             event = event['doc']['event'];
             id = "" + event['client']['name'] + "/" + event['check']['name'];
             event['id'] = CryptoJS.MD5(id).toString(CryptoJS.enc.Base64);
+            if (_ref1 = event.id, __indexOf.call($scope.showDetails, _ref1) >= 0) {
+              event.showdetails = 'in';
+            } else {
+              event.showdetails = '';
+            }
             event['color'] = color[event['check']['status']];
             event['wstatus'] = status[event['check']['status']];
-            event['rel_time'] = "2 hours ago";
+            event['rel_time'] = moment.unix(event['check']['state_change']).fromNow();
             event['check']['issued'] = event['check']['issued'] * 1000;
             if (event['check']['state_change'] != null) {
               event['check']['state_change'] = event['check']['state_change'] * 1000;
@@ -392,9 +397,9 @@
               _base1.silenced = false;
             }
             if ($scope.stashes != null) {
-              _ref1 = $scope.stashes;
-              for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-                stash = _ref1[_j];
+              _ref2 = $scope.stashes;
+              for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+                stash = _ref2[_j];
                 parts = stash['path'].split('/', 3);
                 client = parts[1];
                 if (parts.length > 2) {

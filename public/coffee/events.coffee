@@ -358,9 +358,13 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                     event = event['doc']['event']
                     id = "#{event['client']['name']}/#{event['check']['name']}"
                     event['id'] = CryptoJS.MD5(id).toString(CryptoJS.enc.Base64)
+                    if event.id in $scope.showDetails
+                        event.showdetails = 'in'
+                    else
+                        event.showdetails = ''
                     event['color'] = color[event['check']['status']]
                     event['wstatus'] = status[event['check']['status']]
-                    event['rel_time'] = "2 hours ago"
+                    event['rel_time'] = moment.unix(event['check']['state_change']).fromNow()
                     event['check']['issued'] = event['check']['issued'] * 1000
                     if event['check']['state_change']?
                         event['check']['state_change'] = event['check']['state_change'] * 1000

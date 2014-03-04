@@ -104,7 +104,7 @@
                     \- {{event.check.output}}
                 %h5
                   %span{:class => 'glyphicon glyphicon-collapse-down toggleBtnIcon pull-right', 'ng-click' => "toggleDetails(event.id)"}
-              %div{:class => "panel-body panel-collapse collapse", :id => "{{event.id}}"}
+              %div{:class => "panel-body panel-collapse collapse {{event.showdetails}}", :id => "{{event.id}}"}
                 %div{:class => 'dropdown actions pull-right'}
                   %button{:class => 'btn btn-link dropdown-toggle', 'data-toggle' => 'dropdown'}
                     Actions
@@ -118,7 +118,7 @@
                       %a{"href" => "#", 'ng-click' => 'updateSilencePath(event.client.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'}= "Client"
                     %li
                       %a{"href" => "#", 'ng-click' => 'updateSilencePath(event.client.name + "/" + event.check.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'}= "Check"
-                %div{:class => 'col-md-6 pull-left'}
+                %div{:class => 'col-md-5 pull-left'}
                   %dl{:class => 'dl-horizontal'}
                     %div{'ng-show' => 'event.check.issued'}
                       %dt{:class => 'attr_title'}="issued"
@@ -132,12 +132,12 @@
                       %dt{:class => 'attr_title'}="occurences"
                       %dd{:class => 'attr_value'}
                         {{event.occurrences}}
-                %div{:class => 'col-md-6 pull-right'}
+                %div{:class => 'col-md-5 pull-left'}
                   %dl{:class => 'dl-horizontal'}
                     %div{'ng-show' => 'event.check.state_change'}
                       %dt{:class => 'attr_title'}="state change"
                       %dd{:class => 'attr_value'}
-                        {{event.check.state_change | date:'short'}}
+                        {{event.rel_time}}
                     %div{'ng-show' => 'event.check.subscribers'}
                       %dt{:class => 'attr_title'}="subscribers"
                       %dd{:class => 'attr_value'}
