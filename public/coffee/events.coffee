@@ -76,6 +76,7 @@ sabisu.factory('stashesFactory', ($log, $http) ->
 
 sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsFactory, stashesFactory) ->
     # init vars
+    $scope.first_search = true
     $scope.checks = []
     $scope.clients = []
     $scope.events = []
@@ -320,11 +321,15 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
         $scope.search = $scope.search_field
         $scope.sort = $scope.sort_field
         $scope.limit = $scope.limit_field
+        $location.search('query', $scope.search)
+        $location.search('sort', $scope.sort)
+        $location.search('limit', $scope.limit)
         $scope.updateEvents()
 
     $scope.updateEvents = ->
-        # start progress bar
-        $scope.events_spin = true unless $scope.events.length > 0
+        # start progress bar if first time
+        $scope.events_spin = true if $scope.first_search
+        $scope.first_search = false
         # get events
         eventsFactory.searchEvents($scope.search, $scope.sort, $scope.limit).success( (data, status, headers, config) ->
             color = [ 'success', 'warning', 'danger', 'info' ]
@@ -400,6 +405,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                 if not angular.equals($scope.events, events)
                     $scope.events = events
                     $scope.updateStashes()
+            $scope.events_spin = false
         )
     $scope.updateEvents()
 

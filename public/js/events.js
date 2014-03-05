@@ -96,6 +96,7 @@
   });
 
   sabisu.controller('eventsController', function($scope, $log, $location, $filter, eventsFactory, stashesFactory) {
+    $scope.first_search = true;
     $scope.checks = [];
     $scope.clients = [];
     $scope.events = [];
@@ -331,12 +332,16 @@
       $scope.search = $scope.search_field;
       $scope.sort = $scope.sort_field;
       $scope.limit = $scope.limit_field;
+      $location.search('query', $scope.search);
+      $location.search('sort', $scope.sort);
+      $location.search('limit', $scope.limit);
       return $scope.updateEvents();
     };
     $scope.updateEvents = function() {
-      if (!($scope.events.length > 0)) {
+      if ($scope.first_search) {
         $scope.events_spin = true;
       }
+      $scope.first_search = false;
       return eventsFactory.searchEvents($scope.search, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
         var check, checks, client, color, datapoints, event, events, id, k, parts, stash, statuses, v, _base, _base1, _i, _j, _len, _len1, _ref, _ref1, _ref2;
         color = ['success', 'warning', 'danger', 'info'];
@@ -432,9 +437,10 @@
           $scope.events_spin = false;
           if (!angular.equals($scope.events, events)) {
             $scope.events = events;
-            return $scope.updateStashes();
+            $scope.updateStashes();
           }
         }
+        return $scope.events_spin = false;
       });
     };
     $scope.updateEvents();
