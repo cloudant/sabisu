@@ -406,6 +406,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                     $scope.events = events
                     $scope.updateStashes()
             $scope.events_spin = false
+            $('#corner_status').text("Last Update: " + $filter('date')(Date.now(), 'mediumTime'))
         )
     $scope.updateEvents()
 

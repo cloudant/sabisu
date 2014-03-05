@@ -440,7 +440,8 @@
             $scope.updateStashes();
           }
         }
-        return $scope.events_spin = false;
+        $scope.events_spin = false;
+        return $('#corner_status').text("Last Update: " + $filter('date')(Date.now(), 'mediumTime'));
       });
     };
     $scope.updateEvents();

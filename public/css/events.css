@@ -112,3 +112,15 @@ button.deleteSilenceBtn {
 div.radio {
 	padding-bottom: 5px;
 }
+
+span#corner_status {
+  background-color: #EEE;
+  position: fixed;
+  padding: 0px 10px;
+  font-size: 8pt;
+  bottom: 0px;
+  right: 0px;
+  z-index: 100;
+  -moz-border-radius-topleft: 0px;
+  -webkit-border-top-left-radius: 6px;
+}
