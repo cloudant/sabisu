@@ -22,11 +22,16 @@
                   Events
                   %b{:class => "caret"}
                 %ul{:class => 'dropdown-menu'}
-                  %li{:class => 'dropdown-header'}= 'Problems'
                   %li
-                    %a{"href" => "/events?sort=-age&limit=50&query=", :target => '_self'}= "Recent"
+                    %a{"href" => "/events?sort=-age&limit=50&query=", :target => '_self'}= "Recent State Change"
                   %li
-                    %a{"href" => "/events?sort=age&limit=50&query=", :target => '_self'}= "Old"
+                    %a{"href" => "/events?sort=age&limit=50&query=", :target => '_self'}= "Stale State"
+                  %li
+                    %a{"href" => "/events?sort=-age&limit=50&query=status:1", :target => '_self'}= "Warning"
+                  %li
+                    %a{"href" => "/events?sort=-age&limit=50&query=status:2", :target => '_self'}= "Critical"
+                  %li
+                    %a{"href" => "/events?sort=-age&limit=50&query=status:3", :target => '_self'}= "Unknown"
               %li
                 %a{'href' => '/logout', :target => '_self'}= "Logout"
             - else
