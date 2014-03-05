@@ -16,7 +16,7 @@
               %a{'data-toggle' => 'modal', 'data-target' => '#howdoisearch'}= "How do I search?"
             %div{:class => "pull-left"}
               %span{}= "Sort"
-              %select{:id => 'sort', 'ng-model' => 'sort', :class => 'form-control'}
+              %select{:id => 'sort_field', 'ng-model' => 'sort', :class => 'form-control'}
                 %option{:value => 'client'}= 'client'
                 %option{:value => '-client'}= 'client (decending)'
                 %option{:value => 'check'}= 'check'
@@ -29,7 +29,7 @@
                 %option{:value => '-issued'}= 'issued (decending)'
                 %option{:value => 'output'}= 'output'
                 %option{:value => '-output'}= 'output (decending)'
-          %input{:type => 'submit', :class => 'btn btn-success pull-right', 'ng-click' => 'updateEvents()'}
+          %input{:type => 'submit', :class => 'btn btn-success pull-right', 'ng-click' => 'updateParams()'}
 
   #stats{:class => "col-md-4 pull-left main-content"}
     %div{:class => "panel panel-primary"}
@@ -73,7 +73,7 @@
         %button{:type => "button", :class => "btn btn-primary btn-xs", :id => "collapseStats", "data-toggle" => "collapse", "data-target" => "#events_field"}="Events"
         %div{:class => 'pull-right'}
           %span{:class => 'view'}= "View"
-          %select{:id => 'limit', 'ng-model' => 'limit'}
+          %select{:id => 'limit', 'ng-model' => 'limit_field'}
             %option{:value => '10'}= '10'
             %option{:value => '20'}= '20'
             %option{:value => '50', :selected => "selected"}= '50'

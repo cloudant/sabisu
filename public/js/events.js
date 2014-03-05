@@ -116,18 +116,24 @@
     });
     if ($location.search().query != null) {
       $scope.search_field = $location.search().query;
+      $scope.search = $location.search().query;
     } else {
       $scope.search_field = '';
+      $scope.search = '';
     }
     if ($location.search().sort != null) {
+      $scope.sort_field = $location.search().sort;
       $scope.sort = $location.search().sort;
     } else {
       $scope.sort = '-age';
+      $scope.sort_field = '-age';
     }
     if ($location.search().limit != null) {
       $scope.limit = $location.search().limit;
+      $scope.limit_field = $location.search().limit;
     } else {
       $scope.limit = '50';
+      $scope.limit_field = '50';
     }
     $scope.buildSilencePopover = function(stash) {
       var html, rel_time;
@@ -321,14 +327,17 @@
         return alert("Faild to resolve event: " + client + "/" + check);
       });
     };
+    $scope.updateParams = function() {
+      $scope.search = $scope.search_field;
+      $scope.sort = $scope.sort_field;
+      $scope.limit = $scope.limit_field;
+      return $scope.updateEvents();
+    };
     $scope.updateEvents = function() {
       if (!($scope.events.length > 0)) {
         $scope.events_spin = true;
       }
-      $location.search('query', $scope.search_field);
-      $location.search('sort', $scope.sort);
-      $location.search('limit', $scope.limit);
-      return eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
+      return eventsFactory.searchEvents($scope.search, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
         var check, checks, client, color, datapoints, event, events, id, k, parts, stash, statuses, v, _base, _base1, _i, _j, _len, _len1, _ref, _ref1, _ref2;
         color = ['success', 'warning', 'danger', 'info'];
         status = ['OK', 'Warning', 'Critical', 'Unknown'];
@@ -485,7 +494,7 @@
           $scope.showDetails.push(id);
         }
         $("#" + id).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-down');
-        $("#" + id).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-up');
+        return $("#" + id).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-up');
       } else {
         $("#" + id).collapse('hide');
         i = $scope.showDetails.indexOf(id);
@@ -493,9 +502,8 @@
           $scope.showDetails.splice(i, 1);
         }
         $("#" + id).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-up');
-        $("#" + id).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-down');
+        return $("#" + id).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-down');
       }
-      return $log.info($scope.showDetails);
     };
     return $scope.togglePopover = function() {
       $(this).popover();

@@ -101,18 +101,24 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     # load url parameters
     if $location.search().query?
         $scope.search_field = $location.search().query
+        $scope.search = $location.search().query
     else
         $scope.search_field = ''
+        $scope.search = ''
 
     if $location.search().sort?
+        $scope.sort_field = $location.search().sort
         $scope.sort = $location.search().sort
     else
         $scope.sort = '-age'
+        $scope.sort_field = '-age'
 
     if $location.search().limit?
         $scope.limit = $location.search().limit
+        $scope.limit_field = $location.search().limit
     else
         $scope.limit = '50'
+        $scope.limit_field = '50'
 
     $scope.buildSilencePopover = (stash) ->
         html = '<div class="silence_window">'
@@ -310,15 +316,17 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             alert "Faild to resolve event: #{client}/#{check}"
         )
 
+    $scope.updateParams = ->
+        $scope.search = $scope.search_field
+        $scope.sort = $scope.sort_field
+        $scope.limit = $scope.limit_field
+        $scope.updateEvents()
+
     $scope.updateEvents = ->
         # start progress bar
         $scope.events_spin = true unless $scope.events.length > 0
-        # set url paramaters with query terms etc
-        $location.search('query', $scope.search_field)
-        $location.search('sort', $scope.sort)
-        $location.search('limit', $scope.limit)
         # get events
-        eventsFactory.searchEvents($scope.search_field, $scope.sort, $scope.limit).success( (data, status, headers, config) ->
+        eventsFactory.searchEvents($scope.search, $scope.sort, $scope.limit).success( (data, status, headers, config) ->
             color = [ 'success', 'warning', 'danger', 'info' ]
             status = [ 'OK', 'Warning', 'Critical', 'Unknown' ]
             events = []
@@ -453,7 +461,6 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             # flip the button
             $("#" + id).parent().find('.toggleBtnIcon').removeClass('glyphicon-collapse-up')
             $("#" + id).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-down')
-        $log.info($scope.showDetails)
 
     $scope.togglePopover = ->
         $(@).popover()
