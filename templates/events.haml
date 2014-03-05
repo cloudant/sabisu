@@ -16,7 +16,7 @@
               %a{'data-toggle' => 'modal', 'data-target' => '#howdoisearch'}= "How do I search?"
             %div{:class => "pull-left"}
               %span{}= "Sort"
-              %select{:id => 'sort_field', 'ng-model' => 'sort', :class => 'form-control'}
+              %select{:id => 'sort', 'ng-model' => 'sort_field', :class => 'form-control'}
                 %option{:value => 'client'}= 'client'
                 %option{:value => '-client'}= 'client (decending)'
                 %option{:value => 'check'}= 'check'
