@@ -23,6 +23,10 @@ before '/:name' do
   force_session_auth unless params[:name] == 'login'
 end
 
+before '/api/*' do
+  protected!
+end
+
 get '/' do
   redirect '/login'
 end

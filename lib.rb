@@ -3,11 +3,7 @@
 # sinatra help functions
 helpers do
   def validate(username, password)
-    if username == UI_USERNAME && password == UI_PASSWORD
-      return true
-    else
-      return false
-    end
+    username == UI_USERNAME && password == UI_PASSWORD ? true : false
   end
 
   def logged_in?
@@ -32,8 +28,13 @@ helpers do
     session.clear
   end
 
+  def authorized?
+    @auth ||=  Rack::Auth::Basic::Request.new(request.env)
+    @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == [UI_USERNAME, UI_PASSWORD]
+  end
+
   def protected!
-    unless authorized?
+    unless authorized? || logged_in?
       response['WWW-Authenticate'] = "Basic realm='Sabisu requires authentication'"
       throw(:halt, [401, "Not authorized\n"])
     end
