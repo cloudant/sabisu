@@ -340,7 +340,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             if 'ranges' of data and not angular.equals($scope.previous_events_ranges,data['ranges']['status'])
                 statuses = data['ranges']['status']
                 $scope.previous_events_ranges = statuses
-                $('#stats_status').find('#totals').find('.label-success').text("OK: " + statuses['OK'])
+                # $('#stats_status').find('#totals').find('.label-success').text("OK: " + statuses['OK'])
                 $('#stats_status').find('#totals').find('.label-warning').text("Warning: " + statuses['Warning'])
                 $('#stats_status').find('#totals').find('.label-danger').text("Critical: " + statuses['Critical'])
                 $('#stats_status').find('#totals').find('.label-info').text("Unknown: " + statuses['Unknown'])
