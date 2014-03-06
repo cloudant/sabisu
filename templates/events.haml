@@ -219,11 +219,14 @@
             %td="Desired Result"
             %td="Query"
           %tr
-            %td="For clients starting with 'web'"
+            %td="For clients STARTING with 'web'"
             %td="client:web*"
           %tr
-            %td="For checks ending with 'process'"
+            %td="For checks ENDING with 'process'"
             %td="check:process"
+          %tr
+            %td="For checks MATCHING with 'disk_usage'"
+            %td="check:\"disk_usage\""
           %tr
             %td="For statuses warning or critical"
             %td="status:[1 TO 2]"
@@ -231,7 +234,10 @@
             %td="For 'web' clients and critical"
             %td="client:web* AND status:2"
           %tr
-            %td="For 'web' or 'dbs' and status is unknown"
+            %td="Search for everything, except checks that start with 'disk'"
+            %td="*:* AND NOT check:disk*"
+          %tr
+            %td="For 'web' or 'dbs' clients and status is unknown"
             %td="client:(web* OR db*) AND status:3"
           %tr
             %td="Full text search for 'failure'"
