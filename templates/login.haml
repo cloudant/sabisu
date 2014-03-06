@@ -4,20 +4,19 @@
       %button{:type => "button", :class => "close", "data-dismiss" => "alert"}= "&times;"
       %strong= "Error!"
       = locals[:message]
-  %form{'class' => 'form-horizontal', :action => "/login", :method => "post"}
-    %div{'class' => 'control-group'}
-      %label{'class' => 'control-label', 'for' => 'username'}= "Username"
-      %div{'class' => 'controls'}
+  %div{'class' => 'col-centered'}
+    %form{'class' => 'form-horizontal', :action => "/login", :method => "post"}
+      %div{'class' => 'form-group'}
+        %label{'class' => 'col-sm-2 control-label', 'for' => 'username'}= "Username"
         - if locals[:remember_me].nil?
-          %input{'type' => 'text', 'name' => 'username', 'id' => 'username', 'placeholder' => 'Username'}
+          %input{'type' => 'text', 'class' => 'form-control', 'name' => 'username', 'id' => 'username', 'placeholder' => 'Username'}
         - else
-          %input{'type' => 'text', 'name' => 'username', 'id' => 'username', 'value' => locals[:remember_me]}
-    %div{'class' => 'control-group'}
-      %label{'class' => 'control-label', 'for' => 'password'}= "Password"
-      %div{'class' => 'controls'}
-        %input{'type' => 'password', 'name' => 'password', 'id' => 'password', 'placeholder' => 'Password'}
-    %div{'class' => 'control-group'}
-      %div{'class' => 'controls'}
-        %label{'class' => 'checkbox'}
-          %input{'type' => 'checkbox', 'name' => 'remember_me', 'id' => 'remember_me'}= "Remember Me"
+          %input{'type' => 'text', 'class' => 'form-control', 'name' => 'username', 'id' => 'username', 'value' => locals[:remember_me]}
+      %div{'class' => 'form-group'}
+        %label{'class' => 'col-sm-2 control-label', 'for' => 'password'}= "Password"
+        %input{'type' => 'password', 'class' => 'form-control', 'name' => 'password', 'id' => 'password', 'placeholder' => 'Password'}
+      %div{'class' => 'form-group'}
+        %div{'class' => 'checkbox'}
+          %label
+            %input{'type' => 'checkbox', 'name' => 'remember_me', 'id' => 'remember_me'}= "Remember Me"
         %button{'type' => 'submit', 'id' => 'loginBtn', 'class' => 'btn btn-primary'}= "Log in"

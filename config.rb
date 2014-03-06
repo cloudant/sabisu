@@ -21,7 +21,7 @@ configure :production do
 
   # force ssl connections only
   require 'rack-ssl-enforcer'
-  use Rack::SslEnforcer
+  #use Rack::SslEnforcer
 
   # don't show exceptions
   set :raise_errors, Proc.new { false }

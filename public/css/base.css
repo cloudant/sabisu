@@ -22,3 +22,11 @@
     padding: 0px;
     margin: 2px;
 }
+
+.col-centered{
+    float: none;
+    margin-left:auto;
+    margin-right:auto;
+    width:30%;
+    padding-bottom: 100px;
+}
