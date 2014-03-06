@@ -55,7 +55,7 @@ function(doc) {
   index('default', doc._id);
 #{fields.join(' ')}
 }"
-    search_indexes = { all_fields: { index: search_function } }
+    search_indexes = { all_fields: { analyzer: 'whitespace', index: search_function } }
 
     # save the design doc only if it has changed or doesn't exist
     begin
