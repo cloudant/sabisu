@@ -97,6 +97,7 @@
 
   sabisu.controller('eventsController', function($scope, $log, $location, $filter, eventsFactory, stashesFactory) {
     $scope.first_search = true;
+    $scope.alt_pressed = false;
     $scope.checks = [];
     $scope.clients = [];
     $scope.events = [];
@@ -114,6 +115,18 @@
     });
     $(window).on('blur', function() {
       return $scope.isActive = false;
+    });
+    $(window).keydown(function(evt) {
+      if (evt.which === 18) {
+        $scope.alt_pressed = true;
+      }
+      return $log.info($scope.alt_pressed);
+    });
+    $(window).keyup(function(evt) {
+      if (evt.which === 18) {
+        $scope.alt_pressed = false;
+      }
+      return $log.info($scope.alt_pressed);
     });
     if ($location.search().query != null) {
       $scope.search_field = $location.search().query;
@@ -335,6 +348,41 @@
       $location.search('query', $scope.search);
       $location.search('sort', $scope.sort);
       $location.search('limit', $scope.limit);
+      return $scope.updateEvents();
+    };
+    $scope.appendQuery = function(val, type, quote) {
+      var q;
+      if (type == null) {
+        type = null;
+      }
+      if (quote == null) {
+        quote = true;
+      }
+      $log.info(val, type, quote);
+      q = '';
+      if ($scope.search.length > 0) {
+        if ($scope.alt_pressed) {
+          q += ' AND NOT ';
+        } else {
+          q += ' AND ';
+        }
+      } else {
+        if ($scope.alt_pressed) {
+          q += '*:* AND NOT ';
+        }
+      }
+      if (type != null) {
+        q += type + ':';
+      }
+      if (quote) {
+        q += "\"" + val + "\"";
+      } else {
+        q += "" + val;
+      }
+      $scope.search += q;
+      $scope.search_field = $scope.search;
+      $location.search('query', $scope.search);
+      $log.info(q);
       return $scope.updateEvents();
     };
     $scope.updateEvents = function() {

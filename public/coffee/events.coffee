@@ -77,6 +77,7 @@ sabisu.factory('stashesFactory', ($log, $http) ->
 sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsFactory, stashesFactory) ->
     # init vars
     $scope.first_search = true
+    $scope.alt_pressed = false
     $scope.checks = []
     $scope.clients = []
     $scope.events = []
@@ -99,6 +100,15 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
         $scope.isActive = false
     )
 
+    # track if alt key is pressed ( for appendQuery function )
+    $(window).keydown( (evt) ->
+        $scope.alt_pressed = true if evt.which == 18
+        $log.info($scope.alt_pressed)
+    )
+    $(window).keyup( (evt) ->
+        $scope.alt_pressed = false if evt.which == 18
+        $log.info($scope.alt_pressed)
+    )
     # load url parameters
     if $location.search().query?
         $scope.search_field = $location.search().query
@@ -324,6 +334,27 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
         $location.search('query', $scope.search)
         $location.search('sort', $scope.sort)
         $location.search('limit', $scope.limit)
+        $scope.updateEvents()
+
+    $scope.appendQuery = (val, type = null, quote = true) ->
+        $log.info(val, type, quote)
+        q = ''
+        if $scope.search.length > 0
+            if $scope.alt_pressed
+                q += ' AND NOT '
+            else
+                q += ' AND '
+        else
+            q += '*:* AND NOT ' if $scope.alt_pressed
+        q += type + ':' if type?
+        if quote
+            q += "\"#{val}\""
+        else
+            q += "#{val}"
+        $scope.search += q
+        $scope.search_field = $scope.search
+        $location.search('query', $scope.search)
+        $log.info(q)
         $scope.updateEvents()
 
     $scope.updateEvents = ->

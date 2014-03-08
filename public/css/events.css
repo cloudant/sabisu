@@ -113,6 +113,11 @@ div.radio {
 	padding-bottom: 5px;
 }
 
+.appendQuery {
+	color: #18bc9c;
+	cursor: pointer;
+}
+
 span#corner_status {
   background-color: #EEE;
   position: fixed;
