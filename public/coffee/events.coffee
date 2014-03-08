@@ -336,7 +336,6 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
         $scope.updateEvents()
 
     $scope.appendQuery = (val, type = null, quote = true) ->
-        $log.info(val, type, quote)
         q = ''
         if $scope.search.length > 0
             if $scope.alt_pressed
@@ -353,7 +352,6 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
         $scope.search += q
         $scope.search_field = $scope.search
         $location.search('query', $scope.search)
-        $log.info(q)
         $scope.updateEvents()
 
     $scope.updateEvents = ->

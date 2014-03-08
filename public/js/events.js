@@ -356,7 +356,6 @@
       if (quote == null) {
         quote = true;
       }
-      $log.info(val, type, quote);
       q = '';
       if ($scope.search.length > 0) {
         if ($scope.alt_pressed) {
@@ -380,7 +379,6 @@
       $scope.search += q;
       $scope.search_field = $scope.search;
       $location.search('query', $scope.search);
-      $log.info(q);
       return $scope.updateEvents();
     };
     $scope.updateEvents = function() {
