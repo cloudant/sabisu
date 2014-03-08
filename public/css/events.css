@@ -118,6 +118,10 @@ div.radio {
 	cursor: pointer;
 }
 
+.pointer {
+	cursor: pointer;
+}
+
 span#corner_status {
   background-color: #EEE;
   position: fixed;

@@ -37,9 +37,9 @@
       %div{:class => "panel-body", 'ng-hide' => 'events.length == 0 || events_spin'}
         %div{:id => 'stats_status', 'ng-hide' => 'events_spin'}
           #totals
-            %span{:class => "label label-warning appendQuery", 'ng-click' => 'appendQuery(1, "status", false)'}= " - "
-            %span{:class => "label label-danger appendQuery", 'ng-click' => 'appendQuery(2, "status", false)'}= " - "
-            %span{:class => "label label-info appendQuery", 'ng-click' => 'appendQuery(3, "status", false)'}= " - "
+            %span{:class => "label label-warning pointer", 'ng-click' => 'appendQuery(1, "status", false)'}= " - "
+            %span{:class => "label label-danger pointer", 'ng-click' => 'appendQuery(2, "status", false)'}= " - "
+            %span{:class => "label label-info pointer", 'ng-click' => 'appendQuery(3, "status", false)'}= " - "
         %div{:id => 'stats_check'}
           %h5="Check Stats"
           %table{:class => 'table table-striped', 'ng-hide' => 'events_spin'}
@@ -91,7 +91,7 @@
               %div{:class => "panel-heading flat-heading event_line", :panel => "{{event.client.name}}/{{event.check.name}}"}
                 %div{:class => "col-md-2"}
                   %h4
-                    %span{:class => "label label-{{event.color}} pull-right appendQuery", 'ng-click' => 'appendQuery(event.check.status, "status", false)'}="{{event.wstatus}}"
+                    %span{:class => "label label-{{event.color}} pull-right pointer", 'ng-click' => 'appendQuery(event.check.status, "status", false)'}="{{event.wstatus}}"
                 %h5{:class => "event_title pull-left"}
                   %span{'ng-show' => 'event.client.silenced', :class => 'silenceBtn glyphicon glyphicon-volume-off', 'data-toggle' => 'popover', 'data-content' => '{{event.client.silence_html}}'}
                   %span{:class => 'appendQuery', 'ng-click' => 'appendQuery(event.client.name, "client")'}
