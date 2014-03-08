@@ -470,18 +470,24 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
 
     # expand/contract all events
     $scope.bulkToggleDetails = ->
-        mySwitch = $scope.bulk
-        $scope.showDetails = [] if mySwitch == 'hide'
+        if $scope.bulk == 'show'
+            action = 'show'
+            $scope.showDetails = []
+            for event in $scope.events
+                $scope.showDetails.push event.id
+        else
+            action = 'hide'
+            $scope.showDetails = []
         for event in $scope.events
-            $("#" + event['id']).collapse(mySwitch)
+            $("#" + event.id).collapse(action)
 
     # on hide switch glyhicon
     $('.collapse').on('hide.bs.collapse', ->
-        $scope.bulk = 'show'
+        $scope.bulk = 'show' if $scope.showDetails.length == 0
     )
     # on show switch glyhicon
     $('.collapse').on('show.bs.collapse', ->
-        $scope.bulk = 'hide'
+        $scope.bulk = 'hide' if $scope.showDetails.length > 0
     )
 
     # toggle expand/contract event

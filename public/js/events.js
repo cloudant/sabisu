@@ -522,24 +522,36 @@
     };
     $scope.get_sequence();
     $scope.bulkToggleDetails = function() {
-      var event, mySwitch, _i, _len, _ref, _results;
-      mySwitch = $scope.bulk;
-      if (mySwitch === 'hide') {
+      var action, event, _i, _j, _len, _len1, _ref, _ref1, _results;
+      if ($scope.bulk === 'show') {
+        action = 'show';
+        $scope.showDetails = [];
+        _ref = $scope.events;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          event = _ref[_i];
+          $scope.showDetails.push(event.id);
+        }
+      } else {
+        action = 'hide';
         $scope.showDetails = [];
       }
-      _ref = $scope.events;
+      _ref1 = $scope.events;
       _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        event = _ref[_i];
-        _results.push($("#" + event['id']).collapse(mySwitch));
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        event = _ref1[_j];
+        _results.push($("#" + event.id).collapse(action));
       }
       return _results;
     };
     $('.collapse').on('hide.bs.collapse', function() {
-      return $scope.bulk = 'show';
+      if ($scope.showDetails.length === 0) {
+        return $scope.bulk = 'show';
+      }
     });
     $('.collapse').on('show.bs.collapse', function() {
-      return $scope.bulk = 'hide';
+      if ($scope.showDetails.length > 0) {
+        return $scope.bulk = 'hide';
+      }
     });
     $scope.toggleDetails = function(id) {
       var i;
