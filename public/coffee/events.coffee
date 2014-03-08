@@ -143,7 +143,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
 <dt>Author</dt>
 <dd>#{stash['content']['author']}</dd>
 """
-        if stash['expire']?
+        if stash['expire']? and stash['expire'] != -1
             rel_time = moment.unix(parseInt(stash['content']['timestamp']) + parseInt(stash['expire'])).fromNow()
             html += """
 <dt class="text-warning">Expires</dt>

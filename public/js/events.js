@@ -156,7 +156,7 @@
       if (stash['content']['author'] != null) {
         html += "<dt>Author</dt>\n<dd>" + stash['content']['author'] + "</dd>";
       }
-      if (stash['expire'] != null) {
+      if ((stash['expire'] != null) && stash['expire'] !== -1) {
         rel_time = moment.unix(parseInt(stash['content']['timestamp']) + parseInt(stash['expire'])).fromNow();
         html += "<dt class=\"text-warning\">Expires</dt>\n<dd class=\"text-warning\">" + rel_time + "</dd>";
       }
