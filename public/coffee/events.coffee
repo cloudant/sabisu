@@ -103,12 +103,11 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     # track if alt key is pressed ( for appendQuery function )
     $(window).keydown( (evt) ->
         $scope.alt_pressed = true if evt.which == 18
-        $log.info($scope.alt_pressed)
     )
     $(window).keyup( (evt) ->
         $scope.alt_pressed = false if evt.which == 18
-        $log.info($scope.alt_pressed)
     )
+
     # load url parameters
     if $location.search().query?
         $scope.search_field = $location.search().query

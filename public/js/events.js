@@ -118,15 +118,13 @@
     });
     $(window).keydown(function(evt) {
       if (evt.which === 18) {
-        $scope.alt_pressed = true;
+        return $scope.alt_pressed = true;
       }
-      return $log.info($scope.alt_pressed);
     });
     $(window).keyup(function(evt) {
       if (evt.which === 18) {
-        $scope.alt_pressed = false;
+        return $scope.alt_pressed = false;
       }
-      return $log.info($scope.alt_pressed);
     });
     if ($location.search().query != null) {
       $scope.search_field = $location.search().query;
