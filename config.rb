@@ -38,6 +38,20 @@ configure :production, :development do
     "#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_HISTORYDB']}"
   )
 
+  # fields
+  FIELDS = [
+    { name: 'client', path: 'client.name', facet: true, type: 'str', index: true},
+    { name: 'check', path: 'check.name', facet: true, type: 'str', index: true},
+    { name: 'status', path: 'check.status', facet: false, type: 'int', index: true},
+    { name: 'state_change', path: 'check.state_change', facet: false, type: 'int', index: true},
+    { name: 'occurrence', path: 'occurrences', facet: false, type: 'int', index: true},
+    { name: 'action', path: 'action', facet: false, type: 'str', index: true},
+    { name: 'issued', path: 'check.issued', facet: false, type: 'int', index: true},
+    { name: 'output', path: 'check.output', facet: false, type: 'str', index: true}
+  ]
+
+  FIELDS += JSON.parse(ENV['CUSTOM_FIELDS']) if ENV['CUSTOM_FIELDS']
+
   # connect to redis
   API_URL = ENV['API_URL'] if ENV['API_URL']
   API_PORT = ENV['API_PORT'] if ENV['API_PORT']

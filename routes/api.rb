@@ -26,3 +26,7 @@ get '/api/changes' do
   params = request.env['rack.request.query_hash']
   JSON.pretty_generate(CURRENT_DB.changes(params))
 end
+
+get '/api/configuration/fields' do
+  JSON.pretty_generate(FIELDS)
+end

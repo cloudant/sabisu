@@ -1,13 +1,5 @@
 # class of events in sensu
 class Event
-  # these are all the fields we care about. the key is how we want to
-  # refer to it (e.g. event.client). the value is where it is stored in
-  # the database under doc.event.
-  FIELDS = {
-    client: 'client.name', check: 'check.name', status: 'check.status', state_change: 'check.state_change',
-    occurences: 'occurrences', action: 'action', issued: 'check.issued', output: 'check.output'
-  }
-  attr_accessor(*FIELDS.keys)
 
   # return all docs
   def self.all(options = {})
@@ -24,7 +16,9 @@ class Event
     # define facet range params for status attribute
     ranges = '{"status":{"OK":"[0 TO 0]","Warning":"[1 TO 1]","Critical":"[2 TO 2]","Unknown":"[3 TO 3]"}}'
     # define facet count param
-    counts = %w[ check client ]
+    counts = FIELDS.map do |field|
+      field[:name] if field.key?(:facet) && field[:facet] == true
+    end.compact
     options = { bookmark: nil, limit: nil, sort: [], include_docs: true, ranges: ranges, counts: counts }.merge(options)
     options.delete_if { |k, v| v.nil? || v == [] }
     # because couchrest doesn't handle arrays correctly
@@ -36,19 +30,13 @@ class Event
 
   def self.update_design_doc
     # create search indexes
-    facet = %w[ status check client occurences ]
-    fields = FIELDS.map do |k, v|
-      if facet.include?(k.to_s)
-        "
-  if (typeof(doc.event.#{v}) !== 'undefined' && doc.event.#{v} !== null){
-    index('#{k}', doc.event.#{v}, { 'facet': true });
-  }"
-      else
-        "
-  if (typeof(doc.event.#{v}) !== 'undefined' && doc.event.#{v} !== null){
-    index('#{k}', doc.event.#{v});
-  }"
-      end
+    fields = FIELDS.map do |field|
+      next if field.key?(:index) && field[:index] == false
+      field[:facet] == true ? facet = ", { 'facet': true }" : ''
+      "
+if (typeof(doc.event.#{field[:path]}) !== 'undefined' && doc.event.#{field[:path]} !== null){
+  index('#{field[:name]}', doc.event.#{field[:path]}#{facet});
+}"
     end
     search_function = "
 function(doc) {
