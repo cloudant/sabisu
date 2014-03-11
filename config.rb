@@ -50,7 +50,7 @@ configure :production, :development do
     { name: 'output', path: 'check.output', facet: false, type: 'str', index: true}
   ]
 
-  FIELDS += JSON.parse(ENV['CUSTOM_FIELDS']) if ENV['CUSTOM_FIELDS']
+  FIELDS += JSON.parse(ENV['CUSTOM_FIELDS'],:symbolize_names => true) if ENV['CUSTOM_FIELDS']
 
   # connect to redis
   API_URL = ENV['API_URL'] if ENV['API_URL']

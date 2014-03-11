@@ -24,16 +24,14 @@
   sabisu.factory('eventsFactory', function($log, $http) {
     var factory;
     factory = {};
-    factory.searchEvents = function(search_query, sort, limit) {
-      var int_types;
+    factory.searchEvents = function(search_query, sort, limit, ints) {
       if (sort === 'age') {
         sort = 'state_change';
       }
       if (sort === '-age') {
         sort = '-state_change';
       }
-      int_types = ['issued', '-issued', 'state_change', '-state_change', 'status', '-status', 'occurences', '-occurences'];
-      if (__indexOf.call(int_types, sort) < 0) {
+      if (__indexOf.call(ints, sort) < 0) {
         sort = sort + '<string>';
       }
       sort = "[\"" + sort + "\"]";
@@ -77,6 +75,12 @@
         }
       });
     };
+    factory.event_fields = function() {
+      return $http({
+        method: 'GET',
+        url: '/api/configuration/fields'
+      });
+    };
     return factory;
   });
 
@@ -95,12 +99,16 @@
     return factory;
   });
 
-  sabisu.controller('eventsController', function($scope, $log, $location, $filter, eventsFactory, stashesFactory) {
+  sabisu.controller('eventsController', function($scope, $log, $location, $filter, $sce, eventsFactory, stashesFactory) {
     $scope.first_search = true;
     $scope.alt_pressed = false;
     $scope.checks = [];
     $scope.clients = [];
     $scope.events = [];
+    $scope.event_fields = [];
+    $scope.event_fields_custom = [];
+    $scope.event_fields_facet = [];
+    $scope.event_fields_int = [];
     $scope.events_spin = false;
     $scope.bulk = 'show';
     $scope.isActive = true;
@@ -172,6 +180,86 @@
       }
       html += "<button type=\"button\" class=\"deleteSilenceBtn btn btn-danger btn-sm pull-right\" onclick=\"angular.element($('#eventsController')).scope().deleteSilence('" + stash['path'] + "')\">\n<span class=\"glyphicon glyphicon-remove\"></span> Delete\n</button>";
       return html += "</div>";
+    };
+    $scope.updateEventFields = function() {
+      return eventsFactory.event_fields().success(function(data, status, headers, config) {
+        var defaults, field, _i, _len, _ref, _ref1, _results;
+        defaults = ['client', 'check', 'status', 'state_change', 'occurrence', 'issued', 'output'];
+        $scope.event_fields = data;
+        _ref = $scope.event_fields;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          field = _ref[_i];
+          if (field.type === 'int') {
+            $scope.event_fields_int.push(field.name);
+            $scope.event_fields_int.push('-' + field.name);
+          }
+          if (field.facet === true) {
+            $scope.event_fields_facet.push(field.name);
+          }
+          if (_ref1 = field.name, __indexOf.call(defaults, _ref1) < 0) {
+            _results.push($scope.event_fields_custom.push(field));
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      }).error(function(data, status, headers, config) {
+        return alert("Failed to get fields");
+      });
+    };
+    $scope.add_event_attr_html = function(key, value) {
+      var html;
+      if (("" + value).match('^[0-9]{13}$')) {
+        value = $filter('date')(value, 'short');
+      } else if ($scope.typeIsArray(value)) {
+        value = $filter('joinBy')(value, ', ');
+      }
+      html = "<dt class='attr_title'>" + key + "</dt>";
+      html += "<dd class='attr_value'>" + value + "</dd>";
+      return html;
+    };
+    $scope.build_event_attr_html = function(event) {
+      var i, item, left_custom, left_div, right_custom, right_div, _i, _j, _len, _len1;
+      left_custom = (function() {
+        var _i, _len, _ref, _results;
+        _ref = $scope.event_fields_custom;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i += 2) {
+          i = _ref[_i];
+          _results.push(i);
+        }
+        return _results;
+      })();
+      right_custom = (function() {
+        var _i, _len, _ref, _results;
+        _ref = $scope.event_fields_custom.slice(1);
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i += 2) {
+          i = _ref[_i];
+          _results.push(i);
+        }
+        return _results;
+      })();
+      left_div = "<dl class='dl-horizontal col-md-5 pull-left'>";
+      left_div += $scope.add_event_attr_html('issued', event.check.issued);
+      left_div += $scope.add_event_attr_html('interval', event.check.interval);
+      left_div += $scope.add_event_attr_html('occurrences', event.occurrences);
+      for (_i = 0, _len = left_custom.length; _i < _len; _i++) {
+        item = left_custom[_i];
+        left_div += $scope.add_event_attr_html(item.name, $scope.get_obj_attr(event, item.path));
+      }
+      left_div += "</dl>";
+      right_div = "<dl class='dl-horizontal col-md-5 pull-left'>";
+      right_div += $scope.add_event_attr_html('state change', event.rel_time);
+      right_div += $scope.add_event_attr_html('subscribers', event.check.subscribers);
+      right_div += $scope.add_event_attr_html('handlers', event.check.handlers);
+      for (_j = 0, _len1 = right_custom.length; _j < _len1; _j++) {
+        item = right_custom[_j];
+        right_div += $scope.add_event_attr_html(item.name, $scope.get_obj_attr(event, item.path));
+      }
+      right_div += "</dl>";
+      return left_div + right_div;
     };
     $scope.updateStashes = function() {
       return stashesFactory.stashes().success(function(data, status, headers, config) {
@@ -386,8 +474,8 @@
         $scope.events_spin = true;
       }
       $scope.first_search = false;
-      return eventsFactory.searchEvents($scope.search, $scope.sort, $scope.limit).success(function(data, status, headers, config) {
-        var check, checks, client, color, datapoints, event, events, id, k, parts, stash, statuses, v, _base, _base1, _i, _j, _len, _len1, _ref, _ref1, _ref2;
+      return eventsFactory.searchEvents($scope.search, $scope.sort, $scope.limit, $scope.event_fields_int).success(function(data, status, headers, config) {
+        var check, client, color, event, events, field, id, k, parts, stash, stats, statuses, v, _base, _base1, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
         color = ['success', 'warning', 'danger', 'info'];
         status = ['OK', 'Warning', 'Critical', 'Unknown'];
         events = [];
@@ -406,36 +494,29 @@
         }
         if ('counts' in data && !angular.equals($scope.previous_events_counts, data['counts'])) {
           $scope.previous_events_counts = data['counts'];
-          checks = data['counts']['check'];
-          datapoints = [];
-          for (k in checks) {
-            v = checks[k];
-            datapoints.push([k, v]);
+          stats = {};
+          for (field in data['counts']) {
+            stats[field] = [];
+            _ref = data['counts'][field];
+            for (k in _ref) {
+              v = _ref[k];
+              stats[field].push([k, v]);
+            }
+            stats[field].sort(function(a, b) {
+              return a[1] - b[1];
+            }).reverse();
           }
-          datapoints.sort(function(a, b) {
-            return a[1] - b[1];
-          });
-          $scope.checks = datapoints.reverse();
-          checks = data['counts']['client'];
-          datapoints = [];
-          for (k in checks) {
-            v = checks[k];
-            datapoints.push([k, v]);
-          }
-          datapoints.sort(function(a, b) {
-            return a[1] - b[1];
-          });
-          $scope.clients = datapoints.reverse();
+          $scope.stats = stats;
         }
         if ('rows' in data && !angular.equals($scope.previous_events_events, data['rows'])) {
           $scope.previous_events_events = angular.copy(data['rows']);
-          _ref = data['rows'];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            event = _ref[_i];
+          _ref1 = data['rows'];
+          for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+            event = _ref1[_i];
             event = event['doc']['event'];
             id = "" + event['client']['name'] + "/" + event['check']['name'];
             event['id'] = CryptoJS.MD5(id).toString(CryptoJS.enc.Base64);
-            if (_ref1 = event.id, __indexOf.call($scope.showDetails, _ref1) >= 0) {
+            if (_ref2 = event.id, __indexOf.call($scope.showDetails, _ref2) >= 0) {
               event.showdetails = 'in';
             } else {
               event.showdetails = '';
@@ -454,9 +535,9 @@
               _base1.silenced = false;
             }
             if ($scope.stashes != null) {
-              _ref2 = $scope.stashes;
-              for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-                stash = _ref2[_j];
+              _ref3 = $scope.stashes;
+              for (_j = 0, _len1 = _ref3.length; _j < _len1; _j++) {
+                stash = _ref3[_j];
                 parts = stash['path'].split('/', 3);
                 client = parts[1];
                 if (parts.length > 2) {
@@ -487,6 +568,7 @@
         return $('#corner_status').text("Last Update: " + $filter('date')(Date.now(), 'mediumTime'));
       });
     };
+    $scope.updateEventFields();
     $scope.updateEvents();
     $scope.changes = function() {
       var params;
@@ -570,9 +652,30 @@
         return $("#" + id).parent().find('.toggleBtnIcon').addClass('glyphicon-collapse-down');
       }
     };
-    return $scope.togglePopover = function() {
+    $scope.togglePopover = function() {
       $(this).popover();
       return $(this).popover('toggle');
+    };
+    $scope.typeIsArray = function(value) {
+      return value && typeof value === 'object' && value instanceof Array && typeof value.length === 'number' && typeof value.splice === 'function' && !(value.propertyIsEnumerable('length'));
+    };
+    $scope.to_trusted = function(html_code) {
+      return $sce.trustAsHtml(html_code);
+    };
+    return $scope.get_obj_attr = function(obj, path) {
+      var p, val, _i, _len;
+      path = path.split('.');
+      val = obj;
+      for (_i = 0, _len = path.length; _i < _len; _i++) {
+        p = path[_i];
+        if (p in val) {
+          val = val[p];
+        } else {
+          val = null;
+          break;
+        }
+      }
+      return val;
     };
   });
 

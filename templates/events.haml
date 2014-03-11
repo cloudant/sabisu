@@ -40,31 +40,20 @@
             %span{:class => "label label-warning pointer", 'ng-click' => 'appendQuery(1, "status", false)'}= " - "
             %span{:class => "label label-danger pointer", 'ng-click' => 'appendQuery(2, "status", false)'}= " - "
             %span{:class => "label label-info pointer", 'ng-click' => 'appendQuery(3, "status", false)'}= " - "
-        %div{:id => 'stats_check'}
-          %h5="Check Stats"
+        %div{:id => 'stats_by_count', 'ng-repeat' => '(name, stat) in stats'}
+          %h5
+            {{name | uppercase }} stats
           %table{:class => 'table table-striped', 'ng-hide' => 'events_spin'}
             %tr
-              %td="Check Name"
+              %td
+                {{name}} name
               %td="Quantity"
-            %tr{'ng-repeat' => 'check in checks | slice:0:10'}
+            %tr{'ng-repeat' => 's in stat | slice:0:10'}
               %td{:class => 'col-md-3'}
-                %span{:class => 'appendQuery', 'ng-click' => 'appendQuery(check[0], "check")'}
-                  {{check[0]}}
+                %span{:class => 'appendQuery', 'ng-click' => 'appendQuery(s[0], name)'}
+                  {{s[0]}}
               %td{:class => 'col-md-1 text-center'}
-                {{check[1]}}
-        %div{:id => 'stats_client'}
-          %h5="Client Stats"
-          %table{:class => 'table table-striped', 'ng-hide' => 'events_spin'}
-            %tr
-              %td="Client Name"
-              %td="Quantity"
-            %tr{'ng-repeat' => 'client in clients | slice:0:10'}
-              %td{:class => 'col-md-3'}
-                %span{:class => 'appendQuery', 'ng-click' => 'appendQuery(client[0], "client")'}
-                  {{client[0]}}
-              %td{:class => 'col-md-1 text-center'}
-                {{client[1]}}
-            
+                {{s[1]}}
 
   #events{:class => "col-md-9 pull-right main-content", :style => "margin-bottom: 100px"}
     %div{:class => "panel"}
@@ -118,34 +107,7 @@
                       %a{"href" => "#", 'ng-click' => 'updateSilencePath(event.client.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'}= "Client"
                     %li
                       %a{"href" => "#", 'ng-click' => 'updateSilencePath(event.client.name + "/" + event.check.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'}= "Check"
-                %div{:class => 'col-md-5 pull-left'}
-                  %dl{:class => 'dl-horizontal'}
-                    %div{'ng-show' => 'event.check.issued'}
-                      %dt{:class => 'attr_title'}="issued"
-                      %dd{:class => 'attr_value'}
-                        {{ event.check.issued | date:'short' }}
-                    %div{'ng-show' => 'event.check.interval'}
-                      %dt{:class => 'attr_title'}="interval"
-                      %dd{:class => 'attr_value'}
-                        {{event.check.interval}}
-                    %div{'ng-show' => 'event.occurrences'}
-                      %dt{:class => 'attr_title'}="occurences"
-                      %dd{:class => 'attr_value'}
-                        {{event.occurrences}}
-                %div{:class => 'col-md-5 pull-left'}
-                  %dl{:class => 'dl-horizontal'}
-                    %div{'ng-show' => 'event.check.state_change'}
-                      %dt{:class => 'attr_title'}="state change"
-                      %dd{:class => 'attr_value'}
-                        {{event.rel_time}}
-                    %div{'ng-show' => 'event.check.subscribers'}
-                      %dt{:class => 'attr_title'}="subscribers"
-                      %dd{:class => 'attr_value'}
-                        {{event.check.subscribers | joinBy:', '}}
-                    %div{'ng-show' => 'event.check.handlers'}
-                      %dt{:class => 'attr_title'}="handlers"
-                      %dd{:class => 'attr_value'}
-                        {{event.check.handlers  | joinBy:', '}}
+                %div{'ng-bind-html' => 'to_trusted(build_event_attr_html(event))'}
                 %br
                 %br
                 %br

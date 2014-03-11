@@ -16,11 +16,10 @@ sabisu.filter('joinBy', ->
 
 sabisu.factory('eventsFactory', ($log, $http) ->
     factory = {}
-    factory.searchEvents = (search_query, sort, limit) ->
+    factory.searchEvents = (search_query, sort, limit, ints) ->
         sort = 'state_change' if sort == 'age'
         sort = '-state_change' if sort == '-age'
-        int_types = ['issued', '-issued', 'state_change', '-state_change', 'status', '-status', 'occurences', '-occurences']
-        sort = sort + '<string>' unless sort in int_types
+        sort = sort + '<string>' unless sort in ints
         sort = "[\"#{sort}\"]"
         search_query = '*:*' if search_query == ''
         $http(
@@ -53,6 +52,11 @@ sabisu.factory('eventsFactory', ($log, $http) ->
                 limit: 1
                 descending: true
         )
+    factory.event_fields = ->
+        $http(
+            method: 'GET'
+            url: '/api/configuration/fields'
+        )
     factory
 )
 
@@ -74,13 +78,17 @@ sabisu.factory('stashesFactory', ($log, $http) ->
     factory
 )
 
-sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsFactory, stashesFactory) ->
+sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, eventsFactory, stashesFactory) ->
     # init vars
     $scope.first_search = true
     $scope.alt_pressed = false
     $scope.checks = []
     $scope.clients = []
     $scope.events = []
+    $scope.event_fields = []
+    $scope.event_fields_custom = []
+    $scope.event_fields_facet = []
+    $scope.event_fields_int = []
     $scope.events_spin = false
     $scope.bulk = 'show'
     $scope.isActive = true
@@ -173,6 +181,55 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
 </button>
 """
         html += "</div>"
+
+    $scope.updateEventFields = ->
+        eventsFactory.event_fields().success( (data, status, headers, config) ->
+            defaults = [ 'client', 'check', 'status', 'state_change', 'occurrence', 'issued', 'output']
+            $scope.event_fields = data
+            for field in $scope.event_fields
+                if field.type == 'int'
+                    $scope.event_fields_int.push field.name
+                    $scope.event_fields_int.push '-' + field.name
+                $scope.event_fields_facet.push field.name if field.facet == true
+                $scope.event_fields_custom.push field if field.name not in defaults
+        ).error( (data, status, headers, config) ->
+            alert "Failed to get fields"
+        )
+
+    $scope.add_event_attr_html = (key,value) ->
+        if "#{value}".match '^[0-9]{13}$'
+            value = $filter('date')(value, 'short')
+        else if $scope.typeIsArray value
+            value = $filter('joinBy')(value, ', ')
+        html = "<dt class='attr_title'>#{key}</dt>"
+        html += "<dd class='attr_value'>#{value}</dd>"
+        html
+
+    $scope.build_event_attr_html = (event) ->
+        # split custom fields into left and right columns evenly
+        left_custom = (i for i in $scope.event_fields_custom by 2)
+        right_custom = (i for i in $scope.event_fields_custom[1..] by 2)
+
+        # build left dl
+        left_div = "<dl class='dl-horizontal col-md-5 pull-left'>"
+        left_div += $scope.add_event_attr_html('issued', event.check.issued)
+        left_div += $scope.add_event_attr_html('interval', event.check.interval)
+        left_div += $scope.add_event_attr_html('occurrences', event.occurrences)
+        for item in left_custom
+            left_div += $scope.add_event_attr_html(item.name, $scope.get_obj_attr(event, item.path))
+        left_div += "</dl>"
+
+        # build right dl
+        right_div = "<dl class='dl-horizontal col-md-5 pull-left'>"
+        right_div += $scope.add_event_attr_html('state change', event.rel_time)
+        right_div += $scope.add_event_attr_html('subscribers', event.check.subscribers)
+        right_div += $scope.add_event_attr_html('handlers', event.check.handlers)
+        for item in right_custom
+            right_div += $scope.add_event_attr_html(item.name, $scope.get_obj_attr(event, item.path))
+        right_div += "</dl>"
+
+        # return resulting html (left and right)
+        left_div + right_div
 
     $scope.updateStashes = ->
         stashesFactory.stashes().success( (data, status, headers, config) ->
@@ -359,7 +416,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
         $scope.events_spin = true if $scope.first_search
         $scope.first_search = false
         # get events
-        eventsFactory.searchEvents($scope.search, $scope.sort, $scope.limit).success( (data, status, headers, config) ->
+        eventsFactory.searchEvents($scope.search, $scope.sort, $scope.limit, $scope.event_fields_int).success( (data, status, headers, config) ->
             color = [ 'success', 'warning', 'danger', 'info' ]
             status = [ 'OK', 'Warning', 'Critical', 'Unknown' ]
             events = []
@@ -374,25 +431,17 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
                 $('#stats_status').find('#totals').find('.label-info').text("Unknown: " + statuses['Unknown'])
             if 'counts' of data and not angular.equals($scope.previous_events_counts,data['counts'])
                 $scope.previous_events_counts = data['counts']
-                # get check counts
-                checks = data['counts']['check']
-                datapoints = []
-                for k,v of checks
-                    datapoints.push [k, v]
-                datapoints.sort( (a, b) ->
-                    a[1] - b[1]
-                )
-                $scope.checks = datapoints.reverse()
+                
+                stats = {}
+                for field of data['counts']
+                    stats[field] = []
+                    for k,v of data['counts'][field]
+                        stats[field].push [k, v]
+                    stats[field].sort( (a,b) ->
+                        a[1] - b[1]
+                    ).reverse()
 
-                # get client counts
-                checks = data['counts']['client']
-                datapoints = []
-                for k,v of checks
-                    datapoints.push [k, v]
-                datapoints.sort( (a, b) ->
-                    a[1] - b[1]
-                )
-                $scope.clients = datapoints.reverse()
+                $scope.stats = stats
             if 'rows' of data and not angular.equals($scope.previous_events_events, data['rows'])
                 $scope.previous_events_events = angular.copy(data['rows'])
                 for event in data['rows']
@@ -436,6 +485,8 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
             $scope.events_spin = false
             $('#corner_status').text("Last Update: " + $filter('date')(Date.now(), 'mediumTime'))
         )
+
+    $scope.updateEventFields()
     $scope.updateEvents()
 
     $scope.changes = ->
@@ -507,4 +558,27 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, eventsF
     $scope.togglePopover = ->
         $(@).popover()
         $(@).popover('toggle')
+
+    # test if variable is an array
+    $scope.typeIsArray = ( value ) ->
+        value and
+            typeof value is 'object' and
+            value instanceof Array and
+            typeof value.length is 'number' and
+            typeof value.splice is 'function' and
+            not ( value.propertyIsEnumerable 'length' )
+
+    $scope.to_trusted = (html_code) ->
+        $sce.trustAsHtml(html_code)
+
+    $scope.get_obj_attr = (obj, path) ->
+        path = path.split('.')
+        val = obj
+        for p in path
+            if p of val
+                val = val[p]
+            else
+                val = null
+                break
+        val
 )
