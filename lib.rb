@@ -16,7 +16,6 @@ helpers do
 
   def force_session_auth
     if logged_in?
-      @session = session
       return true
     else
       redirect '/login'

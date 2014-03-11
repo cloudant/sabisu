@@ -20,7 +20,10 @@ require_relative 'config'
 
 # URL Routing
 before '/:name' do
-  force_session_auth unless params[:name] == 'login'
+  unless params[:name] == "login"
+    session[:url] = request.fullpath
+    force_session_auth
+  end
 end
 
 before '/api/*' do
@@ -35,7 +38,6 @@ get '/login' do
   if logged_in?
     redirect '/events'
   else
-    clear_session
     haml :login, locals: { remember_me: session[:remember_me] }
   end
 end
@@ -45,7 +47,8 @@ post '/login' do
     session[:logged_in] = true
     session[:username] = params[:username]
     session[:remember_me] = params[:username] if params[:remember_me] == 'on'
-    redirect '/events'
+    session[:url] = '/events' unless session.key?(:url)
+    redirect session[:url]
   else
     haml :login, locals: { message: 'Incorrect username and/or password' }
   end
