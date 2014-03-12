@@ -33,5 +33,17 @@ Sabisu was designed to be deployed to [heroku](http://heroku.com). There is [ple
  * API_PASSWORD: your sensu api password
  * UILOGIN_USER: username to log into sabisu webui or api
  * UILOGIN_PASSWORD: password to log into sabisu webui or api
+ * CUSTOM_FIELDS - an array of custom fields_
 
+Development Environment
+=======================
 
+To setup sabisu for local development, 
+
+1. first setup/install [RVM](https://rvm.io/) (or something like it). Its a good idea to keep your dev environment separate from your system ruby.
+2. clone the repo locally
+3. Create a `.env` file to setup your environment variables (see `Environment Variables` above).
+4. Source the file (`source .env`)
+5. Next run `bundle install`
+6. To startup sabisu locally, run `foreman start`
+7. In your browser, visit [localhost:8080](http://localhost:8080)
