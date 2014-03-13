@@ -214,7 +214,7 @@
         value = $filter('date')(value, 'short');
       } else if ($scope.typeIsArray(value)) {
         value = $filter('joinBy')(value, ', ');
-      } else if (value === 'undefined' || value === null) {
+      } else if (value === void 0 || value === null) {
         value = 'n/a';
       } else {
         _ref = $scope.event_fields;

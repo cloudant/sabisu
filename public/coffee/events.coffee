@@ -201,7 +201,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
             value = $filter('date')(value, 'short')
         else if $scope.typeIsArray value
             value = $filter('joinBy')(value, ', ')
-        else if value == 'undefined' or value == null
+        else if value == undefined or value == null
             value = 'n/a'
         else
             for field in $scope.event_fields
