@@ -214,12 +214,14 @@
         value = $filter('date')(value, 'short');
       } else if ($scope.typeIsArray(value)) {
         value = $filter('joinBy')(value, ', ');
+      } else if (value === 'undefined' || value === null) {
+        value = 'n/a';
       } else {
         _ref = $scope.event_fields;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           field = _ref[_i];
           if (key === field.name) {
-            if (field.type === 'url') {
+            if (field.type === 'url' && (value != null)) {
               value = "<a href=\"" + value + "\">goto</a>";
             }
             break;
