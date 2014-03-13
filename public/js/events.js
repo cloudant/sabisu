@@ -209,11 +209,22 @@
       });
     };
     $scope.add_event_attr_html = function(key, value) {
-      var html;
+      var field, html, _i, _len, _ref;
       if (("" + value).match('^[0-9]{13}$')) {
         value = $filter('date')(value, 'short');
       } else if ($scope.typeIsArray(value)) {
         value = $filter('joinBy')(value, ', ');
+      } else {
+        _ref = $scope.event_fields;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          field = _ref[_i];
+          if (key === field.name) {
+            if (field.type === 'url') {
+              value = "<a href=\"" + value + "\">goto</a>";
+            }
+            break;
+          }
+        }
       }
       html = "<dt class='attr_title'>" + key + "</dt>";
       html += "<dd class='attr_value'>" + value + "</dd>";

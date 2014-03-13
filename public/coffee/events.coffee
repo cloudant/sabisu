@@ -201,6 +201,13 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
             value = $filter('date')(value, 'short')
         else if $scope.typeIsArray value
             value = $filter('joinBy')(value, ', ')
+        else
+            for field in $scope.event_fields
+                if key == field.name
+                    if field.type == 'url'
+                        value = "<a href=\"#{value}\">goto</a>"
+                    break
+            
         html = "<dt class='attr_title'>#{key}</dt>"
         html += "<dd class='attr_value'>#{value}</dd>"
         html
