@@ -14,19 +14,6 @@ sabisu.filter('joinBy', ->
         (input || []).join(delimiter || ',')
 )
 
-sabisu.directive('searchTypeahead', () ->
-  (scope, element, attrs) ->
-    angular.element(element).typeahead(
-      { minLength: 1, highlight: true },
-      {
-        name: 'keys',
-        displayKey: 'value',
-        source: (query, cb) ->
-          cb([ { 'value': 'aaa' }, { 'value': 'bbb' }, { 'value': 'ccc' } ])
-      }
-    )
-)
-
 sabisu.factory('eventsFactory', ($log, $http) ->
     factory = {}
     factory.searchEvents = (search_query, sort, limit, ints) ->
@@ -71,6 +58,26 @@ sabisu.factory('eventsFactory', ($log, $http) ->
             url: '/api/configuration/fields'
         )
     factory
+)
+
+sabisu.directive('searchTypeahead', ($window, $filter, eventsFactory) ->
+    (scope, element, attrs) ->
+        angular.element(element).typeahead(
+            {
+                minLength: 1,
+                highlight: true
+            },
+            {
+                name: 'keys',
+                displayKey: 'name',
+                source: (query, cb) ->
+                    eventsFactory.event_fields().success (data, status, headers, config) ->
+                        data = $.grep data, (n, i) ->
+                            n.name.indexOf(query) == 0
+                        data = $filter('orderBy')(data, 'name')
+                        cb(data)
+            }
+        )
 )
 
 sabisu.factory('stashesFactory', ($log, $http) ->
@@ -229,7 +236,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
                     if field.type == 'url' and value?
                         value = "<a href=\"#{value}\">goto</a>"
                     break
-            
+
         html = "<dt class='attr_title'>#{key}</dt>"
         html += "<dd class='attr_value'>#{value}</dd>"
         html
@@ -460,7 +467,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
                 $('#stats_status').find('#totals').find('.label-info').text("Unknown: " + statuses['Unknown'])
             if 'counts' of data and not angular.equals($scope.previous_events_counts,data['counts'])
                 $scope.previous_events_counts = data['counts']
-                
+
                 stats = {}
                 for field of data['counts']
                     stats[field] = []

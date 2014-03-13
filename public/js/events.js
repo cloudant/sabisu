@@ -21,29 +21,6 @@
     };
   });
 
-  sabisu.directive('searchTypeahead', function() {
-    return function(scope, element, attrs) {
-      return angular.element(element).typeahead({
-        minLength: 1,
-        highlight: true
-      }, {
-        name: 'keys',
-        displayKey: 'value',
-        source: function(query, cb) {
-          return cb([
-            {
-              'value': 'aaa'
-            }, {
-              'value': 'bbb'
-            }, {
-              'value': 'ccc'
-            }
-          ]);
-        }
-      });
-    };
-  });
-
   sabisu.factory('eventsFactory', function($log, $http) {
     var factory;
     factory = {};
@@ -105,6 +82,27 @@
       });
     };
     return factory;
+  });
+
+  sabisu.directive('searchTypeahead', function($window, $filter, eventsFactory) {
+    return function(scope, element, attrs) {
+      return angular.element(element).typeahead({
+        minLength: 1,
+        highlight: true
+      }, {
+        name: 'keys',
+        displayKey: 'name',
+        source: function(query, cb) {
+          return eventsFactory.event_fields().success(function(data, status, headers, config) {
+            data = $.grep(data, function(n, i) {
+              return n.name.indexOf(query) === 0;
+            });
+            data = $filter('orderBy')(data, 'name');
+            return cb(data);
+          });
+        }
+      });
+    };
   });
 
   sabisu.factory('stashesFactory', function($log, $http) {
