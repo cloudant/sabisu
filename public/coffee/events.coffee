@@ -14,6 +14,19 @@ sabisu.filter('joinBy', ->
         (input || []).join(delimiter || ',')
 )
 
+sabisu.directive('searchTypeahead', () ->
+  (scope, element, attrs) ->
+    angular.element(element).typeahead(
+      { minLength: 1, highlight: true },
+      {
+        name: 'keys',
+        displayKey: 'value',
+        source: (query, cb) ->
+          cb([ { 'value': 'aaa' }, { 'value': 'bbb' }, { 'value': 'ccc' } ])
+      }
+    )
+)
+
 sabisu.factory('eventsFactory', ($log, $http) ->
     factory = {}
     factory.searchEvents = (search_query, sort, limit, ints) ->

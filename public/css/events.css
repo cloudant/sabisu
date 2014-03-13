@@ -1,6 +1,6 @@
 /* @override http://localhost:8080/css/events.css */
 
-#search_field div.panel-body form.form-inline.ng-pristine.ng-valid div.col-md-9.form-group {
+#search_field div.panel-body form.form-inline div.col-md-9.form-group {
 	margin-left: 0;
 	padding-left: 0;
 }
@@ -132,4 +132,61 @@ span#corner_status {
   z-index: 100;
   -moz-border-radius-topleft: 0px;
   -webkit-border-top-left-radius: 6px;
+}
+
+/* Typeahead */
+
+.twitter-typeahead {
+  width: 100%;
+}
+
+.tt-dropdown-menu {
+  text-align: left;
+}
+
+.tt-hint {
+  color: #999;
+  font-size: 15px;
+  height: 43px;
+  width: 422px;
+  padding: 10px 15px;
+}
+
+.tt-dropdown-menu {
+  width: 200px;
+  margin-top: 0px;
+  margin-left: 5px;
+  padding: 0 0 8px 0;
+  background-color: #fff;
+  border-left: 1px solid #ccc;
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+  border-right: 1px solid #ccc;
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-border-bottom-left-radius: 8px;
+     -moz-border-bottom-left-radius: 8px;
+          border-bottom-left-radius: 8px;
+  -webkit-border-bottom-right-radius: 8px;
+     -moz-border-bottom-right-radius: 8px;
+          border-bottom-right-radius: 8px;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+  padding: 3px 20px;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.tt-suggestion.tt-cursor {
+  color: #fff;
+  background-color: #0097cf;
+
+}
+
+.tt-suggestion p {
+  margin: 0;
 }
