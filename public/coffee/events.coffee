@@ -90,6 +90,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
     $scope.event_fields_facet = []
     $scope.event_fields_int = []
     $scope.events_spin = false
+    $scope.showAll = false
     $scope.bulk = 'show'
     $scope.isActive = true
     $scope.showDetails = []
@@ -137,6 +138,10 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
     else
         $scope.limit = '50'
         $scope.limit_field = '50'
+
+    if $location.search().showAll?
+        $scope.showAll = $location.search().showAll
+        $log.info($scope.showAll)
 
     $scope.buildSilencePopover = (stash) ->
         html = '<div class="silence_window">'
@@ -457,7 +462,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
                     event = event['doc']['event']
                     id = "#{event['client']['name']}/#{event['check']['name']}"
                     event['id'] = CryptoJS.MD5(id).toString(CryptoJS.enc.Base64)
-                    if event.id in $scope.showDetails
+                    if event.id in $scope.showDetails or $scope.showAll == 'true'
                         event.showdetails = 'in'
                     else
                         event.showdetails = ''

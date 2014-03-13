@@ -110,6 +110,7 @@
     $scope.event_fields_facet = [];
     $scope.event_fields_int = [];
     $scope.events_spin = false;
+    $scope.showAll = false;
     $scope.bulk = 'show';
     $scope.isActive = true;
     $scope.showDetails = [];
@@ -154,6 +155,10 @@
     } else {
       $scope.limit = '50';
       $scope.limit_field = '50';
+    }
+    if ($location.search().showAll != null) {
+      $scope.showAll = $location.search().showAll;
+      $log.info($scope.showAll);
     }
     $scope.buildSilencePopover = function(stash) {
       var html, rel_time;
@@ -529,7 +534,7 @@
             event = event['doc']['event'];
             id = "" + event['client']['name'] + "/" + event['check']['name'];
             event['id'] = CryptoJS.MD5(id).toString(CryptoJS.enc.Base64);
-            if (_ref2 = event.id, __indexOf.call($scope.showDetails, _ref2) >= 0) {
+            if ((_ref2 = event.id, __indexOf.call($scope.showDetails, _ref2) >= 0) || $scope.showAll === 'true') {
               event.showdetails = 'in';
             } else {
               event.showdetails = '';
