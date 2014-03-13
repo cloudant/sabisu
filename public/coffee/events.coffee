@@ -33,7 +33,7 @@ sabisu.factory('eventsFactory', ($log, $http) ->
     factory.resolveEvent = (client, check) ->
         $http(
             method: 'POST'
-            url: '/sensu/event/resolve'
+            url: '/sensu/resolve'
             data:
                 client: client
                 check: check

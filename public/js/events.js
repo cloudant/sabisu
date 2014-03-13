@@ -51,7 +51,7 @@
     factory.resolveEvent = function(client, check) {
       return $http({
         method: 'POST',
-        url: '/sensu/event/resolve',
+        url: '/sensu/resolve',
         data: {
           client: client,
           check: check
