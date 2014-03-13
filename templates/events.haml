@@ -160,25 +160,6 @@
         %h4{:class => 'modal-title'}= "How Do I Search?"
       %div{:class => 'modal-body'}
         %h4="Query Syntax"
-        %p
-          The Cloudant search query syntax is based on the
-          %a{:href => 'http://lucene.apache.org/core/4_2_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package_description'}="Lucene"
-          syntax. Search queries take the form of "name:value" (unless the name is omitted, in which case they hit the default field as we demonstrated in the first example, above).
-        %p
-          Queries over multiple fields can be logically combined and groups and fields can be grouped. The available logical operators are: "AND", "+", "OR", "NOT" and "-", and are case sensitive. Range queries can run over strings or numbers.
-        %p
-          If you want a fuzzy search you can run a query with "~" to find terms like the search term, for instance "look~" will find terms book and took.
-        %p
-          You can also increase the importance of a search term by using the boost character "^". This makes matches containing the term more relevant, e.g. cloudant "data layer"^4 will make results containing "data layer" 4 times more relevant. The default boost value is 1. Boost values must be positive, but can be less than 1 (e.g. 0.5 to reduce importance).
-        %p
-          Wild card searches are supported, for both single ("?") and multiple ("*") character searches. "dat?" would match date and data, "dat*" would match date, data, database, dates etc. Wildcards must come after a search term, you cannot do a query like "*base".
-
-        %p
-          The following characters require escaping if you want to search on them
-
-        %p{:class => 'well well-sm'}
-          + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
-
         %h4="Examples"
         %table{:class => "table table-striped"}
           %tr
@@ -211,6 +192,25 @@
           %tr
             %td="Events since Jan 1, 2014"
             %td="issued:[1388534400 TO Infinity]"
+        %p
+          The Cloudant search query syntax is based on the
+          %a{:href => 'http://lucene.apache.org/core/4_2_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package_description'}="Lucene"
+          syntax. Search queries take the form of "name:value" (unless the name is omitted, in which case they hit the default field).
+        %p
+          Queries over multiple fields can be logically combined and groups and fields can be grouped. The available logical operators are: "AND", "+", "OR", "NOT" and "-", and are case sensitive. Range queries can run over strings or numbers.
+        %p
+          If you want a fuzzy search you can run a query with "~" to find terms like the search term, for instance "look~" will find terms book and took.
+        %p
+          You can also increase the importance of a search term by using the boost character "^". This makes matches containing the term more relevant, e.g. cloudant "data layer"^4 will make results containing "data layer" 4 times more relevant. The default boost value is 1. Boost values must be positive, but can be less than 1 (e.g. 0.5 to reduce importance).
+        %p
+          Wild card searches are supported, for both single ("?") and multiple ("*") character searches. "dat?" would match date and data, "dat*" would match date, data, database, dates etc. Wildcards must come after a search term, you cannot do a query like "*base".
+
+        %p
+          The following characters require escaping if you want to search on them
+
+        %p{:class => 'well well-sm'}
+          + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
+
       %div{:class => 'modal-footer'}
         %button{:type => 'button', :class => 'btn btn-default', 'data-dismiss' => 'modal'}= "Close"
 
