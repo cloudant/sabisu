@@ -13,6 +13,11 @@ Features
  * Silence with expiration timeout, unsilence on resolve, or never expire
  * Create views of your environment and save, bookmark, and share them with your colleagues.
 
+Requirements
+============
+
+[Sensu](https://github.com/sensu/sensu) >= [0.12.1](https://github.com/sensu/sensu/blob/master/CHANGELOG.md#0121---2013-11-02)
+
 Installation
 ============
 
