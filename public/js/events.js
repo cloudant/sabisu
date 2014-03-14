@@ -84,54 +84,6 @@
     return factory;
   });
 
-  sabisu.directive('searchTypeahead', function($window, $filter, eventsFactory) {
-    return function(scope, element, attrs) {
-      var el;
-      el = angular.element(element);
-      el.typeahead({
-        minLength: 0,
-        highlight: true
-      }, {
-        name: 'keys',
-        displayKey: 'name',
-        source: function(search_string, cb) {
-          var dd, indent, m;
-          el.current_search_string = search_string;
-          m = search_string.match(/[a-z0-9_\-]+$/);
-          search_string = m ? m[0] : '';
-          indent = Math.max(0, (element[0].selectionStart || 0) - search_string.length) * 0.535;
-          dd = angular.element("#" + element[0].id + " ~ .tt-dropdown-menu");
-          dd[0].style.left = "" + indent + "em";
-          if (search_string.length === 0) {
-            angular.element(".tt-hint").hide();
-          } else {
-            angular.element(".tt-hint").show();
-          }
-          return eventsFactory.event_fields().success(function(data, status, headers, config) {
-            if (search_string.length > 0) {
-              data = $.grep(data, function(n, i) {
-                return n.name.indexOf(search_string) === 0;
-              });
-            }
-            data = $filter('orderBy')(data, 'name');
-            return cb(data);
-          });
-        }
-      });
-      el.on('focus', function() {
-        var curval;
-        curval = el.typeahead('val');
-        el.typeahead('val', 'c').typeahead('open');
-        return el.typeahead('val', curval).typeahead('open');
-      });
-      return el.on('typeahead:selected', function($e, datum) {
-        var new_str;
-        new_str = el.current_search_string.replace(/[a-z0-9_\-]+$/, '') + datum.name;
-        return el.typeahead('val', new_str);
-      });
-    };
-  });
-
   sabisu.factory('stashesFactory', function($log, $http) {
     var factory;
     factory = {};
@@ -761,6 +713,80 @@
     return Mousetrap.bind('enter', function() {
       return $scope.updateParams();
     }, 'keyup');
+  });
+
+  sabisu.directive('searchTypeahead', function($window, $filter, eventsFactory) {
+    return function(scope, element, attrs) {
+      var el;
+      el = angular.element(element);
+      el.typeahead({
+        minLength: 0,
+        highlight: true
+      }, {
+        name: 'keys',
+        displayKey: 'name',
+        source: function(search_string, cb) {
+          var data, dd, field, indent, m, m2, search_word;
+          el.current_search_string = search_string;
+          m = search_string.match(/[a-z0-9_\-]+$/);
+          search_word = m ? m[0] : '';
+          indent = Math.max(0, (element[0].selectionStart || 0) - search_word.length) * 0.535;
+          dd = angular.element("#" + element[0].id + " ~ .tt-dropdown-menu");
+          dd[0].style.left = "" + indent + "em";
+          if (search_string.length === 0) {
+            angular.element(".tt-hint").hide();
+          } else {
+            angular.element(".tt-hint").show();
+          }
+          m2 = search_string.match(/[a-z0-9_\-:]+$/);
+          field = m2 && m2[0].indexOf(':') >= 0 ? m2[0].split(':')[0] : null;
+          if (field) {
+            if (scope.stats[field]) {
+              data = [];
+              angular.forEach(scope.stats[field], function(v, k) {
+                if (v[0].trim() !== "") {
+                  return data.push({
+                    name: v[0]
+                  });
+                }
+              });
+              data = $filter('orderBy')(data, 'name');
+              return cb(data);
+            } else {
+              return cb([]);
+            }
+          } else {
+            return eventsFactory.event_fields().success(function(data, status, headers, config) {
+              if (search_word.length > 0) {
+                data = $.grep(data, function(n, i) {
+                  return n.name.indexOf(search_word) === 0;
+                });
+              }
+              data = $filter('orderBy')(data, 'name');
+              return cb(data);
+            });
+          }
+        }
+      });
+      el.on('focus', function() {
+        var curval;
+        curval = el.typeahead('val');
+        console.log(curval);
+        el.typeahead('val', 'c').typeahead('open');
+        return el.typeahead('val', curval).typeahead('open');
+      });
+      return el.on('typeahead:selected', function($e, datum) {
+        var all_but_last, m;
+        all_but_last = el.current_search_string.replace(/[a-z0-9_\-]+$/, '');
+        m = el.current_search_string.match(/[a-z0-9_\-:]+$/);
+        if (m && m[0].indexOf(':') >= 0) {
+          el.typeahead('val', all_but_last + datum.name);
+        } else {
+          el.typeahead('val', all_but_last + datum.name + ':');
+        }
+        return el.typeahead('open');
+      });
+    };
   });
 
 }).call(this);

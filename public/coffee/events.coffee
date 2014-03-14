@@ -60,62 +60,6 @@ sabisu.factory('eventsFactory', ($log, $http) ->
     factory
 )
 
-sabisu.directive('searchTypeahead', ($window, $filter, eventsFactory) ->
-    (scope, element, attrs) ->
-        el = angular.element element
-
-        # set up the typeahead plugin
-        el.typeahead(
-            {
-                minLength: 0,
-                highlight: true
-            },
-            {
-                name: 'keys',
-                displayKey: 'name',
-                source: (search_string, cb) ->
-                    # store the current search string
-                    el.current_search_string = search_string
-
-                    # squash the search string to only the last word
-                    m = search_string.match /[a-z0-9_\-]+$/
-                    search_string = if m then m[0] else ''
-
-                    # position the dropdown under the cursor (~ means sibling in the css selector)
-                    # doesn't work in non-compliant browser (ie IE)
-                    indent = Math.max(0, (element[0].selectionStart || 0) - search_string.length) * 0.535
-                    dd = angular.element "##{element[0].id} ~ .tt-dropdown-menu"
-                    dd[0].style.left = "#{indent}em"
-
-                    # don't display the hint if the search string is blank
-                    if search_string.length == 0
-                        angular.element(".tt-hint").hide()
-                    else
-                        angular.element(".tt-hint").show()
-
-                    # return the list of fields that match this word in alpha order
-                    eventsFactory.event_fields().success (data, status, headers, config) ->
-                        if search_string.length > 0
-                            data = $.grep data, (n, i) ->
-                                n.name.indexOf(search_string) == 0
-                        data = $filter('orderBy')(data, 'name')
-                        cb(data)
-            }
-        )
-
-        # make sure the dropdown displays on textbox focus
-        el.on 'focus', () ->
-            # hacky, but I can't get this to work otherwise
-            curval = el.typeahead('val')
-            el.typeahead('val', 'c').typeahead('open')
-            el.typeahead('val', curval).typeahead('open')
-
-        # intercept the autocomplete and make sure it only replaces the last word
-        el.on 'typeahead:selected', ($e, datum) ->
-            new_str = el.current_search_string.replace(/[a-z0-9_\-]+$/, '') + datum.name
-            el.typeahead('val', new_str)
-)
-
 sabisu.factory('stashesFactory', ($log, $http) ->
     factory = {}
     factory.stashes = ->
@@ -675,3 +619,83 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
     )
     ##########################
 )
+
+sabisu.directive('searchTypeahead', ($window, $filter, eventsFactory) ->
+    (scope, element, attrs) ->
+        el = angular.element element
+
+        # set up the typeahead plugin
+        el.typeahead(
+            {
+                minLength: 0,
+                highlight: true
+            },
+            {
+                name: 'keys',
+                displayKey: 'name',
+                source: (search_string, cb) ->
+                    # store the current search string
+                    el.current_search_string = search_string
+
+                    # squash the search string to only the last word
+                    m = search_string.match /[a-z0-9_\-]+$/
+                    search_word = if m then m[0] else ''
+
+                    # position the dropdown under the cursor (~ means sibling in the css selector)
+                    # doesn't work in non-compliant browser (ie IE)
+                    indent = Math.max(0, (element[0].selectionStart || 0) - search_word.length) * 0.535
+                    dd = angular.element "##{element[0].id} ~ .tt-dropdown-menu"
+                    dd[0].style.left = "#{indent}em"
+
+                    # don't display the hint if the search string is blank
+                    if search_string.length == 0
+                        angular.element(".tt-hint").hide()
+                    else
+                        angular.element(".tt-hint").show()
+
+                    # if this search word is after a :, autocomplete the value instead
+                    m2 = search_string.match /[a-z0-9_\-:]+$/
+                    field = if m2 && m2[0].indexOf(':') >= 0 then m2[0].split(':')[0] else null
+                    if field
+                        if scope.stats[field]
+                            data = []
+                            angular.forEach scope.stats[field], (v, k) ->
+                                if v[0].trim() != ""
+                                    data.push { name: v[0] }
+                            data = $filter('orderBy')(data, 'name')
+                            cb(data)
+                        else
+                            cb([])
+
+                    else
+                        # return the list of fields that match this word in alpha order
+                        eventsFactory.event_fields().success (data, status, headers, config) ->
+                            if search_word.length > 0
+                                data = $.grep data, (n, i) ->
+                                    n.name.indexOf(search_word) == 0
+                            data = $filter('orderBy')(data, 'name')
+                            cb(data)
+            }
+        )
+
+        # make sure the dropdown displays on textbox focus
+        el.on 'focus', () ->
+            # hacky, but I can't get this to work otherwise
+            curval = el.typeahead('val')
+            console.log curval
+            el.typeahead('val', 'c').typeahead('open')
+            el.typeahead('val', curval).typeahead('open')
+
+        # intercept the autocomplete and make sure it only replaces the last word
+        el.on 'typeahead:selected', ($e, datum) ->
+            all_but_last = el.current_search_string.replace(/[a-z0-9_\-]+$/, '')
+
+            # determine whether this is a key or value
+            m = el.current_search_string.match /[a-z0-9_\-:]+$/
+            if m && m[0].indexOf(':') >= 0
+                el.typeahead('val', all_but_last + datum.name)
+            else
+                el.typeahead('val', all_but_last + datum.name + ':')
+            el.typeahead('open')
+)
+
