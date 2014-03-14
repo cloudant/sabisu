@@ -680,7 +680,7 @@
     $scope.to_trusted = function(html_code) {
       return $sce.trustAsHtml(html_code);
     };
-    return $scope.get_obj_attr = function(obj, path) {
+    $scope.get_obj_attr = function(obj, path) {
       var p, val, _i, _len;
       path = path.split('.');
       val = obj;
@@ -695,6 +695,22 @@
       }
       return val;
     };
+    /* Keyboard Shortcuts*/
+
+    Mousetrap.bind('?', function() {
+      $log.info('showing shortcuts');
+      return $("#keyboard_shortcuts").modal('show');
+    }, 'keyup');
+    Mousetrap.bind('.', function() {
+      return $('#search_input').focus();
+    }, 'keyup');
+    Mousetrap.bind('s', function() {
+      $('#sort').focus();
+      return $('#sort').click();
+    }, 'keyup');
+    return Mousetrap.bind('enter', function() {
+      return $scope.updateParams();
+    }, 'keyup');
   });
 
 }).call(this);

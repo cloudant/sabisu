@@ -595,4 +595,25 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
                 val = null
                 break
         val
+
+    ### Keyboard Shortcuts ###
+    Mousetrap.bind('?', ->
+        $log.info('showing shortcuts')
+        $("#keyboard_shortcuts").modal('show')
+    'keyup'
+    )
+    Mousetrap.bind('.', ->
+        $('#search_input').focus()
+    'keyup'
+    )
+    Mousetrap.bind('s', ->
+        $('#sort').focus()
+        $('#sort').click()
+    'keyup'
+    )
+    Mousetrap.bind('enter', ->
+        $scope.updateParams()
+    'keyup'
+    )
+    ##########################
 )

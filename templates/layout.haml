@@ -3,6 +3,7 @@
   %head
     %script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"}
     %script{:src => "https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"}
+    %script{:src => "http://cdn.craig.is/js/mousetrap/mousetrap.min.js"}
     %script{:src => "/js/base.js"}
     %script{:src => "/js/moment.js"}
     %script{:src => "https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"}
@@ -45,4 +46,38 @@
         %a{:href => "https://www.cloudant.com"}= "Cloudant, Inc."
         2014
         %a{:href => "http://www.apache.org/licenses/LICENSE-2.0.html"}= "Apache License, Version 2.0"
+        %br
+        %a{'data-toggle' => 'modal', 'data-target' => '#keyboard_shortcuts'}= "Keyboard Shortcuts"
+
+%div{:class => 'modal fade', :id => 'keyboard_shortcuts'}
+  %div{:class => 'modal-dialog'}
+    %div{:class => 'modal-content'}
+      %div{:class => 'modal-header'}
+        %button{:type => "button", :class => "close", 'data-dismiss' => "modal", 'aria-hidden' => "true"}
+        %h3{:class => 'modal-title'}= "Keyboard Shortcuts"
+      %div{:class => 'modal-body'}
+        %div
+          %h4='Events'
+          %table{:class => "table table-striped"}
+            %tr
+              %td="Description"
+              %td="Shortcut"
+            %tr
+              %td="Show keyboard shortcuts"
+              %td
+                %span{:class => 'well well-sm'}="? (question mark)"
+            %tr
+              %td="Goto search query"
+              %td
+                %span{:class => 'well well-sm'}=". (period)"
+            %tr
+              %td="Select the sort dropdown"
+              %td
+                %span{:class => 'well well-sm'}="s"
+            %tr
+              %td="Press search button"
+              %td
+                %span{:class => 'well well-sm'}="enter"
+      %div{:class => 'modal-footer'}
+        %button{:type => 'button', :class => 'btn btn-default', 'data-dismiss' => 'modal'}= "Close"
         
