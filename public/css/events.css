@@ -144,14 +144,6 @@ span#corner_status {
   text-align: left;
 }
 
-.tt-hint {
-  color: #999;
-  font-size: 15px;
-  height: 43px;
-  width: 422px;
-  padding: 10px 15px;
-}
-
 .tt-dropdown-menu {
   width: 200px;
   margin-top: 0px;
@@ -175,9 +167,20 @@ span#corner_status {
           box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
 
+.tt-hint, .tt-suggestion, #search_input {
+  font-size: 13px;
+  font-family: "Bitstream Vera Sans Mono","DejaVu Sans Mono","Monaco","Courier New",monospace;
+}
+
+.tt-hint {
+  color: #999;
+  height: 43px;
+  width: 422px;
+  padding: 10px 15px;
+}
+
 .tt-suggestion {
-  padding: 3px 20px;
-  font-size: 15px;
+  padding: 3px 12px;
   line-height: 20px;
 }
 

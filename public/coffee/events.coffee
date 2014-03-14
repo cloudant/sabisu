@@ -62,22 +62,58 @@ sabisu.factory('eventsFactory', ($log, $http) ->
 
 sabisu.directive('searchTypeahead', ($window, $filter, eventsFactory) ->
     (scope, element, attrs) ->
-        angular.element(element).typeahead(
+        el = angular.element element
+
+        # set up the typeahead plugin
+        el.typeahead(
             {
-                minLength: 1,
+                minLength: 0,
                 highlight: true
             },
             {
                 name: 'keys',
                 displayKey: 'name',
-                source: (query, cb) ->
+                source: (search_string, cb) ->
+                    # store the current search string
+                    el.current_search_string = search_string
+
+                    # squash the search string to only the last word
+                    m = search_string.match /[a-z0-9_\-]+$/
+                    search_string = if m then m[0] else ''
+
+                    # position the dropdown under the cursor (~ means sibling in the css selector)
+                    # doesn't work in non-compliant browser (ie IE)
+                    indent = Math.max(0, (element[0].selectionStart || 0) - search_string.length) * 0.535
+                    dd = angular.element "##{element[0].id} ~ .tt-dropdown-menu"
+                    dd[0].style.left = "#{indent}em"
+
+                    # don't display the hint if the search string is blank
+                    if search_string.length == 0
+                        angular.element(".tt-hint").hide()
+                    else
+                        angular.element(".tt-hint").show()
+
+                    # return the list of fields that match this word in alpha order
                     eventsFactory.event_fields().success (data, status, headers, config) ->
-                        data = $.grep data, (n, i) ->
-                            n.name.indexOf(query) == 0
+                        if search_string.length > 0
+                            data = $.grep data, (n, i) ->
+                                n.name.indexOf(search_string) == 0
                         data = $filter('orderBy')(data, 'name')
                         cb(data)
             }
         )
+
+        # make sure the dropdown displays on textbox focus
+        el.on 'focus', () ->
+            # hacky, but I can't get this to work otherwise
+            curval = el.typeahead('val')
+            el.typeahead('val', 'c').typeahead('open')
+            el.typeahead('val', curval).typeahead('open')
+
+        # intercept the autocomplete and make sure it only replaces the last word
+        el.on 'typeahead:selected', ($e, datum) ->
+            new_str = el.current_search_string.replace(/[a-z0-9_\-]+$/, '') + datum.name
+            el.typeahead('val', new_str)
 )
 
 sabisu.factory('stashesFactory', ($log, $http) ->

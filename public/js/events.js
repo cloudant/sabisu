@@ -86,21 +86,48 @@
 
   sabisu.directive('searchTypeahead', function($window, $filter, eventsFactory) {
     return function(scope, element, attrs) {
-      return angular.element(element).typeahead({
-        minLength: 1,
+      var el;
+      el = angular.element(element);
+      el.typeahead({
+        minLength: 0,
         highlight: true
       }, {
         name: 'keys',
         displayKey: 'name',
-        source: function(query, cb) {
+        source: function(search_string, cb) {
+          var dd, indent, m;
+          el.current_search_string = search_string;
+          m = search_string.match(/[a-z0-9_\-]+$/);
+          search_string = m ? m[0] : '';
+          indent = Math.max(0, (element[0].selectionStart || 0) - search_string.length) * 0.535;
+          dd = angular.element("#" + element[0].id + " ~ .tt-dropdown-menu");
+          dd[0].style.left = "" + indent + "em";
+          if (search_string.length === 0) {
+            angular.element(".tt-hint").hide();
+          } else {
+            angular.element(".tt-hint").show();
+          }
           return eventsFactory.event_fields().success(function(data, status, headers, config) {
-            data = $.grep(data, function(n, i) {
-              return n.name.indexOf(query) === 0;
-            });
+            if (search_string.length > 0) {
+              data = $.grep(data, function(n, i) {
+                return n.name.indexOf(search_string) === 0;
+              });
+            }
             data = $filter('orderBy')(data, 'name');
             return cb(data);
           });
         }
+      });
+      el.on('focus', function() {
+        var curval;
+        curval = el.typeahead('val');
+        el.typeahead('val', 'c').typeahead('open');
+        return el.typeahead('val', curval).typeahead('open');
+      });
+      return el.on('typeahead:selected', function($e, datum) {
+        var new_str;
+        new_str = el.current_search_string.replace(/[a-z0-9_\-]+$/, '') + datum.name;
+        return el.typeahead('val', new_str);
       });
     };
   });
