@@ -17,17 +17,17 @@
             %select{:id => 'sort', 'ng-model' => 'sort_field', :class => 'form-control'}
               %option{:disabled => true}= 'Sort by'
               %option{:value => 'client'}= 'client'
-              %option{:value => '-client'}= 'client (decending)'
+              %option{:value => '-client'}= 'client (descending)'
               %option{:value => 'check'}= 'check'
-              %option{:value => '-check'}= 'check (decending)'
+              %option{:value => '-check'}= 'check (descending)'
               %option{:value => 'status'}= 'status'
-              %option{:value => '-status'}= 'status (decending)'
+              %option{:value => '-status'}= 'status (descending)'
               %option{:value => 'age', :selected => "selected"}= 'age'
-              %option{:value => '-age'}= 'age (decending)'
+              %option{:value => '-age'}= 'age (descending)'
               %option{:value => 'issued'}= 'issued'
-              %option{:value => '-issued'}= 'issued (decending)'
+              %option{:value => '-issued'}= 'issued (descending)'
               %option{:value => 'output'}= 'output'
-              %option{:value => '-output'}= 'output (decending)'
+              %option{:value => '-output'}= 'output (descending)'
           %input{:type => 'submit', :value => 'Search', :class => 'btn btn-success pull-right', 'ng-click' => 'updateParams()'}
         
 
