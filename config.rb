@@ -45,7 +45,6 @@ configure :production, :development do
     { name: 'status', path: 'check.status', facet: false, type: 'int', index: true},
     { name: 'state_change', path: 'check.state_change', facet: false, type: 'int', index: true},
     { name: 'occurrence', path: 'occurrences', facet: false, type: 'int', index: true},
-    { name: 'action', path: 'action', facet: false, type: 'str', index: true},
     { name: 'issued', path: 'check.issued', facet: false, type: 'int', index: true},
     { name: 'output', path: 'check.output', facet: false, type: 'str', index: true}
   ]
