@@ -89,6 +89,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
     $scope.event_fields_custom = []
     $scope.event_fields_facet = []
     $scope.event_fields_int = []
+    $scope.event_fields_name = []
     $scope.events_spin = false
     $scope.showAll = false
     $scope.bulk = 'show'
@@ -192,6 +193,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
             defaults = [ 'client', 'check', 'status', 'state_change', 'occurrence', 'issued', 'output']
             $scope.event_fields = data
             for field in $scope.event_fields
+                $scope.event_fields_name.push field.name
                 if field.type == 'int'
                     $scope.event_fields_int.push field.name
                     $scope.event_fields_int.push '-' + field.name
