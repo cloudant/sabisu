@@ -1529,7 +1529,9 @@
                 datum = this.dropdown.getDatumForTopSuggestion();
                 if (datum && this.dropdown.isVisible() && !this.input.hasOverflow()) {
                     val = this.input.getInputValue();
-                    query = Input.normalizeQuery(val);
+                    lastIndex = val.lastIndexOf(" ");
+                    val_last_word = val.substring(lastIndex + 1);
+                    query = Input.normalizeQuery(val_last_word);
                     escapedQuery = _.escapeRegExChars(query);
                     frontMatchRegEx = new RegExp("^(?:" + escapedQuery + ")(.+$)", "i");
                     match = frontMatchRegEx.exec(datum.value);
@@ -1545,7 +1547,7 @@
                 isCursorAtEnd = laxCursor || this.input.isCursorAtEnd();
                 if (hint && query !== hint && isCursorAtEnd) {
                     datum = this.dropdown.getDatumForTopSuggestion();
-                    datum && this.input.setInputValue(datum.value);
+                    datum //&& this.input.setInputValue(datum.value);
                     this.eventBus.trigger("autocompleted", datum.raw, datum.datasetName);
                 }
             },
