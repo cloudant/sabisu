@@ -715,10 +715,46 @@
     }, 'keyup');
   });
 
-  sabisu.directive('searchTypeahead', function($window, $filter, eventsFactory) {
+  sabisu.directive('searchTypeahead', function($window, $filter, $timeout, eventsFactory) {
     return function(scope, element, attrs) {
-      var el;
+      var all_but_last_clause, at_bool, at_key, at_none, at_val, clause_char_list, current_clause, el, whitespace_at_end;
+      clause_char_list = "a-zA-Z0-9_\\-\\?\\*\\+\\~\\.\\[\\]\\{\\}\\^\"";
       el = angular.element(element);
+      current_clause = function() {
+        var m;
+        m = el.current_search_string.match(RegExp("([" + clause_char_list + ":]+) *$"));
+        if (m && m[0]) {
+          if (m[0].indexOf(':') >= 0) {
+            return m[0].split(':');
+          } else {
+            return [m[0]];
+          }
+        } else {
+          return null;
+        }
+      };
+      all_but_last_clause = function() {
+        return el.current_search_string.replace(RegExp("[" + clause_char_list + "]+$"), '');
+      };
+      whitespace_at_end = function() {
+        var m;
+        m = el.current_search_string.match(RegExp(" $"));
+        return m != null;
+      };
+      at_none = function() {
+        var c, quote_count;
+        quote_count = (c = current_clause()) && c.length >= 2 ? c[1].split('"').length - 1 : 0;
+        return el.current_search_string.slice(-1) === '"' && quote_count === 2;
+      };
+      at_val = function() {
+        return (current_clause() != null) && current_clause().length === 2 && !whitespace_at_end();
+      };
+      at_bool = function() {
+        return (current_clause() != null) && current_clause().length === 2 && whitespace_at_end();
+      };
+      at_key = function() {
+        return !at_bool() && !at_val() && !at_none();
+      };
       el.typeahead({
         minLength: 0,
         highlight: true
@@ -726,10 +762,13 @@
         name: 'keys',
         displayKey: 'name',
         source: function(search_string, cb) {
-          var data, dd, field, indent, m, m2, search_word;
+          var data, dd, indent, key, search_word, search_word_clean;
           el.current_search_string = search_string;
-          m = search_string.match(/[a-z0-9_\-]+$/);
-          search_word = m ? m[0] : '';
+          search_word = current_clause() ? current_clause().slice(-1)[0] : '';
+          if (at_key() && whitespace_at_end()) {
+            search_word = '';
+          }
+          search_word_clean = search_word.trim().replace(/"/, '');
           indent = Math.max(0, (element[0].selectionStart || 0) - search_word.length) * 0.535;
           dd = angular.element("#" + element[0].id + " ~ .tt-dropdown-menu");
           dd[0].style.left = "" + indent + "em";
@@ -738,13 +777,12 @@
           } else {
             angular.element(".tt-hint").show();
           }
-          m2 = search_string.match(/[a-z0-9_\-:]+$/);
-          field = m2 && m2[0].indexOf(':') >= 0 ? m2[0].split(':')[0] : null;
-          if (field) {
-            if (scope.stats[field]) {
+          if (at_val()) {
+            key = current_clause()[0];
+            if (scope.stats[key]) {
               data = [];
-              angular.forEach(scope.stats[field], function(v, k) {
-                if (v[0].trim() !== "") {
+              angular.forEach(scope.stats[key], function(v, k) {
+                if (v[0].trim() !== "" && v[0].indexOf(search_word_clean) === 0) {
                   return data.push({
                     name: v[0]
                   });
@@ -755,11 +793,25 @@
             } else {
               return cb([]);
             }
+          } else if (at_bool()) {
+            return cb([
+              {
+                name: 'AND'
+              }, {
+                name: 'AND NOT'
+              }, {
+                name: 'OR'
+              }, {
+                name: 'OR NOT'
+              }
+            ]);
+          } else if (at_none()) {
+            return cb([]);
           } else {
             return eventsFactory.event_fields().success(function(data, status, headers, config) {
-              if (search_word.length > 0) {
+              if (search_word_clean.length > 0) {
                 data = $.grep(data, function(n, i) {
-                  return n.name.indexOf(search_word) === 0;
+                  return n.name.indexOf(search_word_clean) === 0;
                 });
               }
               data = $filter('orderBy')(data, 'name');
@@ -771,20 +823,33 @@
       el.on('focus', function() {
         var curval;
         curval = el.typeahead('val');
-        console.log(curval);
         el.typeahead('val', 'c').typeahead('open');
         return el.typeahead('val', curval).typeahead('open');
       });
-      return el.on('typeahead:selected', function($e, datum) {
-        var all_but_last, m;
-        all_but_last = el.current_search_string.replace(/[a-z0-9_\-]+$/, '');
-        m = el.current_search_string.match(/[a-z0-9_\-:]+$/);
-        if (m && m[0].indexOf(':') >= 0) {
-          el.typeahead('val', all_but_last + datum.name);
+      el.on('typeahead:selected', function($e, datum) {
+        if (at_val()) {
+          el.typeahead('val', all_but_last_clause() + '"' + datum.name + '" ');
+        } else if (at_key()) {
+          el.typeahead('val', all_but_last_clause() + datum.name + ':');
         } else {
-          el.typeahead('val', all_but_last + datum.name + ':');
+          el.typeahead('val', all_but_last_clause() + datum.name + ' ');
         }
-        return el.typeahead('open');
+        return $timeout(function() {
+          var curval;
+          curval = el.typeahead('val');
+          el.typeahead('val', 'c').typeahead('open');
+          return el.typeahead('val', curval).typeahead('open');
+        }, 100);
+      });
+      el.on('typeahead:autocompleted', function($e, datum) {
+        if (at_key()) {
+          el.typeahead('val', el.typeahead('val') + ':');
+          return el.typeahead('open');
+        }
+      });
+      return el.on('typeahead:cursorchanged', function($e, datum, dsName) {
+        angular.element(".tt-input").val(all_but_last_clause() + datum.name);
+        return angular.element(".tt-hint").val("");
       });
     };
   });

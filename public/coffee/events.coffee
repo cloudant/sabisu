@@ -620,9 +620,47 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
     ##########################
 )
 
-sabisu.directive('searchTypeahead', ($window, $filter, eventsFactory) ->
+sabisu.directive('searchTypeahead', ($window, $filter, $timeout, eventsFactory) ->
     (scope, element, attrs) ->
+        clause_char_list = "a-zA-Z0-9_\\-\\?\\*\\+\\~\\.\\[\\]\\{\\}\\^\""
         el = angular.element element
+
+        # returns the current clause as [key, value] or null if none
+        current_clause = () ->
+            m = el.current_search_string.match RegExp("([#{clause_char_list}:]+) *$")
+            if m && m[0]
+                if m[0].indexOf(':') >= 0
+                    m[0].split(':')
+                else
+                    [m[0]]
+            else
+                null
+
+        # return the search string up until the last clause
+        all_but_last_clause = () ->
+            el.current_search_string.replace(RegExp("[#{clause_char_list}]+$"), '')
+
+        # is there whitespace at the end of the search string?
+        whitespace_at_end = () ->
+            m = el.current_search_string.match(RegExp(" $"))
+            m?
+
+        # is the cursor currently at a spot that should have no autocomplete?
+        at_none = () ->
+            quote_count = if (c = current_clause()) && c.length >= 2 then (c[1].split('"').length - 1) else 0
+            el.current_search_string.slice(-1) == '"' && quote_count == 2
+
+        # is the cursor currently in a spot to enter a value?
+        at_val = () ->
+            current_clause()? && current_clause().length == 2 && !whitespace_at_end()
+
+        # is the cursor currently in a spot to enter a boolean?
+        at_bool = () ->
+            current_clause()? && current_clause().length == 2 && whitespace_at_end()
+
+        # is the cursor currently in a spot to enter a key?
+        at_key = () ->
+            !at_bool() && !at_val() && !at_none()
 
         # set up the typeahead plugin
         el.typeahead(
@@ -637,12 +675,14 @@ sabisu.directive('searchTypeahead', ($window, $filter, eventsFactory) ->
                     # store the current search string
                     el.current_search_string = search_string
 
-                    # squash the search string to only the last word
-                    m = search_string.match /[a-z0-9_\-]+$/
-                    search_word = if m then m[0] else ''
+                    # squash the search string to only the current word
+                    search_word = if current_clause() then current_clause().slice(-1)[0] else ''
+                    if at_key() && whitespace_at_end()
+                        search_word = ''
+                    search_word_clean = search_word.trim().replace(/"/, '')
 
                     # position the dropdown under the cursor (~ means sibling in the css selector)
-                    # doesn't work in non-compliant browser (ie IE)
+                    # doesn't work in non-compliant browsers (ie IE)
                     indent = Math.max(0, (element[0].selectionStart || 0) - search_word.length) * 0.535
                     dd = angular.element "##{element[0].id} ~ .tt-dropdown-menu"
                     dd[0].style.left = "#{indent}em"
@@ -653,26 +693,33 @@ sabisu.directive('searchTypeahead', ($window, $filter, eventsFactory) ->
                     else
                         angular.element(".tt-hint").show()
 
-                    # if this search word is after a :, autocomplete the value instead
-                    m2 = search_string.match /[a-z0-9_\-:]+$/
-                    field = if m2 && m2[0].indexOf(':') >= 0 then m2[0].split(':')[0] else null
-                    if field
-                        if scope.stats[field]
+                    # determine if we are entering a key, boolean, or value
+                    if at_val()
+                        # if this is a value of a key we are indexing,
+                        # show matching values in alpha order
+                        key = current_clause()[0]
+                        if scope.stats[key]
                             data = []
-                            angular.forEach scope.stats[field], (v, k) ->
-                                if v[0].trim() != ""
+                            angular.forEach scope.stats[key], (v, k) ->
+                                if v[0].trim() != "" && v[0].indexOf(search_word_clean) == 0
                                     data.push { name: v[0] }
                             data = $filter('orderBy')(data, 'name')
                             cb(data)
                         else
                             cb([])
 
+                    else if at_bool()
+                        cb([ { name: 'AND' }, { name: 'AND NOT' }, { name: 'OR' }, { name: 'OR NOT' } ])
+
+                    else if at_none()
+                        cb([])
+
                     else
-                        # return the list of fields that match this word in alpha order
+                        # if we are entering a key, return all matching keys in alpha order
                         eventsFactory.event_fields().success (data, status, headers, config) ->
-                            if search_word.length > 0
+                            if search_word_clean.length > 0
                                 data = $.grep data, (n, i) ->
-                                    n.name.indexOf(search_word) == 0
+                                    n.name.indexOf(search_word_clean) == 0
                             data = $filter('orderBy')(data, 'name')
                             cb(data)
             }
@@ -682,20 +729,35 @@ sabisu.directive('searchTypeahead', ($window, $filter, eventsFactory) ->
         el.on 'focus', () ->
             # hacky, but I can't get this to work otherwise
             curval = el.typeahead('val')
-            console.log curval
             el.typeahead('val', 'c').typeahead('open')
             el.typeahead('val', curval).typeahead('open')
 
         # intercept the autocomplete and make sure it only replaces the last word
         el.on 'typeahead:selected', ($e, datum) ->
-            all_but_last = el.current_search_string.replace(/[a-z0-9_\-]+$/, '')
-
             # determine whether this is a key or value
-            m = el.current_search_string.match /[a-z0-9_\-:]+$/
-            if m && m[0].indexOf(':') >= 0
-                el.typeahead('val', all_but_last + datum.name)
+            if at_val()
+                el.typeahead('val', all_but_last_clause() + '"' + datum.name + '" ')
+            else if at_key()
+                el.typeahead('val', all_but_last_clause() + datum.name + ':')
             else
-                el.typeahead('val', all_but_last + datum.name + ':')
-            el.typeahead('open')
+                el.typeahead('val', all_but_last_clause() + datum.name + ' ')
+
+            # hack to avoid the fact that the dropdown is normally closed
+            $timeout () ->
+                curval = el.typeahead('val')
+                el.typeahead('val', 'c').typeahead('open')
+                el.typeahead('val', curval).typeahead('open')
+            , 100
+
+        # if you hit tab to autocomplete a key, append the :
+        el.on 'typeahead:autocompleted', ($e, datum) ->
+            if at_key()
+                el.typeahead('val', el.typeahead('val') + ':')
+                el.typeahead('open')
+
+        # only change the last word when scrolling through the dropdown
+        el.on 'typeahead:cursorchanged', ($e, datum, dsName) ->
+            angular.element(".tt-input").val(all_but_last_clause() + datum.name)
+            angular.element(".tt-hint").val("")
 )
 
