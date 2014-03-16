@@ -300,7 +300,6 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
         )
 
     $scope.closePopovers = ->
-        $log.info('closing popovers')
         $('.silenceBtn').popover('hide')
 
     $scope.updateSilencePath = (path) ->

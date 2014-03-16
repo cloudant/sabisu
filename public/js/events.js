@@ -347,7 +347,6 @@
       });
     };
     $scope.closePopovers = function() {
-      $log.info('closing popovers');
       return $('.silenceBtn').popover('hide');
     };
     $scope.updateSilencePath = function(path) {
