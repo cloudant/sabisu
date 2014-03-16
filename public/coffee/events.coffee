@@ -160,32 +160,32 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
         if stash['expire']? and stash['expire'] != -1
             rel_time = moment.unix(parseInt(stash['content']['timestamp']) + parseInt(stash['expire'])).fromNow()
             html += """
-<dt class="text-warning">Expires</dt>
-<dd class="text-warning">#{rel_time}</dd>
-"""
+                    <dt class="text-warning">Expires</dt>
+                    <dd class="text-warning">#{rel_time}</dd>
+                    """
         if stash['content']['expiration'] == 'resolve'
             html += """
-<dt class="text-success">Expires</dt>
-<dd class="text-success">On resolve</dt>
-"""
+                    <dt class="text-success">Expires</dt>
+                    <dd class="text-success">On resolve</dt>
+                    """
         if stash['content']['expiration'] == 'never'
             html += """
-<dt class="text-danger">Expires</dt>
-<dd class="text-danger">Never</dt>
-"""
+                    <dt class="text-danger">Expires</dt>
+                    <dd class="text-danger">Never</dt>
+                    """
         html += "</dl>"
         if stash['content']['reason']?
             html += """
-<dl>
-<dt>Reason</dt>
-<dd>#{stash['content']['reason']}</dd>
-</dl>
-"""
+                    <dl>
+                    <dt>Reason</dt>
+                    <dd>#{stash['content']['reason']}</dd>
+                    </dl>
+                    """
         html += """
-<button type="button" class="deleteSilenceBtn btn btn-danger btn-sm pull-right" onclick="angular.element($('#eventsController')).scope().deleteSilence('#{stash['path']}')">
-<span class="glyphicon glyphicon-remove"></span> Delete
-</button>
-"""
+                <button type="button" class="deleteSilenceBtn btn btn-danger btn-sm pull-right" onclick="angular.element($('#eventsController')).scope().deleteSilence('#{stash['path']}')">
+                <span class="glyphicon glyphicon-remove"></span> Delete
+                </button>
+                """
         html += "</div>"
 
     $scope.updateEventFields = ->
@@ -284,7 +284,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
             )
 
             $('.close_popover').click( ->
-                $('.silenceBtn').popover('hide')
+                $scope.closePopovers()
             )
 
             # if they click outside the popover, close it
@@ -300,6 +300,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
         )
 
     $scope.closePopovers = ->
+        $log.info('closing popovers')
         $('.silenceBtn').popover('hide')
 
     $scope.updateSilencePath = (path) ->
@@ -458,22 +459,25 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
                     ).reverse()
 
                 $scope.stats = stats
-            if 'rows' of data and not angular.equals($scope.previous_events_events, data['rows'])
-                $scope.previous_events_events = angular.copy(data['rows'])
-                for event in data['rows']
-                    event = event['doc']['event']
-                    id = "#{event['client']['name']}/#{event['check']['name']}"
-                    event['id'] = CryptoJS.MD5(id).toString(CryptoJS.enc.Base64)
+            if 'rows' of data and not angular.equals($scope.previous_events_events, data.rows)
+                $scope.previous_events_events = angular.copy(data.rows)
+                for event in data.rows
+                    event = event.doc.event
+                    id = "#{event.client.name}/#{event.check.name}"
+                    event.id = CryptoJS.MD5(id).toString(CryptoJS.enc.Base64)
                     if event.id in $scope.showDetails or $scope.showAll == 'true'
                         event.showdetails = 'in'
                     else
                         event.showdetails = ''
-                    event['color'] = color[event['check']['status']]
-                    event['wstatus'] = status[event['check']['status']]
-                    event['rel_time'] = moment.unix(event['check']['state_change']).fromNow()
-                    event['check']['issued'] = event['check']['issued'] * 1000
-                    if event['check']['state_change']?
-                        event['check']['state_change'] = event['check']['state_change'] * 1000
+                    event.color = color[event.check.status]
+                    event.wstatus = status[event.check.status]
+                    if event.check.state_change == null or event.check.state_change == undefined
+                        event.rel_time = 'n/a'
+                    else
+                        event.rel_time = moment.unix(event.check.state_change).fromNow()
+                    event.check.issued = event.check.issued * 1000
+                    if event.check.state_change?
+                        event.check.state_change = event.check.state_change * 1000
                     # add silence info
                     event.client.silenced ?= false
                     event.check.silenced ?= false

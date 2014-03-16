@@ -334,7 +334,7 @@
           title: "Silence Details <button type=\"button\" class=\"btn btn-link btn-xs pull-right close_popover\" onclick=\"$('.silenceBtn').popover('hide')\"><span class=\"glyphicon glyphicon-remove\"></span>close</button>"
         });
         $('.close_popover').click(function() {
-          return $('.silenceBtn').popover('hide');
+          return $scope.closePopovers();
         });
         $('body').on('click', function(e) {
           return $('[data-toggle="popover"]').each(function() {
@@ -347,6 +347,7 @@
       });
     };
     $scope.closePopovers = function() {
+      $log.info('closing popovers');
       return $('.silenceBtn').popover('hide');
     };
     $scope.updateSilencePath = function(path) {
@@ -528,25 +529,29 @@
           }
           $scope.stats = stats;
         }
-        if ('rows' in data && !angular.equals($scope.previous_events_events, data['rows'])) {
-          $scope.previous_events_events = angular.copy(data['rows']);
-          _ref1 = data['rows'];
+        if ('rows' in data && !angular.equals($scope.previous_events_events, data.rows)) {
+          $scope.previous_events_events = angular.copy(data.rows);
+          _ref1 = data.rows;
           for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
             event = _ref1[_i];
-            event = event['doc']['event'];
-            id = "" + event['client']['name'] + "/" + event['check']['name'];
-            event['id'] = CryptoJS.MD5(id).toString(CryptoJS.enc.Base64);
+            event = event.doc.event;
+            id = "" + event.client.name + "/" + event.check.name;
+            event.id = CryptoJS.MD5(id).toString(CryptoJS.enc.Base64);
             if ((_ref2 = event.id, __indexOf.call($scope.showDetails, _ref2) >= 0) || $scope.showAll === 'true') {
               event.showdetails = 'in';
             } else {
               event.showdetails = '';
             }
-            event['color'] = color[event['check']['status']];
-            event['wstatus'] = status[event['check']['status']];
-            event['rel_time'] = moment.unix(event['check']['state_change']).fromNow();
-            event['check']['issued'] = event['check']['issued'] * 1000;
-            if (event['check']['state_change'] != null) {
-              event['check']['state_change'] = event['check']['state_change'] * 1000;
+            event.color = color[event.check.status];
+            event.wstatus = status[event.check.status];
+            if (event.check.state_change === null || event.check.state_change === void 0) {
+              event.rel_time = 'n/a';
+            } else {
+              event.rel_time = moment.unix(event.check.state_change).fromNow();
+            }
+            event.check.issued = event.check.issued * 1000;
+            if (event.check.state_change != null) {
+              event.check.state_change = event.check.state_change * 1000;
             }
             if ((_base = event.client).silenced == null) {
               _base.silenced = false;
