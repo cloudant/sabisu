@@ -121,14 +121,14 @@
           %h4{:class => 'modal-title'}= "Silence {{silencePath}}"
         %div{:class => 'modal-body'}
           %form{:class => 'form-horizontal', :role => 'form', :id => 'silence_form'}
-            %div{:class => 'form-group silence_author has-feedback'}
-              %label{:for => 'author', :class => 'col-sm-2 control-label'}= "Author*"
+            %div{:class => 'form-group silence_owner has-feedback'}
+              %label{:for => 'owner', :class => 'col-sm-2 control-label'}= "Author*"
               %div{:class => 'col-sm-10'}
-                %input{:type => 'text', :class => 'form-control', :id => 'author', :placeholder => 'Joe Smith'}
-            %div{:class => 'form-group silence_comment has-feedback'}
-              %label{:for => 'comment', :class => 'col-sm-2 control-label'}= "Comment*"
+                %input{:type => 'text', :class => 'form-control', :id => 'owner', :placeholder => 'Joe Smith'}
+            %div{:class => 'form-group silence_reason has-feedback'}
+              %label{:for => 'reason', :class => 'col-sm-2 control-label'}= "Comment*"
               %div{:class => 'col-sm-10'}
-                %textarea{:class => 'form-control', :id => 'comment', :placeholder => 'Enter comments here', :rows => '3'}
+                %textarea{:class => 'form-control', :id => 'reason', :placeholder => 'Enter reason here', :rows => '3'}
             %div{:class => 'form-group'}
               %label{:for => 'expires', :class => 'col-sm-2 control-label'}="Expiration*"
               %div{:class => 'col-sm-10'}

@@ -152,10 +152,10 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
 <dt>Created</dt>
 <dd>#{$filter('date')((stash['content']['timestamp'] * 1000), "short")}</dd>
 """
-        if stash['content']['author']?
+        if stash['content']['owner']?
             html += """
-<dt>Author</dt>
-<dd>#{stash['content']['author']}</dd>
+<dt>Owner</dt>
+<dd>#{stash['content']['owner']}</dd>
 """
         if stash['expire']? and stash['expire'] != -1
             rel_time = moment.unix(parseInt(stash['content']['timestamp']) + parseInt(stash['expire'])).fromNow()
@@ -174,11 +174,11 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
 <dd class="text-danger">Never</dt>
 """
         html += "</dl>"
-        if stash['content']['comment']?
+        if stash['content']['reason']?
             html += """
 <dl>
-<dt>Comment</dt>
-<dd>#{stash['content']['comment']}</dd>
+<dt>Reason</dt>
+<dd>#{stash['content']['reason']}</dd>
 </dl>
 """
         html += """
@@ -278,7 +278,7 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
             $('.silenceBtn').popover(
                 trigger: 'click'
                 html: true
-                placement: 'top'
+                placement: 'right'
                 container: 'body'
                 title: """Silence Details <button type="button" class="btn btn-link btn-xs pull-right close_popover" onclick="$('.silenceBtn').popover('hide')"><span class="glyphicon glyphicon-remove"></span>close</button>"""
             )
@@ -308,22 +308,22 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
     $scope.saveSilence = ->
         valid = true
         # check that input fields are valid
-        author = $('#author').val()
-        if author == ''
-            $('.silence_author').removeClass('has-success')
-            $('.silence_author').addClass('has-error')
+        owner = $('#owner').val()
+        if owner == ''
+            $('.silence_owner').removeClass('has-success')
+            $('.silence_owner').addClass('has-error')
             valid = false
         else
-            $('.silence_author').removeClass('has-error') 
-            $('.silence_author').addClass('has-success')
-        comment = $('#comment').val()
-        if comment == ''
-            $('.silence_comment').removeClass('has-success')
-            $('.silence_comment').addClass('has-error')
+            $('.silence_owner').removeClass('has-error') 
+            $('.silence_owner').addClass('has-success')
+        reason = $('#reason').val()
+        if reason == ''
+            $('.silence_reason').removeClass('has-success')
+            $('.silence_reason').addClass('has-error')
             valid = false
         else
-            $('.silence_comment').removeClass('has-error')
-            $('.silence_comment').addClass('has-success')
+            $('.silence_reason').removeClass('has-error')
+            $('.silence_reason').addClass('has-success')
 
         timer_val = $('#timer_val').val()
         expiration = $('input[name=expiration]:checked', '#silence_form').val()
@@ -359,8 +359,8 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
             stash['path'] = "silence/" + $scope.silencePath
             stash['content'] = {}
             stash['content']['timestamp'] = Math.round( (new Date().getTime()) / 1000)
-            stash['content']['author'] = author
-            stash['content']['comment'] = comment
+            stash['content']['owner'] = owner
+            stash['content']['reason'] = reason
             stash['content']['expiration'] = expiration
             if expiration == 'timer'
                 stash['expire'] = timerToSec(timer_val)
@@ -368,12 +368,12 @@ sabisu.controller('eventsController', ($scope, $log, $location, $filter, $sce, e
                 # update stashes displayed
                 $scope.updateStashes()
                 # clean the modal
-                author = $('#author').val()
-                $('.silence_author').removeClass('has-success')
-                $('.silence_author').removeClass('has-error')
-                comment = $('#comment').val()
-                $('.silence_comment').removeClass('has-success')
-                $('.silence_comment').removeClass('has-error')
+                owner = $('#owner').val()
+                $('.silence_owner').removeClass('has-success')
+                $('.silence_owner').removeClass('has-error')
+                reason = $('#reason').val()
+                $('.silence_reason').removeClass('has-success')
+                $('.silence_reason').removeClass('has-error')
                 timer_val = $('#timer_val').val()
                 expiration = $('input[name=expiration]:checked', '#silence_form').val()
                 $('.silence_timer_val').removeClass('has-error')

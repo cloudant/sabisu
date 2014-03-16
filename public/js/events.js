@@ -167,8 +167,8 @@
       if (stash['content']['timestamp'] != null) {
         html = "<dl class=\"dl-horizontal\">\n<dt>Created</dt>\n<dd>" + ($filter('date')(stash['content']['timestamp'] * 1000, "short")) + "</dd>";
       }
-      if (stash['content']['author'] != null) {
-        html += "<dt>Author</dt>\n<dd>" + stash['content']['author'] + "</dd>";
+      if (stash['content']['owner'] != null) {
+        html += "<dt>Owner</dt>\n<dd>" + stash['content']['owner'] + "</dd>";
       }
       if ((stash['expire'] != null) && stash['expire'] !== -1) {
         rel_time = moment.unix(parseInt(stash['content']['timestamp']) + parseInt(stash['expire'])).fromNow();
@@ -181,8 +181,8 @@
         html += "<dt class=\"text-danger\">Expires</dt>\n<dd class=\"text-danger\">Never</dt>";
       }
       html += "</dl>";
-      if (stash['content']['comment'] != null) {
-        html += "<dl>\n<dt>Comment</dt>\n<dd>" + stash['content']['comment'] + "</dd>\n</dl>";
+      if (stash['content']['reason'] != null) {
+        html += "<dl>\n<dt>Reason</dt>\n<dd>" + stash['content']['reason'] + "</dd>\n</dl>";
       }
       html += "<button type=\"button\" class=\"deleteSilenceBtn btn btn-danger btn-sm pull-right\" onclick=\"angular.element($('#eventsController')).scope().deleteSilence('" + stash['path'] + "')\">\n<span class=\"glyphicon glyphicon-remove\"></span> Delete\n</button>";
       return html += "</div>";
@@ -329,7 +329,7 @@
         $('.silenceBtn').popover({
           trigger: 'click',
           html: true,
-          placement: 'top',
+          placement: 'right',
           container: 'body',
           title: "Silence Details <button type=\"button\" class=\"btn btn-link btn-xs pull-right close_popover\" onclick=\"$('.silenceBtn').popover('hide')\"><span class=\"glyphicon glyphicon-remove\"></span>close</button>"
         });
@@ -353,25 +353,25 @@
       return $scope.silencePath = path;
     };
     $scope.saveSilence = function() {
-      var author, comment, expiration, re, stash, timerToSec, timer_val, valid;
+      var expiration, owner, re, reason, stash, timerToSec, timer_val, valid;
       valid = true;
-      author = $('#author').val();
-      if (author === '') {
-        $('.silence_author').removeClass('has-success');
-        $('.silence_author').addClass('has-error');
+      owner = $('#owner').val();
+      if (owner === '') {
+        $('.silence_owner').removeClass('has-success');
+        $('.silence_owner').addClass('has-error');
         valid = false;
       } else {
-        $('.silence_author').removeClass('has-error');
-        $('.silence_author').addClass('has-success');
+        $('.silence_owner').removeClass('has-error');
+        $('.silence_owner').addClass('has-success');
       }
-      comment = $('#comment').val();
-      if (comment === '') {
-        $('.silence_comment').removeClass('has-success');
-        $('.silence_comment').addClass('has-error');
+      reason = $('#reason').val();
+      if (reason === '') {
+        $('.silence_reason').removeClass('has-success');
+        $('.silence_reason').addClass('has-error');
         valid = false;
       } else {
-        $('.silence_comment').removeClass('has-error');
-        $('.silence_comment').addClass('has-success');
+        $('.silence_reason').removeClass('has-error');
+        $('.silence_reason').addClass('has-success');
       }
       timer_val = $('#timer_val').val();
       expiration = $('input[name=expiration]:checked', '#silence_form').val();
@@ -408,20 +408,20 @@
         stash['path'] = "silence/" + $scope.silencePath;
         stash['content'] = {};
         stash['content']['timestamp'] = Math.round((new Date().getTime()) / 1000);
-        stash['content']['author'] = author;
-        stash['content']['comment'] = comment;
+        stash['content']['owner'] = owner;
+        stash['content']['reason'] = reason;
         stash['content']['expiration'] = expiration;
         if (expiration === 'timer') {
           stash['expire'] = timerToSec(timer_val);
         }
         return stashesFactory.saveStash(stash).success(function(data, status, headers, config) {
           $scope.updateStashes();
-          author = $('#author').val();
-          $('.silence_author').removeClass('has-success');
-          $('.silence_author').removeClass('has-error');
-          comment = $('#comment').val();
-          $('.silence_comment').removeClass('has-success');
-          $('.silence_comment').removeClass('has-error');
+          owner = $('#owner').val();
+          $('.silence_owner').removeClass('has-success');
+          $('.silence_owner').removeClass('has-error');
+          reason = $('#reason').val();
+          $('.silence_reason').removeClass('has-success');
+          $('.silence_reason').removeClass('has-error');
           timer_val = $('#timer_val').val();
           expiration = $('input[name=expiration]:checked', '#silence_form').val();
           $('.silence_timer_val').removeClass('has-error');
