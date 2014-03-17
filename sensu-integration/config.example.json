@@ -1,0 +1,14 @@
+{
+  "cloudant": {
+    "username": "<username>",
+    "auth": {
+      "username": "<api key user>",
+      "password": "<api key password>"
+    }
+  },
+  "threads": 8,
+  "redis": {
+    "server": "<redis server url>",
+    "port": "<port number>"
+  }
+}

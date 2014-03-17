@@ -1,0 +1,191 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'json/ext'
+require 'redis'
+require 'couchrest'
+require 'optparse'
+require 'pp'
+
+# rubocop:disable Loop, MethodLength
+
+options = {}
+
+optparse = OptionParser.new do|opts|
+  opts.banner = 'Usage: sabisu_uploader [options]'
+
+  opts.on('-c', '--config FILE', 'configuration file (json format)') do |json|
+    options[:config] = json
+  end
+
+  opts.on('-h', '--help', 'Display this screen') do
+    puts opts
+    exit
+  end
+end
+optparse.parse!
+
+if options[:config].nil?
+  puts 'Must give configuration file (-c)'
+  exit 1
+else
+  config = JSON.parse(File.read(options[:config]), symbolize_names: true)
+  config[:redis][:server] = 'localhost' unless config[:redis].key?(:server)
+  config[:redis][:port] = 6379 unless config[:redis].key?(:port)
+  config[:redis][:db] = 0 unless config[:redis].key?(:db)
+  config[:redis][:list] = 'events' unless config[:redis].key?(:list)
+
+  config[:cloudant][:dbs][:current] = 'sensu_current' unless config[:cloudant][:dbs].key?(:current)
+  config[:cloudant][:dbs][:history] = 'sensu_history' unless config[:cloudant][:dbs].key?(:history)
+
+  config[:threads] = 8 unless config.key?(:threads)
+end
+
+# cloudant class to send sensu events to cloudant dbs
+class Cloudant
+  def initialize(username, cred_user, cred_password, current_db, history_db)
+    @username = username
+    @credentials = { username: cred_user, password: cred_password }
+    @current_db = CouchRest.database!(make_url(current_db))
+    @history_db = CouchRest.database!(make_url(history_db))
+  end
+
+  def make_url(db)
+    "https://#{@credentials[:username]}:#{@credentials[:password]}@#{@username}.cloudant.com/#{db}"
+  end
+
+  # get the last known event
+  def last_event(client, check)
+    @current_db.get("#{client}/#{check}")
+  rescue RestClient::ResourceNotFound
+    nil
+  end
+
+  def send_history(event)
+    @history_db.save_doc('event' => event)
+  end
+
+  def send_current(event, last_event)
+    _id = "#{event['client']['name']}/#{event['check']['name']}"
+    tries = 0
+    begin
+      tries += 1
+      if last_event.nil?
+        @current_db.save_doc('_id' => _id, 'event' => event)
+      else
+        @current_db.save_doc(
+          '_id' => _id,
+          '_rev' => last_event['_rev'],
+          'event' => event
+        )
+      end
+    rescue RestClient::Conflict
+      # Due to sensu check results are on an interval (ie 60 secs)
+      # the odds of a conflict is extremely low, (in that the doc
+      # gets update/changed in the less than a sec operation of .get
+      # the .save_doc
+      # In addition this updating a doc only occurs when there is a
+      # state change, making it even less likely.
+      retry if tries <= 3
+    rescue RestClient::ResourceNotFound
+      # The current_id doesn't exist yet, so create it
+      @current_db.save_doc('_id' => _id, 'event' => event)
+    end
+  end
+
+  def delete(event, last_event)
+    _id = "#{event['client']['name']}/#{event['check']['name']}"
+    tries = 0
+    begin
+      tries += 1
+      unless last_event.nil?
+        @current_db.delete_doc(
+          '_id' => _id,
+          '_rev' => last_event['_rev']
+        )
+      end
+    rescue RestClient::Conflict
+      retry if tries <= 3
+      puts 'Failed to delete doc due to repetitive conflict'
+    rescue RestClient::ResourceNotFound
+      # do nothing, nothing to delete
+      puts "Doc doesn't exist to delete"
+    end
+  end
+end
+
+def process_event(event, i, cloudant)
+  starttime = Time.now
+  prefix = "Thread #{i} | "
+  last_event = cloudant.last_event(event['client']['name'], event['check']['name'])
+  if event['check']['status'] == 0
+    # check has resolved, delete it from current db
+    unless last_event.nil?
+      cloudant.delete(event, last_event)
+      puts prefix + 'Recovery (deleted current doc)'
+    end
+    # add to history
+    cloudant.send_history(event)
+  elsif last_event.nil?
+    # event doesn't exist yet, create it
+    cloudant.send_current(event, last_event)
+    cloudant.send_history(event)
+    puts prefix + 'Created (first occurrence)'
+  else
+    state_changed = false
+    output_changed = false
+    if last_event['event']['check']['status'] != event['check']['status']
+      # state has changed
+      state_changed = true
+      event['check']['state_change'] = event['check']['issued']
+    else
+      event['check']['state_change'] = last_event['event']['check']['state_change']
+    end
+    # check if output has changed
+    output_changed = true if last_event['event']['check']['output'] != event['check']['output']
+
+    # only update the current state if the event is newer than what was last written
+    if last_event['event']['check']['issued'].to_i < event['check']['issued'].to_i
+      if state_changed
+        cloudant.send_current(event, last_event)
+        cloudant.send_history(event)
+        puts prefix + 'Updated (state change)'
+      elsif output_changed
+        # only update current db with only an output change
+        cloudant.send_current(event, last_event)
+        puts prefix + 'Updated (output change)'
+      end
+    end
+  end
+  puts prefix +
+       "Finished in #{((Time.now - starttime) * 1000).round(3)} ms " +
+       "(#{event['client']['name']}/#{event['check']['name']})"
+end
+
+quit = false
+redis = Redis.new(
+  host: config[:redis][:server],
+  port: config[:redis][:port],
+  db: config[:redis][:db]
+)
+cloudant = Cloudant.new(
+  config[:cloudant][:username],
+  config[:cloudant][:auth][:username],
+  config[:cloudant][:auth][:password],
+  config[:cloudant][:dbs][:current],
+  config[:cloudant][:dbs][:history]
+)
+
+threads = config[:threads].times.map do |i|
+  Thread.new do
+    begin
+      event = JSON.parse(redis.brpop(config[:redis][:list]).last)
+      process_event(event, i, cloudant)
+    rescue StandardError => e
+      pp "Failure: #{e}"
+      pp e.backtrace
+    end until quit == true
+  end
+end
+
+threads.each { |t| t.join }
