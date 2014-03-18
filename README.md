@@ -8,10 +8,13 @@ Features
 
  * Full text search (based on [lucene](http://lucene.apache.org/))
  * Complex search, filtering, and sorting
- * Statistical Analysis of your search/query
+ * Smart autocomplete to help you find what you're looking for
+ * Statistical analysis of your search/query (faceting)
  * Real-time streaming updates to the event list and stats (non-polling)
+ * Add custom attributes to your sensu events and make them searchable, indexed, and give them statistical context
+ * Easy "drill down" by clicking on any client, check, status or even custom attributes to see more events like them
  * Silence with expiration timeout, unsilence on resolve, or never expire
- * Create views of your environment and save, bookmark, and share them with your colleagues.
+ * Create views of your sensu environment and save, bookmark, and share them with your colleagues.
 
 Requirements
 ============
@@ -21,7 +24,13 @@ Requirements
 Installation
 ============
 
-Sabisu was designed to be deployed to [heroku](http://heroku.com). There is [plenty of documentation]() on how to deploy a ruby app to heroku.
+First, you'll need a [Cloudant account](https://cloudant.com/sign-up/). Its free to sign-up and free to use, see [pricing details](https://cloudant.com/product/pricing/). Next, you'll need to create two databases. Commonly, you can call them `sensu_current` and `sensu_history`, but you can call them whatever you want. 
+
+Next you'll want to create yourself api keys. You technically don't need to do this step, but it is recommended as best practices. You can do this via the webui or the [api](http://docs.cloudant.com/api/authz.html?highlight=api%20key). Create api keys on one of the database and give it full permissions (reader, writer, admin). Then grant the same API key to the other cloudant database you've created.
+
+Once you've got that setup, the next step is integrating the cloudant database into sensu. To do this, follow [this documentation](https://github.com/cloudant/sabisu/blob/master/sensu-integration/README.md).
+
+Sabisu was designed to be deployed to [heroku](http://heroku.com) for purposes of ease. There is [plenty of documentation](https://devcenter.heroku.com/articles/ruby-support) on how to deploy a ruby app to heroku. But you can also deployed to a server within your environment if desired.
 
 ### Environment Variables
 
@@ -30,8 +39,8 @@ Sabisu was designed to be deployed to [heroku](http://heroku.com). There is [ple
  * CLOUDANT_USER: cloudant user (recommended to use [api keys](http://docs.cloudant.com/api/authz.html?highlight=key))
  * CLOUDANT_PASSWORD: cloudant password or api key
  * CLOUDANT_URL: your cloudant url (typically <username>.cloudant.com)
- * CLOUDANT_CURRENTDB: name of db to store current events (ie sensu_current_prod)
- * CLOUDANT_HISTORYDB: name of the db to store historical events (ie sensu_history_prod)
+ * CLOUDANT_CURRENTDB: name of db to store current events (ie sensu_current)
+ * CLOUDANT_HISTORYDB: name of the db to store historical events (ie sensu_history)
  * API_URL: your sensu api url
  *  API_PORT: your sensu api port
  * API_USER: your sensu api username
@@ -39,15 +48,22 @@ Sabisu was designed to be deployed to [heroku](http://heroku.com). There is [ple
  * UILOGIN_USER: username to log into sabisu webui or api
  * UILOGIN_PASSWORD: password to log into sabisu webui or api
  * CUSTOM_FIELDS - an array of custom fields_
+    example: `[{"name": "environment", "path": "client.environment", "facet": true, "type": "str", "index": true}]`
+    more examples: see config.rb
+    name = name of the attribute (will be the field name in sabisu)
+    path = path to the attribute with the sensu event
+    facet = include in faceting (statistics). Only supports ints and strings (not boolean, arrays, hashes, etc)
+    type = variable type this attribute value will have, supports [ str, int, url ]
+    index = make this attribute searchable
 
 Development Environment
 =======================
 
 To setup sabisu for local development, 
 
-1. first setup/install [RVM](https://rvm.io/) (or something like it). Its a good idea to keep your dev environment separate from your system ruby.
+1. first setup/install [RVM](https://rvm.io/) (or something like it, ie [rbenv](http://rbenv.org/)). Its a good idea to keep your dev environment separate from your system ruby.
 2. clone the repo locally
-3. Create a `.env` file to setup your environment variables (see `Environment Variables` above).
+3. Create a `.env` file to setup your environment variables (see [Environment Variables](https://github.com/cloudant/sabisu/blob/master/README.md#environment-variables) above).
 4. Source the file (`source .env`)
 5. Next run `bundle install`
 6. To startup sabisu locally, run `foreman start`
