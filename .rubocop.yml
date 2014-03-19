@@ -8,7 +8,10 @@ NumericLiterals:
   MinDigits: 7
 
 MethodLength:
-  Max: 20
+  Max: 40
 
 CyclomaticComplexity:
-  Max: 10
+  Max: 20
+
+ClassLength:
+  Max: 150

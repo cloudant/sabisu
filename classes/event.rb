@@ -5,7 +5,7 @@ class Event
     options = { skip: 0, limit: nil, sort: [] }.merge(options)
     options.delete_if { |k, v| v.nil? || v == [] }
 
-    results = CURRENT_DB.all_docs(options.merge(include_docs: true, start_key: '"a"'))
+    CURRENT_DB.all_docs(options.merge(include_docs: true, start_key: '"a"'))
   end
 
   # Example: Event.search("client:*cheftest001 AND status:warning", :bookmark => 'ABCD36',
@@ -13,18 +13,29 @@ class Event
   #                       :sort => [ 'status<string>', '-client<string>', '-issued<number>' ])
   def self.search(query, options = {})
     # define facet range params for status attribute
-    ranges = '{"status":{"OK":"[0 TO 0]","Warning":"[1 TO 1]","Critical":"[2 TO 2]","Unknown":"[3 TO 3]"}}'
+    ranges = { status: {} }
+    ranges[:status][:OK] = '[0 TO 0]'
+    ranges[:status][:Warning] = '[1 TO 1]'
+    ranges[:status][:Critical] = '[2 TO 2]'
+    ranges[:status][:Unknown] = '[3 TO 3]'
     # define facet count param
     counts = FIELDS.map do |field|
       field[:name] if field.key?(:facet) && field[:facet] == true
     end.compact
-    options = { bookmark: nil, limit: nil, sort: [], include_docs: true, ranges: ranges, counts: counts }.merge(options)
+    options = {
+      bookmark: nil,
+      limit: nil,
+      sort: [],
+      include_docs: true,
+      ranges: ranges.to_json,
+      counts: counts
+    }.merge(options)
     options.delete_if { |k, v| v.nil? || v == [] }
     # because couchrest doesn't handle arrays correctly
     options[:counts] = options[:counts].to_s unless options[:counts].nil?
     options[:sort] = options[:sort].to_s unless options[:sort].nil?
 
-    results = CURRENT_DB.view('_design/sabisu/_search/all_fields', options.merge(q: query))
+    CURRENT_DB.view('_design/sabisu/_search/all_fields', options.merge(q: query))
   end
 
   def self.update_design_doc
@@ -52,10 +63,9 @@ function(doc) {
         doc[:indexes] = search_indexes
         CURRENT_DB.save_doc(doc)
       end
-    # rubocop:disable HandleExceptions
     rescue RestClient::Conflict
-      # ignore conflicts
-    # rubocop:enable HandleExceptions
+      # ignore this
+      puts 'doc conflict'
     rescue RestClient::ResourceNotFound
       CURRENT_DB.save_doc(
         '_id' => '_design/sabisu',
@@ -97,7 +107,6 @@ function(doc) {
     end
     ##############################################
 
-    # stale = Hash[(cloudant_events.to_a | sensu_events.to_a) - (cloudant_events.to_a & sensu_events.to_a)]
     stale = cloudant_events.deep_diff(sensu_events)
 
     # get list of cloudant docs to be deleted (marked as recovered by sensu)
@@ -107,24 +116,30 @@ function(doc) {
       clear_list = cloudant_events_tmp.each.map do |event|
         client = event['doc']['event']['client']['name']
         check = event['doc']['event']['check']['name']
-        { client: client, check: check } unless sensu_events.key?(client) && sensu_events[client].key?(check)
+        { client: client, check: check } unless
+          sensu_events.key?(client) && sensu_events[client].key?(check)
       end.compact
 
-      # delete those cloudant docs
-      clear_list.each do |event|
-        pp "Deleting #{event[:client]}/#{event[:check]}"
-        begin
-          doc = CURRENT_DB.get("#{event[:client]}/#{event[:check]}")
-          doc.destroy
-        rescue RestClient::Conflict
-          # there been a conflict, skip it
-        rescue RestClient::ResourceNotFound
-          # looks like its already deleted, noop
-        end
-      end
+      clear_events(clear_list)
     end
 
     stale
+  end
+
+  def clear_events(events)
+    events.each do |event|
+      pp "Deleting #{event[:client]}/#{event[:check]}"
+      begin
+        doc = CURRENT_DB.get("#{event[:client]}/#{event[:check]}")
+        doc.destroy
+      rescue RestClient::Conflict
+        # there been a conflict, skip it
+        puts 'doc conflict'
+      rescue RestClient::ResourceNotFound
+        # looks like its already deleted, noop
+        puts 'doc not found'
+      end
+    end
   end
 
   def to_hash
@@ -145,6 +160,7 @@ function(doc) {
   end
 end
 
+# extend hash class
 class Hash
   def deep_diff(b)
     a = self

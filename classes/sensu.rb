@@ -14,13 +14,13 @@ class Sensu
     proxy_header = { 'api-proxy' => 'true' }
     case opts[:method]
     when 'get'.upcase
-      req =  Net::HTTP::Get.new(opts[:path], initheader = proxy_header)
+      req =  Net::HTTP::Get.new(opts[:path], proxy_header)
     when 'delete'.upcase
-      req =  Net::HTTP::Delete.new(opts[:path], initheader = proxy_header)
+      req =  Net::HTTP::Delete.new(opts[:path], proxy_header)
     when 'post'.upcase
       req =  Net::HTTP::Post.new(
         opts[:path],
-        initheader = proxy_header.merge!('Content-Type' => 'application/json')
+        proxy_header.merge!('Content-Type' => 'application/json')
       )
       req.body = opts[:payload].to_json
     end
