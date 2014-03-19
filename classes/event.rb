@@ -116,8 +116,8 @@ function(doc) {
       clear_list = cloudant_events_tmp.each.map do |event|
         client = event['doc']['event']['client']['name']
         check = event['doc']['event']['check']['name']
-        { client: client, check: check } unless
-          sensu_events.key?(client) && sensu_events[client].key?(check)
+        { client: client, check: check } unless sensu_events.key?(client) &&
+          sensu_events[client].key?(check)
       end.compact
 
       clear_events(clear_list)
