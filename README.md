@@ -26,7 +26,7 @@ Installation
 
 First, you'll need a [Cloudant account](https://cloudant.com/sign-up/). Its free to sign-up and free to use, see [pricing details](https://cloudant.com/product/pricing/). Next, you'll need to create two databases. Commonly, you can call them `sensu_current` and `sensu_history`, but you can call them whatever you want. 
 
-Next you'll want to create yourself api keys. You technically don't need to do this step, but it is recommended as best practices. You can do this via the webui or the [api](http://docs.cloudant.com/api/authz.html?highlight=api%20key). Create api keys on one of the database and give it full permissions (reader, writer, admin). Then grant the same API key to the other cloudant database you've created.
+Next you'll want to create yourself api keys. You technically don't need to do this step, but it is recommended as best practices. You could use your cloudant username and password if desired. To create api keys, you can do this via the webui or the [api](http://docs.cloudant.com/api/authz.html?highlight=api%20key). Create an api key on one of the database and give it full permissions (reader, writer, admin). Then grant the same API key to the other cloudant database you've created.
 
 Once you've got that setup, the next step is integrating the cloudant database into sensu. To do this, follow [this documentation](https://github.com/cloudant/sabisu/blob/master/sensu-integration/README.md).
 
@@ -34,27 +34,27 @@ Sabisu was designed to be deployed to [heroku](http://heroku.com) for purposes o
 
 ### Environment Variables
 
- * SABISU_ENV: which environment to start sabisu in (produciton or development)
+ * SABISU\_ENV: which environment to start sabisu in (produciton or development)
  * PORT: http port to run sabisu on
- * CLOUDANT_USER: cloudant user (recommended to use [api keys](http://docs.cloudant.com/api/authz.html?highlight=key))
- * CLOUDANT_PASSWORD: cloudant password or api key
- * CLOUDANT_URL: your cloudant url (typically <username>.cloudant.com)
- * CLOUDANT_CURRENTDB: name of db to store current events (ie sensu_current)
- * CLOUDANT_HISTORYDB: name of the db to store historical events (ie sensu_history)
- * API_URL: your sensu api url
- *  API_PORT: your sensu api port
- * API_USER: your sensu api username
- * API_PASSWORD: your sensu api password
- * UILOGIN_USER: username to log into sabisu webui or api
- * UILOGIN_PASSWORD: password to log into sabisu webui or api
- * CUSTOM_FIELDS - an array of custom fields_
-    example: `[{"name": "environment", "path": "client.environment", "facet": true, "type": "str", "index": true}]`
-    more examples: see config.rb
-    name = name of the attribute (will be the field name in sabisu)
-    path = path to the attribute with the sensu event
-    facet = include in faceting (statistics). Only supports ints and strings (not boolean, arrays, hashes, etc)
-    type = variable type this attribute value will have, supports [ str, int, url ]
-    index = make this attribute searchable
+ * CLOUDANT\_USER: cloudant user (recommended to use [api keys](http://docs.cloudant.com/api/authz.html?highlight=key))
+ * CLOUDANT\_PASSWORD: cloudant password or api key
+ * CLOUDANT\_URL: your cloudant url (typically USERNAME.cloudant.com)
+ * CLOUDANT\_CURRENTDB: name of db to store current events (ie sensu_current)
+ * CLOUDANT\_HISTORYDB: name of the db to store historical events (ie sensu_history)
+ * API\_URL: your sensu api url
+ * API\_PORT: your sensu api port
+ * API\_USER: your sensu api username
+ * API\_PASSWORD: your sensu api password
+ * UILOGIN\_USER: username to log into sabisu webui or api
+ * UILOGIN\_PASSWORD: password to log into sabisu webui or api
+ * CUSTOM\_FIELDS - an array of custom fields
+    - example: `[{"name": "environment", "path": "client.environment", "facet": true, "type": "str", "index": true}]`
+      more examples: see config.rb
+      * name: [string] name of the attribute (will be the field name in sabisu)
+      * path: [string] path to the attribute with the sensu event
+      * facet: [boolean] include in faceting (statistics). Only supports ints and strings (not boolean, arrays, hashes, etc)
+      * type: [string] variable type this attribute value will have, supports [ str, int, url ]
+      * index: [boolean] make this attribute searchable
 
 Development Environment
 =======================
