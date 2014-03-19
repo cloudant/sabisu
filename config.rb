@@ -23,7 +23,7 @@ configure :production do
   # use Rack::SslEnforcer
 
   # don't show exceptions
-  set :raise_errors, Proc.new { false }
+  set :raise_errors, proc { false }
   set :show_exceptions, false
 end
 
