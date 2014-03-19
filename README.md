@@ -47,7 +47,7 @@ Sabisu was designed to be deployed to [heroku](http://heroku.com) for purposes o
  * API\_PASSWORD: your sensu api password
  * UILOGIN\_USER: username to log into sabisu webui or api
  * UILOGIN\_PASSWORD: password to log into sabisu webui or api
- * CUSTOM\_FIELDS - an array of custom fields
+ * CUSTOM\_FIELDS - an array of custom fields to support. Out of the box, sabisu supports `client`, `check`, `status`, `state_change`, `occurrence`, `issued`, and `output`. These fields are indexed, searchable, and sometimes faceted (statistics). In addition to these you can add your own custom fields based on client and check attributes that your sensu architecture sends. Some example ideas are, environment, cluster, datacenter, documentation url, metrics url, pod, rack, team, paging or non-paging, provider, ec2 availability zone, etc. Whatever would make sense in your environment to make events more discoverable.
     - example: `[{"name": "environment", "path": "client.environment", "facet": true, "type": "str", "index": true}]`
       more examples: see config.rb
       * name: [string] name of the attribute (will be the field name in sabisu)
