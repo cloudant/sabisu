@@ -3,4 +3,4 @@ rvm:
   - 2.0.0
 
 script:
-  - rubocop
+  - bundle exec rubocop
