@@ -39,6 +39,5 @@ module Sensu::Extension
 
       yield("redis_output execution time: #{Time.now - now}", 0)
     end
-
   end
 end
