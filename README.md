@@ -26,7 +26,7 @@ Installation
 
 First, you'll need a [Cloudant account](https://cloudant.com/sign-up/). Its free to sign-up and free to use, see [pricing details](https://cloudant.com/product/pricing/). Next, you'll need to create two databases. Commonly, you can call them `sensu_current` and `sensu_history`, but you can call them whatever you want. 
 
-Next you'll want to create yourself api keys. You technically don't need to do this step, but it is recommended as best practices. You could use your cloudant username and password if desired. To create api keys, you can do this via the webui or the [api](http://docs.cloudant.com/api/authz.html?highlight=api%20key). Create an api key on one of the database and give it full permissions (reader, writer, admin). Then grant the same API key to the other cloudant database you've created.
+Next you'll want to create yourself api keys. You technically don't need to do this step, but it is recommended as best practices. You could use your cloudant username and password instead. To create api keys, you can do this via the webui or the [api](http://docs.cloudant.com/api/authz.html?highlight=api%20key). Create an api key on one of the database and give it full permissions (reader, writer, admin). Then grant the same API key to the other cloudant database you've created.
 
 Once you've got that setup, the next step is integrating the cloudant database into sensu. To do this, follow [this documentation](https://github.com/cloudant/sabisu/blob/master/sensu-integration/README.md).
 
