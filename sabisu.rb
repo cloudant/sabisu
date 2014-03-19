@@ -20,7 +20,7 @@ require_relative 'config'
 
 # URL Routing
 before '/:name' do
-  unless params[:name] == "login"
+  unless params[:name] == 'login'
     session[:url] = request.fullpath
     force_session_auth
   end

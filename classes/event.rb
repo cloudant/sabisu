@@ -1,6 +1,5 @@
 # class of events in sensu
 class Event
-
   # return all docs
   def self.all(options = {})
     options = { skip: 0, limit: nil, sort: [] }.merge(options)
@@ -69,7 +68,7 @@ function(doc) {
   def self.stale(params)
     # get cloudant events and put them into a hash
     cloudant_events = {}
-    cloudant_events_tmp = self.all()['rows']
+    cloudant_events_tmp = all['rows']
     cloudant_events_tmp.each do |event|
       event = event['doc']['event']
       client = event['client']['name']
@@ -84,7 +83,7 @@ function(doc) {
 
     # get sensu event and put them into a hash
     sensu = Sensu.new
-    rawdata = sensu.request({ method: 'GET', ssl: true, path: '/events'})
+    rawdata = sensu.request(method: 'GET', ssl: true, path: '/events')
     sensu_events_tmp = JSON.parse(rawdata.body)
     sensu_events = {}
     sensu_events_tmp.each do |event|
@@ -131,13 +130,13 @@ function(doc) {
   def to_hash
     hash = {}
     instance_variables.each do |var|
-      hash[var.to_s.delete("@")] = instance_variable_get(var)
+      hash[var.to_s.delete('@')] = instance_variable_get(var)
     end
     hash
   end
 
   def to_json
-    JSON.pretty_generate(self.to_hash)
+    JSON.pretty_generate(to_hash)
   end
 
   # takes a hash and maps it to the fields defined in FIELDS
@@ -147,10 +146,9 @@ function(doc) {
 end
 
 class Hash
- 
   def deep_diff(b)
     a = self
-    (a.keys | b.keys).inject({}) do |diff, k|
+    (a.keys | b.keys).reduce({}) do |diff, k|
       if a[k] != b[k]
         if a[k].respond_to?(:deep_diff) && b[k].respond_to?(:deep_diff)
           diff[k] = a[k].deep_diff(b[k])
@@ -161,5 +159,4 @@ class Hash
       diff
     end
   end
- 
 end

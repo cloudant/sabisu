@@ -19,7 +19,7 @@ end
 get '/api/events/stale' do
   params = request.env['rack.request.query_hash']
   stale = Event.stale(params)
-  JSON.pretty_generate({ stale: stale})
+  JSON.pretty_generate(stale: stale)
 end
 
 get '/api/changes' do

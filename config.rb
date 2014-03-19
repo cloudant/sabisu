@@ -20,7 +20,7 @@ configure :production do
 
   # force ssl connections only
   require 'rack-ssl-enforcer'
-  #use Rack::SslEnforcer
+  # use Rack::SslEnforcer
 
   # don't show exceptions
   set :raise_errors, Proc.new { false }
@@ -40,16 +40,16 @@ configure :production, :development do
 
   # fields
   FIELDS = [
-    { name: 'client', path: 'client.name', facet: true, type: 'str', index: true},
-    { name: 'check', path: 'check.name', facet: true, type: 'str', index: true},
-    { name: 'status', path: 'check.status', facet: false, type: 'int', index: true},
-    { name: 'state_change', path: 'check.state_change', facet: false, type: 'int', index: true},
-    { name: 'occurrence', path: 'occurrences', facet: false, type: 'int', index: true},
-    { name: 'issued', path: 'check.issued', facet: false, type: 'int', index: true},
-    { name: 'output', path: 'check.output', facet: false, type: 'str', index: true}
+    { name: 'client', path: 'client.name', facet: true, type: 'str', index: true },
+    { name: 'check', path: 'check.name', facet: true, type: 'str', index: true },
+    { name: 'status', path: 'check.status', facet: false, type: 'int', index: true },
+    { name: 'state_change', path: 'check.state_change', facet: false, type: 'int', index: true },
+    { name: 'occurrence', path: 'occurrences', facet: false, type: 'int', index: true },
+    { name: 'issued', path: 'check.issued', facet: false, type: 'int', index: true },
+    { name: 'output', path: 'check.output', facet: false, type: 'str', index: true }
   ]
 
-  FIELDS += JSON.parse(ENV['CUSTOM_FIELDS'],:symbolize_names => true) if ENV['CUSTOM_FIELDS']
+  FIELDS += JSON.parse(ENV['CUSTOM_FIELDS'], symbolize_names: true) if ENV['CUSTOM_FIELDS']
 
   # connect to redis
   API_URL = ENV['API_URL'] if ENV['API_URL']
