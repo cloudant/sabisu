@@ -24,7 +24,7 @@ class Sensu
       )
       req.body = opts[:payload].to_json
     end
-    req.basic_auth(API_USER, API_PASSWORD) if API_USER && API_PASSWORD
+    req.basic_auth(API_USER, API_PASSWORD) if defined?(API_USER) && defined?(API_PASSWORD)
     http.request(req)
   end
 
