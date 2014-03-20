@@ -1,0 +1,8 @@
+applications:
+- host: sabisu-demo
+  disk: 1024M
+  name: sabisu-demo
+  path: .
+  domain: ng.bluemix.net
+  mem: 128M
+  instances: 1
