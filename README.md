@@ -17,6 +17,11 @@ Features
  * Silence with expiration timeout, unsilence on resolve, or never expire
  * Create views of your sensu environment and save, bookmark, and share them with your colleagues.
 
+Demo
+====
+
+If you want to take sabisu for a test drive, jump over to the [demo](http://demo.sabisuapp.org/)
+
 Requirements
 ============
 
