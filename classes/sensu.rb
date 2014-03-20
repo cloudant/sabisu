@@ -7,7 +7,7 @@ class Sensu
     http = Net::HTTP.new(API_URL, API_PORT)
     http.read_timeout = 15
     http.open_timeout = 5
-    if opts[:ssl]
+    if API_SSL && API_SSL.to_s.downcase == "true"
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
