@@ -53,6 +53,7 @@ configure :production, :development do
 
   # connect to redis
   API_URL = ENV['API_URL'] if ENV['API_URL']
+  API_SSL = ENV['API_URL'] || false
   API_PORT = ENV['API_PORT'] if ENV['API_PORT']
   API_USER = ENV['API_USER'] if ENV['API_USER']
   API_PASSWORD = ENV['API_PASSWORD'] if ENV['API_PASSWORD']
