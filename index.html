@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Sabisu by cloudant</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/cloudant/sabisu">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/cloudant/sabisu/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/cloudant/sabisu/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Sabisu</h1>
+          <p>A sensu web UI powered by Cloudant</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/cloudant">cloudant</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <p><a href="https://magnum.travis-ci.com/cloudant/sabisu"><img src="https://magnum.travis-ci.com/cloudant/sabisu.png?token=r6PdrwNFR1nUzFeEEiQ6&amp;branch=master" alt="Build Status"></a></p>
+
+<h1>
+<a name="sabisu" class="anchor" href="#sabisu"><span class="octicon octicon-link"></span></a>sabisu</h1>
+
+<p>A sensu web ui powered by <a href="https://cloudant.com">Cloudant</a></p>
+
+<h1>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h1>
+
+<ul>
+<li>Full text search (based on <a href="http://lucene.apache.org/">lucene</a>)</li>
+<li>Complex search, filtering, and sorting</li>
+<li>Smart autocomplete to help you find what you're looking for</li>
+<li>Statistical analysis of your search/query (faceting)</li>
+<li>Real-time streaming updates to the event list and stats (non-polling)</li>
+<li>Add custom attributes to your sensu events and make them searchable, indexed, and give them statistical context</li>
+<li>Easy "drill down" by clicking on any client, check, status or even custom attributes to see more events like them</li>
+<li>Silence with expiration timeout, unsilence on resolve, or never expire</li>
+<li>Create views of your sensu environment and save, bookmark, and share them with your colleagues.</li>
+</ul><h1>
+<a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo</h1>
+
+<p>If you want to take sabisu for a test drive, jump over to the <a href="http://demo.sabisuapp.org/">demo</a></p>
+
+<h1>
+<a name="screenshots" class="anchor" href="#screenshots"><span class="octicon octicon-link"></span></a>Screenshots</h1>
+
+<p><img src="https://raw.githubusercontent.com/cloudant/sabisu/master/screenshots/example.png" alt="Dashboard" title="dashboard"></p>
+
+<h1>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h1>
+
+<p><a href="https://github.com/sensu/sensu">Sensu</a> &gt;= <a href="https://github.com/sensu/sensu/blob/master/CHANGELOG.md#0121---2013-11-02">0.12.1</a></p>
+
+<h1>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h1>
+
+<p>First, you'll need a <a href="https://cloudant.com/sign-up/">Cloudant account</a>. Its free to sign-up and free to use, see <a href="https://cloudant.com/product/pricing/">pricing details</a>. Next, you'll need to create two databases. Commonly, you can call them <code>sensu_current</code> and <code>sensu_history</code>, but you can call them whatever you want. </p>
+
+<p>Next you'll want to create yourself api keys. You technically don't need to do this step, but it is recommended as best practices. You could use your cloudant username and password instead. To create api keys, you can do this via the webui or the <a href="http://docs.cloudant.com/api/authz.html?highlight=api%20key">api</a>. Create an api key on one of the database and give it full permissions (reader, writer, admin). Then grant the same API key to the other cloudant database you've created.</p>
+
+<p>Once you've got that setup, the next step is integrating the cloudant database into sensu. To do this, follow <a href="https://github.com/cloudant/sabisu/blob/master/sensu-integration/README.md">this documentation</a>.</p>
+
+<p>Sabisu was designed to be deployed to <a href="http://heroku.com">heroku</a> for purposes of ease, but you can also deploy it on your own infrastructure. There is <a href="https://github.com/cloudant/omnibus-sabisu">omnibus repo</a> for building packages for various platforms. There is <a href="https://devcenter.heroku.com/articles/ruby-support">plenty of documentation</a> on how to deploy a ruby app to heroku. But you can also deployed to a server within your environment if desired.</p>
+
+<h3>
+<a name="environment-variables" class="anchor" href="#environment-variables"><span class="octicon octicon-link"></span></a>Environment Variables</h3>
+
+<ul>
+<li>SABISU_ENV: which environment to start sabisu in (produciton or development)</li>
+<li>PORT: http port to run sabisu on</li>
+<li>CLOUDANT_USER: cloudant user (recommended to use <a href="http://docs.cloudant.com/api/authz.html?highlight=key">api keys</a>)</li>
+<li>CLOUDANT_PASSWORD: cloudant password or api key</li>
+<li>CLOUDANT_URL: your cloudant url (typically USERNAME.cloudant.com)</li>
+<li>CLOUDANT_CURRENTDB: name of db to store current events (ie sensu_current)</li>
+<li>CLOUDANT_HISTORYDB: name of the db to store historical events (ie sensu_history)</li>
+<li>API_URL: your sensu api url</li>
+<li>API_PORT: your sensu api port</li>
+<li>API_USER: your sensu api username</li>
+<li>API_PASSWORD: your sensu api password</li>
+<li>UILOGIN_USER: username to log into sabisu webui or api</li>
+<li>UILOGIN_PASSWORD: password to log into sabisu webui or api</li>
+<li>CUSTOM_FIELDS - an array of custom fields to support. Out of the box, sabisu supports <code>client</code>, <code>check</code>, <code>status</code>, <code>state_change</code>, <code>occurrence</code>, <code>issued</code>, and <code>output</code>. These fields are indexed, searchable, and sometimes faceted (statistics). In addition to these you can add your own custom fields based on client and check attributes that your sensu architecture sends. Some example ideas are, environment, cluster, datacenter, documentation url, metrics url, pod, rack, team, paging or non-paging, provider, ec2 availability zone, etc. Whatever would make sense in your environment to make events more discoverable.
+
+<ul>
+<li>example: <code>[{"name": "environment", "path": "client.environment", "facet": true, "type": "str", "index": true}]</code>
+more examples: see config.rb
+
+<ul>
+<li>name: [string] name of the attribute (will be the field name in sabisu)</li>
+<li>path: [string] path to the attribute with the sensu event</li>
+<li>facet: [boolean] include in faceting (statistics). Only supports ints and strings (not boolean, arrays, hashes, etc)</li>
+<li>type: [string] variable type this attribute value will have, supports [ str, int, url ]</li>
+<li>index: [boolean] make this attribute searchable</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul><h1>
+<a name="development-environment" class="anchor" href="#development-environment"><span class="octicon octicon-link"></span></a>Development Environment</h1>
+
+<p>To setup sabisu for local development, </p>
+
+<ol>
+<li>first setup/install <a href="https://rvm.io/">RVM</a> (or something like it, ie <a href="http://rbenv.org/">rbenv</a>). Its a good idea to keep your dev environment separate from your system ruby.</li>
+<li>clone the repo locally</li>
+<li>Create a <code>.env</code> file to setup your environment variables (see <a href="https://github.com/cloudant/sabisu/blob/master/README.md#environment-variables">Environment Variables</a> above).</li>
+<li>Source the file (<code>source .env</code>)</li>
+<li>Next run <code>bundle install</code>
+</li>
+<li>To startup sabisu locally, run <code>foreman start</code>
+</li>
+<li>In your browser, visit <a href="http://localhost:8080">localhost:8080</a>
+</li>
+</ol>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-49239808-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
