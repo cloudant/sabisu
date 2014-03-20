@@ -31,7 +31,7 @@ Next you'll want to create yourself api keys. You technically don't need to do t
 
 Once you've got that setup, the next step is integrating the cloudant database into sensu. To do this, follow [this documentation](https://github.com/cloudant/sabisu/blob/master/sensu-integration/README.md).
 
-Sabisu was designed to be deployed to [heroku](http://heroku.com) for purposes of ease. There is [plenty of documentation](https://devcenter.heroku.com/articles/ruby-support) on how to deploy a ruby app to heroku. But you can also deployed to a server within your environment if desired.
+Sabisu was designed to be deployed to [heroku](http://heroku.com) for purposes of ease, but you can also deploy it on your own infrastructure. There is [omnibus repo](https://github.com/cloudant/omnibus-sabisu) for building packages for various platforms. There is [plenty of documentation](https://devcenter.heroku.com/articles/ruby-support) on how to deploy a ruby app to heroku. But you can also deployed to a server within your environment if desired.
 
 ### Environment Variables
 
