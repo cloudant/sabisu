@@ -22,6 +22,11 @@ Demo
 
 If you want to take sabisu for a test drive, jump over to the [demo](http://demo.sabisuapp.org/)
 
+Screenshots
+===========
+
+![Dashboard](https://raw.github.com/cloudant/sabisu/master/screenshots/example.png "dashboard")
+
 Requirements
 ============
 
