@@ -25,7 +25,7 @@ If you want to take sabisu for a test drive, jump over to the [demo](http://demo
 Screenshots
 ===========
 
-![Dashboard](https://raw.github.com/cloudant/sabisu/master/screenshots/example.png "dashboard")
+![Dashboard](https://raw.githubusercontent.com/cloudant/sabisu/master/screenshots/example.png "dashboard")
 
 Requirements
 ============
