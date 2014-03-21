@@ -748,7 +748,7 @@ sabisu.directive('searchTypeahead', ($log, $window, $filter, $timeout, eventsFac
         # make sure the dropdown displays on textbox focus
         el.on 'focus', () ->
             # hacky, but I can't get this to work otherwise
-            curval = el.typeahead('val')
+            curval = scope.search_field
             el.typeahead('val', 'c').typeahead('open')
             el.typeahead('val', curval).typeahead('open')
 
@@ -762,6 +762,7 @@ sabisu.directive('searchTypeahead', ($log, $window, $filter, $timeout, eventsFac
                 el.typeahead('val', all_but_last_clause() + datum.name + ':')
             else
                 el.typeahead('val', all_but_last_clause() + datum.name + ' ')
+            scope.search_field = el.typeahead('val')
 
             # hack to avoid the fact that the dropdown is normally closed
             $timeout () ->
@@ -772,21 +773,15 @@ sabisu.directive('searchTypeahead', ($log, $window, $filter, $timeout, eventsFac
 
         # if you hit tab to autocomplete a key
         el.on 'typeahead:autocompleted', ($e, datum) ->
-            $log.info(datum.name)
-            $log.info(el.current_search_string)
             if at_key()
-                $log.info('key')
                 el.typeahead('val', all_but_last_clause() + datum.name + ':')
-                el.typeahead('open')
             else if at_val()
-                $log.info('val')
                 val = datum.name.split(':')
                 el.typeahead('val', all_but_last_clause() + val[0] + ':"' + val[1] + '" ')
-                el.typeahead('open')
             else
-                $log.info('tab else')
                 el.typeahead('val', all_but_last_clause() + datum.name + ' ')
-                el.typeahead('open')
+            scope.search_field = el.typeahead('val')
+            el.typeahead('open')
 
         # only change the last word when scrolling through the dropdown
         el.on 'typeahead:cursorchanged', ($e, datum, dsName) ->

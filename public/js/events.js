@@ -859,7 +859,7 @@
       });
       el.on('focus', function() {
         var curval;
-        curval = el.typeahead('val');
+        curval = scope.search_field;
         el.typeahead('val', 'c').typeahead('open');
         return el.typeahead('val', curval).typeahead('open');
       });
@@ -873,6 +873,7 @@
         } else {
           el.typeahead('val', all_but_last_clause() + datum.name + ' ');
         }
+        scope.search_field = el.typeahead('val');
         return $timeout(function() {
           var curval;
           curval = el.typeahead('val');
@@ -882,22 +883,16 @@
       });
       el.on('typeahead:autocompleted', function($e, datum) {
         var val;
-        $log.info(datum.name);
-        $log.info(el.current_search_string);
         if (at_key()) {
-          $log.info('key');
           el.typeahead('val', all_but_last_clause() + datum.name + ':');
-          return el.typeahead('open');
         } else if (at_val()) {
-          $log.info('val');
           val = datum.name.split(':');
           el.typeahead('val', all_but_last_clause() + val[0] + ':"' + val[1] + '" ');
-          return el.typeahead('open');
         } else {
-          $log.info('tab else');
           el.typeahead('val', all_but_last_clause() + datum.name + ' ');
-          return el.typeahead('open');
         }
+        scope.search_field = el.typeahead('val');
+        return el.typeahead('open');
       });
       return el.on('typeahead:cursorchanged', function($e, datum, dsName) {
         angular.element(".tt-input").val(all_but_last_clause() + datum.name);
