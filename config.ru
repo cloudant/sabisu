@@ -1,3 +1,3 @@
-require './sabisu'
-run Sinatra::Application
+require './lib/sabisu/server'
+run Sabisu::Server
 
