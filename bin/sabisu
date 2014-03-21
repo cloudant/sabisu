@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
 
-unless $LOAD_PATH.include?(File.dirname(__FILE__) + '/../lib/')
-  $LOAD_PATH << File.dirname(__FILE__) + '/../lib'
+begin
+  # look for local copy first for dev purposes
+  require_relative '../lib/sabisu/server'
+rescue LoadError
+  require 'sabisu/server'
 end
 
-require 'sabisu'
-
-Sabisu::Server.run(options)
+Sabisu::Server.run!

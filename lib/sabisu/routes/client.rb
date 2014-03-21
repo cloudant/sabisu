@@ -1,7 +1,13 @@
-get '/clients/:client' do
-  haml :client, locals: { client: params[:client] }
-end
+# client routes
+module Sabisu
+  # server class
+  class Server
+    get '/clients/:client' do
+      haml :client, locals: { client: params[:client] }
+    end
 
-get '/clients/:client/:check' do
-  haml :client_check, locals: { client: params[:client], check: params[:check] }
+    get '/clients/:client/:check' do
+      haml :client_check, locals: { client: params[:client], check: params[:check] }
+    end
+  end
 end
