@@ -43,9 +43,9 @@ Development Environment
 To setup sabisu for local development, 
 
 1. first setup/install [RVM](https://rvm.io/) (or something like it, ie [rbenv](http://rbenv.org/)). Its a good idea to keep your dev environment separate from your system ruby.
-2. clone the repo locally
-3. Create a `.env` file to setup your environment variables (see [Environment Variables](https://github.com/cloudant/sabisu/wiki/Installation#environment-variables) above).
+2. clone the repo (`git clone git@github.com:cloudant/sabisu.git`)
+3. Create a `.env` file to setup your environment variables (see [Environment Variables](https://github.com/cloudant/sabisu/wiki/Installation#environment-variables)).
 4. Source the file (`source .env`)
-5. Next run `bundle install`
+5. Next run `bundle install` to install all gem dependencies
 6. To startup sabisu locally, run `foreman start`
 7. In your browser, visit [localhost:8080](http://localhost:8080)
