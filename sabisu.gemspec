@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2.0.0'
 
   s.add_dependency 'sinatra', '~> 1.4.4'
-  %w( thin hanl redis couchrest rack-ssl-enforcer ).each do |gem|
+  %w( thin haml couchrest rack-ssl-enforcer ).each do |gem|
     s.add_dependency gem
   end
 end
