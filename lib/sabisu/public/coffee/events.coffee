@@ -41,13 +41,13 @@ sabisu.factory('eventsFactory', ($log, $http) ->
     factory.changes = (params) ->
         $http(
             method: 'GET'
-            url: '/api/changes'
+            url: '/api/events/changes'
             params: params
         )
     factory.last_sequence = ->
         $http(
             method: 'GET'
-            url: '/api/changes'
+            url: '/api/events/changes'
             params:
                 limit: 1
                 descending: true
