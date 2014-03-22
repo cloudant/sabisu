@@ -26,7 +26,7 @@ module Sabisu
       JSON.pretty_generate(stale: stale)
     end
 
-    get '/api/changes' do
+    get '/api/events/changes' do
       params = request.env['rack.request.query_hash']
       JSON.pretty_generate(CURRENT_DB.changes(params))
     end
