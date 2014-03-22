@@ -1,5 +1,33 @@
 #!/usr/bin/env ruby
 
+require 'optparse'
+
+opt_parser = OptionParser.new do |opt|
+  opt.banner = 'Usage: sabisu [OPTIONS]'
+
+  opt.on('-c', '--config FILE', 'config file in json format') do |c|
+    CONFIG_FILE = JSON.parse(File.read(c), symbolize_names: true)
+  end
+
+  opt.on('-p', '--port INT', 'port to run on') do |p|
+    PORT = p
+  end
+
+  opt.on('-e', '--environment ENVIRONMENT',
+         'environment to run as (ie "production" or "development"') do |e|
+    SABISU_ENV = e
+  end
+
+  opt.on('-h', '--help', 'help') do
+    puts opt_parser
+    exit 0
+  end
+end
+
+opt_parser.parse!
+
+CONFIG_FILE = {} unless defined?(CONFIG_FILE)
+
 begin
   # look for local copy first for dev purposes
   require_relative '../lib/sabisu/server'

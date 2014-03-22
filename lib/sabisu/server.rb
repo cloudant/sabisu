@@ -3,7 +3,6 @@ gem 'sinatra', '1.4.4'
 
 # load gems
 require 'sinatra'
-require 'redis'
 require 'couchrest'
 require 'cgi'
 require 'json'

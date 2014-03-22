@@ -1,7 +1,44 @@
+# extend String class
+class String
+  def to_bool
+    self == true || self =~ (/(true|t|yes|y|1)$/i) ? true : false
+  end
+end
+
 # Sensu dashboard powered by Cloudant
 module Sabisu
   # server class
   class Server
+    if defined?(::CONFIG_FILE)
+      CONFIG_FILE = ::CONFIG_FILE
+    else
+      CONFIG_FILE = {}
+    end
+
+    configure :development do
+      puts 'DEVELOPMENT ENVIRONMENT!!!'
+      auth = CONFIG_FILE[:NOAUTH] || ENV['NOAUTH'] || true
+      NOAUTH = auth.is_a?(String) ? auth.to_bool : auth
+
+      # get SSL_ONLY, default to false
+      use_ssl = CONFIG_FILE[:SSL_ONLY] || ENV['SSL_ONLY'] || false
+      SSL_ONLY = use_ssl.is_a?(String) ? use_ssl.to_bool : use_ssl
+    end
+
+    configure :production do
+      puts 'PRODUCTION ENVIRONMENT!!!'
+      auth = CONFIG_FILE[:NOAUTH] || ENV['NOAUTH'] || false
+      NOAUTH = auth.is_a?(String) ? auth.to_bool : auth
+
+      # get SSL_ONLY, default to true
+      use_ssl = CONFIG_FILE[:SSL_ONLY] || ENV['SSL_ONLY'] || true
+      SSL_ONLY = use_ssl.is_a?(String) ? use_ssl.to_bool : use_ssl
+
+      # don't show exceptions
+      set :raise_errors, proc { false }
+      set :show_exceptions, false
+    end
+
     configure do
       use Rack::Session::Pool, expire_after: 2_592_000
       set :views, File.join(settings.root, 'templates')
@@ -11,39 +48,33 @@ module Sabisu
       # enable heroku realtime logging;
       # see https://devcenter.heroku.com/articles/ruby#logging
       $stdout.sync = true
-    end
 
-    configure :development do
-      puts 'DEVELOPMENT ENVIRONMENT!!!'
-      NOAUTH = true
-    end
+      PORT = 8080 unless defined?(PORT)
+      set :port, PORT
 
-    configure :production do
-      puts 'PRODUCTION ENVIRONMENT!!!'
-      NOAUTH = false
+      # set the environment
+      if defined?(SABISU_ENV)
+        environment = SABISU_ENV
+      else
+        environment = CONFIG_FILE[:SABISU_ENV] || ENV['SABISU_ENV'] || 'production'
+      end
+      set :environment, environment.to_sym
 
-      # force ssl connections only
-      require 'rack-ssl-enforcer'
-      # use Rack::SslEnforcer
+      user = CONFIG_FILE[:CLOUDANT_USER] || ENV['CLOUDANT_USER'] || nil
+      password = CONFIG_FILE[:CLOUDANT_PASSWORD] || ENV['CLOUDANT_PASSWORD'] || nil
+      url = CONFIG_FILE[:CLOUDANT_URL] || ENV['CLOUDANT_URL'] || nil
+      current_db = CONFIG_FILE[:CLOUDANT_URL] || ENV['CLOUDANT_CURRENTDB'] || nil
+      history_db = CONFIG_FILE[:CLOUDANT_HISTORYDB] || ENV['CLOUDANT_HISTORYDB'] || nil
 
-      # don't show exceptions
-      set :raise_errors, proc { false }
-      set :show_exceptions, false
-    end
-
-    configure :production, :development do
-      # this is defined by Heroku in production, by your .env file in development
-      CURRENT_DB = CouchRest.database!(
-        "https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@" \
-        "#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_CURRENTDB']}"
+      CURRENT_DB = CouchRest.database(
+        "https://#{user}:#{password}@#{url}/#{current_db}"
       )
-      HISTORY_DB = CouchRest.database!(
-        "https://#{ENV['CLOUDANT_USER']}:#{ENV['CLOUDANT_PASSWORD']}@" \
-        "#{ENV['CLOUDANT_URL']}/#{ENV['CLOUDANT_HISTORYDB']}"
+      HISTORY_DB = CouchRest.database(
+        "https://#{user}:#{password}@#{url}/#{history_db}"
       )
 
       # fields
-      fields = [
+      default_fields = [
         { name: 'client', path: 'client.name', facet: true, type: 'str', index: true },
         { name: 'check', path: 'check.name', facet: true, type: 'str', index: true },
         { name: 'status', path: 'check.status', facet: false, type: 'int', index: true },
@@ -54,36 +85,30 @@ module Sabisu
         { name: 'output', path: 'check.output', facet: false, type: 'str', index: true }
       ]
 
-      if ENV['CUSTOM_FIELDS']
-        FIELDS = fields + JSON.parse(ENV['CUSTOM_FIELDS'], symbolize_names: true)
-      else
-        FIELDS = fields
+      custom_fields = CONFIG_FILE[:CUSTOM_FIELDS] || ENV['CUSTOM_FIELDS'] || []
+      custom_fields = JSON.parse(
+        custom_fields, symbolize_names: true
+      ) if custom_fields.is_a?(String)
+      FIELDS = default_fields + custom_fields
+
+      API_URL = CONFIG_FILE[:API_URL] || ENV['API_URL'] || 'localhost'
+      use_api_ssl = CONFIG_FILE[:API_SSL] || ENV['API_SSL'] || false
+      API_SSL = use_api_ssl.is_a?(String) ? use_api_ssl.to_bool : use_api_ssl
+      API_PORT = CONFIG_FILE[:API_PORT] || ENV['API_PORT'] || 4567
+      API_USER = CONFIG_FILE[:API_USER] || ENV['API_USER'] || nil
+      API_PASSWORD = CONFIG_FILE[:API_PASSWORD] || ENV['API_PASSWORD'] || nil
+
+      UI_USERNAME = CONFIG_FILE[:UILOGIN_USER] || ENV['UILOGIN_USER'] || 'guest'
+      UI_PASSWORD = CONFIG_FILE[:UILOGIN_PASSWORD] || ENV['UILOGIN_PASSWORD'] || 'guest'
+
+      if SSL_ONLY == true
+        # force ssl connections only
+        require 'rack-ssl-enforcer'
+        use Rack::SslEnforcer
       end
 
-      # connect to redis
-      API_URL = ENV['API_URL'] if ENV['API_URL']
-      API_SSL = ENV['API_URL'] || false
-      API_PORT = ENV['API_PORT'] if ENV['API_PORT']
-      API_USER = ENV['API_USER'] if ENV['API_USER']
-      API_PASSWORD = ENV['API_PASSWORD'] if ENV['API_PASSWORD']
-
-      UI_USERNAME = ENV['UILOGIN_USER']
-      UI_PASSWORD = ENV['UILOGIN_PASSWORD']
-
-      # create the design doc if needed for retrieving events
+      # create/update the design doc for sabisu to index the db
       Event.update_design_doc
-
-      if ENV['NOAUTH']
-        if ENV['NOAUTH'] == 'true'
-          NOAUTH = true
-        else
-          NOAUTH = false
-        end
-      end
-    end
-
-    configure :test do
-      # run tests
     end
   end
 end

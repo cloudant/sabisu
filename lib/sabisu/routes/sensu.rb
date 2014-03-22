@@ -7,11 +7,10 @@ module Sabisu
       tmp_path = request.path_info.split('/')
       tmp_path.delete_at(1)
       path = tmp_path.join('/')
-      puts path
       opts = {
         path: path,
         method: request.request_method,
-        ssl: true
+        ssl: API_SSL
       }
       begin
         opts[:payload] = JSON.parse(request.body.read)

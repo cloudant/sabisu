@@ -10,7 +10,7 @@ module Sabisu
         http = Net::HTTP.new(API_URL, API_PORT)
         http.read_timeout = 15
         http.open_timeout = 5
-        if API_SSL && API_SSL.to_s.downcase == 'true'
+        if API_SSL == true
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
@@ -27,7 +27,7 @@ module Sabisu
           )
           req.body = opts[:payload].to_json
         end
-        req.basic_auth(API_USER, API_PASSWORD) if defined?(API_USER) && defined?(API_PASSWORD)
+        req.basic_auth(API_USER, API_PASSWORD) unless API_USER.nil? && API_PASSWORD.nil?
         http.request(req)
       end
 
