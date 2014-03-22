@@ -1,0 +1,27 @@
+{
+  "SABISU_ENV": "development",
+  "PORT": 8080,
+  "CLOUDANT_USER": "XXXXXXXXXXXXXXXXXXXXXXXX",
+  "CLOUDANT_PASSWORD": "XXXXXXXXXXXXXXXXXXXXXXXX",
+  "CLOUDANT_URL": "myuser.cloudant.com",
+  "CLOUDANT_CURRENTDB": "sensu_current",
+  "CLOUDANT_HISTORYDB": "sensu_history",
+  "API_URL": "mysensu.mycompany.com",
+  "API_SSL": false,
+  "API_USER": "guest",
+  "API_PASSWORD": "guest",
+  "API_PORT": 4567,
+  "NOAUTH": false,
+  "SSL_ONLY": false,
+  "UILOGIN_USER": "guest",
+  "UILOGIN_PASSWORD": "guest",
+  "CUSTOM_FIELDS": [
+    {
+      "name": "datacenter",
+      "path": "client.datacenter",
+      "facet": true,
+      "type": "str",
+      "index": true
+    }
+  ]
+}
