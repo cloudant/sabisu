@@ -20,3 +20,6 @@ doc/
 # Bash stuff
 .env*
 *.swp
+
+#sabisu configs
+config*.json

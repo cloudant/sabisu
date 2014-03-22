@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
+require 'json'
 
 opt_parser = OptionParser.new do |opt|
   opt.banner = 'Usage: sabisu [OPTIONS]'

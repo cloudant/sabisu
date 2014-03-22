@@ -63,7 +63,7 @@ module Sabisu
       user = CONFIG_FILE[:CLOUDANT_USER] || ENV['CLOUDANT_USER'] || nil
       password = CONFIG_FILE[:CLOUDANT_PASSWORD] || ENV['CLOUDANT_PASSWORD'] || nil
       url = CONFIG_FILE[:CLOUDANT_URL] || ENV['CLOUDANT_URL'] || nil
-      current_db = CONFIG_FILE[:CLOUDANT_URL] || ENV['CLOUDANT_CURRENTDB'] || nil
+      current_db = CONFIG_FILE[:CLOUDANT_CURRENTDB] || ENV['CLOUDANT_CURRENTDB'] || nil
       history_db = CONFIG_FILE[:CLOUDANT_HISTORYDB] || ENV['CLOUDANT_HISTORYDB'] || nil
 
       CURRENT_DB = CouchRest.database(
