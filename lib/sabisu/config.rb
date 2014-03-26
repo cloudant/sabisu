@@ -1,7 +1,7 @@
 # extend String class
 class String
   def to_bool
-    self == true || self =~ (/(true|t|yes|y|1)$/i) ? true : false
+    self == true || self =~ (/(true|t|yes|y|1)$/i)
   end
 end
 
@@ -42,14 +42,13 @@ module Sabisu
     configure do
       use Rack::Session::Pool, expire_after: 2_592_000
       set :views, File.join(settings.root, 'templates')
-      # set :public_folder, File.join(settings.root, 'public')
       set :haml, format: :html5
 
       # enable heroku realtime logging;
       # see https://devcenter.heroku.com/articles/ruby#logging
       $stdout.sync = true
 
-      PORT = 8080 unless defined?(PORT)
+      PORT = CONFIG_FILE[:PORT] || ENV['PORT'] || 8080
       set :port, PORT
 
       # set the environment
@@ -86,9 +85,9 @@ module Sabisu
       ]
 
       custom_fields = CONFIG_FILE[:CUSTOM_FIELDS] || ENV['CUSTOM_FIELDS'] || []
-      custom_fields = JSON.parse(
-        custom_fields, symbolize_names: true
-      ) if custom_fields.is_a?(String)
+      if custom_fields.is_a?(String)
+        custom_fields = JSON.parse(custom_fields, symbolize_names: true)
+      end
       FIELDS = default_fields + custom_fields
 
       API_URL = CONFIG_FILE[:API_URL] || ENV['API_URL'] || 'localhost'

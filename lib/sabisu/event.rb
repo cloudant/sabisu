@@ -11,7 +11,7 @@ module Sabisu
         CURRENT_DB.all_docs(options.merge(include_docs: true, start_key: '"a"'))
       end
 
-      # Example: Event.search("client:*cheftest001 AND status:warning", :bookmark => 'ABCD36',
+      # Example: Event.search("client:cheftest* AND status:1", :bookmark => 'ABCD36',
       #                       :limit => 10,
       #                       :sort => [ 'status<string>', '-client<string>', '-issued<number>' ])
       def self.search(query, options = {})
@@ -119,8 +119,9 @@ module Sabisu
           clear_list = cloudant_events_tmp.each.map do |event|
             client = event['doc']['event']['client']['name']
             check = event['doc']['event']['check']['name']
-            { client: client, check: check } unless sensu_events.key?(client) &&
-              sensu_events[client].key?(check)
+            unless sensu_events.key?(client) && sensu_events[client].key?(check)
+              { client: client, check: check }
+            end
           end.compact
 
           clear_events(clear_list)
@@ -131,12 +132,12 @@ module Sabisu
 
       def clear_events(events)
         events.each do |event|
-          pp "Deleting #{event[:client]}/#{event[:check]}"
+          puts "Deleting #{event[:client]}/#{event[:check]}"
           begin
             doc = CURRENT_DB.get("#{event[:client]}/#{event[:check]}")
             doc.destroy
           rescue RestClient::Conflict
-            # there been a conflict, skip it
+            # there been a conflict, ignore
             puts 'doc conflict'
           rescue RestClient::ResourceNotFound
             # looks like its already deleted, noop

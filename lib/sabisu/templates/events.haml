@@ -1,202 +1,202 @@
-%link{:rel => "stylesheet", :href => "/css/events.css"}
-%script{:src => "/js/typeahead.js"}
-%script{:src => "https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"}
+%link{:rel => 'stylesheet', :href => '/css/events.css'}
+%script{:src => '/js/typeahead.js'}
+%script{:src => 'https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js'}
 
-%div{:class => "row", 'ng-controller' => 'eventsController', :id => 'eventsController'}
-  %span{:id => 'corner_status'}
-  #search{:class => 'col-md-12 pull-right main-content'}
-    %div{:class => "panel"}
-    #search_field{:role => "search", :class => "collapse in"}
-      %div{:class => "panel-body"} 
-        %form{:role => 'search', :class => 'form-inline'}
-          .form-group{:class => 'form-group col-md-9', :id => 'search_form_group'}
-            %input{:type => 'text', :class => 'form-control', :placeholder => 'Search', 'ng-model' => 'search_field', 'search-typeahead' => '', :id => 'search_input'}
-            %small{:class => 'help-block'}
-              %a{'data-toggle' => 'modal', 'data-target' => '#howdoisearch'}= "How do I search?"
-          .form-group{:class => 'form-group', :class => 'col-md-2'}
-            %select{:id => 'sort', 'ng-model' => 'sort_field', :class => 'form-control'}
-              %option{:disabled => true}= 'Sort by'
-              %option{:value => 'client'}= 'client'
-              %option{:value => '-client'}= 'client (descending)'
-              %option{:value => 'check'}= 'check'
-              %option{:value => '-check'}= 'check (descending)'
-              %option{:value => 'status'}= 'status'
-              %option{:value => '-status'}= 'status (descending)'
-              %option{:value => 'age', :selected => "selected"}= 'age'
-              %option{:value => '-age'}= 'age (descending)'
-              %option{:value => 'issued'}= 'issued'
-              %option{:value => '-issued'}= 'issued (descending)'
-              %option{:value => 'output'}= 'output'
-              %option{:value => '-output'}= 'output (descending)'
-          %input{:type => 'submit', :value => 'Search', :class => 'btn btn-success pull-right', 'ng-click' => 'updateParams()'}
+#eventsController.row{'ng-controller' => 'eventsController'}
+  %span#corner_status
+  #search.col-md-12.pull-right.main-content
+    .panel
+    #search_field.collapse.in{:role => 'search'}
+      .panel-body
+        %form.form-inline{:role => 'search'}
+          #search_form_group.form-group.col-md-9
+            %input#search_input.form-control{:type => 'text', :placeholder => 'Search', 'ng-model' => 'search_field', 'search-typeahead' => ''}
+            %small.help-block
+              %a{'data-toggle' => 'modal', 'data-target' => '#howdoisearch'} How do I search?
+          .form-group.col-md-2
+            %select#sort.form-control{'ng-model' => 'sort_field'}
+              %option{disabled: true} Sort by
+              %option{:value => 'client'} client
+              %option{:value => '-client'} client (descending)
+              %option{:value => 'check'} check
+              %option{:value => '-check'} check (descending)
+              %option{:value => 'status'} status
+              %option{:value => '-status'} status (descending)
+              %option{:value => 'age', :selected => 'selected'} age
+              %option{:value => '-age'} age (descending)
+              %option{:value => 'issued'} issued
+              %option{:value => '-issued'} issued (descending)
+              %option{:value => 'output'} output
+              %option{:value => '-output'} output (descending)
+          %input.btn.btn-success.pull-right{:type => 'submit', :value => 'Search', 'ng-click' => 'updateParams()'}
 
-  #stats{:class => "col-md-3 pull-left main-content"}
-    %div{:class => "panel"}
-    #stats_field{:role => "stats", :class => "collapse in"}
-      %div{:class => "panel-body", 'ng-hide' => 'events.length == 0 || events_spin'}
-        %div{:id => 'stats_status', 'ng-hide' => 'events_spin'}
-          #totals
-            %span{:class => "label label-warning pointer", 'ng-click' => 'appendQuery(1, "status", false)'}= " - "
-            %span{:class => "label label-danger pointer", 'ng-click' => 'appendQuery(2, "status", false)'}= " - "
-            %span{:class => "label label-info pointer", 'ng-click' => 'appendQuery(3, "status", false)'}= " - "
-        %div{:id => 'stats_by_count', 'ng-repeat' => '(name, stat) in stats'}
-          %h5
-            {{name | uppercase }} stats
-          %table{:class => 'table table-striped', 'ng-hide' => 'events_spin'}
-            %tr
-              %td
-                {{name}} name
-              %td="Quantity"
-            %tr{'ng-repeat' => 's in stat | slice:0:10'}
-              %td{:class => 'col-md-3'}
-                %span{:class => 'appendQuery', 'ng-click' => 'appendQuery(s[0], name)'}
-                  {{s[0]}}
-              %td{:class => 'col-md-1 text-center'}
-                {{s[1]}}
+  #stats.col-md-3.pull-left.main-content
+    .panel
+      #stats_field.collapse.in{:role => 'stats'}
+        .panel-body{'ng-hide' => 'events.length == 0 || events_spin'}
+          #stats_status{'ng-hide' => 'events_spin'}
+            #totals
+              %span.label.label-warning.pointer{'ng-click' => 'appendQuery(1, "status", false)'}= ' - '
+              %span.label.label-danger.pointer{'ng-click' => 'appendQuery(2, "status", false)'}= ' - '
+              %span.label.label-info.pointer{'ng-click' => 'appendQuery(3, "status", false)'}= ' - '
+          #stats_by_count{'ng-repeat' => '(name, stat) in stats'}
+            %h5
+              {{name | uppercase }} stats
+            %table.table.table-striped{'ng-hide' => 'events_spin'}
+              %tr
+                %td {{name}} name
+                %td Quantity
+              %tr{'ng-repeat' => 's in stat | slice:0:10'}
+                %td.col-md-3
+                  %span.appendQuery{'ng-click' => 'appendQuery(s[0], name)'}
+                    {{s[0]}}
+                %td.col-md-1.text-center
+                  {{s[1]}}
 
-  #events{:class => "col-md-9 pull-right main-content", :style => "margin-bottom: 100px"}
-    %div{:class => "panel"}
-            
-    #events_field{:role => "events", :class => "collapse in"}
-      %ul{:class => "list-group"}
-        %div{:class => 'progress progress-striped active', 'ng-show' => 'events_spin', :style => 'margin-top: 50px;'}
-          %div{:class => 'progress-bar progress-bar-success', :role => 'progressbar', 'aria-valuenow' => '100', 'aria-valuemin' => '0', 'aria-valuemax' => '100', :style => 'width: 100%'}
-            %span{:class => 'sr-only'}= "getting events..."
-        %div{:class => 'text-center', 'ng-hide' => 'events.length || events_spin'}= "No Events"
-        %div{:class => 'pull-right', 'ng-hide' => 'events.length == 0 || events_spin'}
-          %span{:class => 'view'}= "View"
-          %select{:id => 'limit', 'ng-model' => 'limit_field'}
-            %option{:value => '10'}= '10'
-            %option{:value => '20'}= '20'
-            %option{:value => '50', :selected => "selected"}= '50'
-            %option{:value => '100'}= '100'
-            %option{:value => '200'}= '200'
-        %a{:class => 'text-right pull-left', :id => 'events-accordian-toggle', 'ng-click' => 'bulkToggleDetails()', 'ng-hide' => 'events.length == 0 || events_spin'}= "{{bulk}} all details"
+  #events.col-md-9.pull-right.main-content{:style => 'margin-bottom: 100px'}
+    .panel
+    #events_field.collapse.in{:role => 'events'}
+      %ul.list-group
+        .progress.progress-striped.active{'ng-show' => 'events_spin', :style => 'margin-top: 50px;'}
+          .progress-bar.progress-bar-success{:role => 'progressbar', 'aria-valuenow' => '100', 'aria-valuemin' => '0', 'aria-valuemax' => '100', :style => 'width: 100%'}
+            %span.sr-only getting events...
+        .text-center{'ng-hide' => 'events.length || events_spin'} No Events
+        .pull-right{'ng-hide' => 'events.length == 0 || events_spin'}
+          %span.view View
+          %select#limit{'ng-model' => 'limit_field'}
+            %option{:value => '10'} 10
+            %option{:value => '20'} 20
+            %option{:value => '50', :selected => "selected"} 50
+            %option{:value => '100'} 100
+            %option{:value => '200'} 200
+        %a#events-accordian-toggle.text-right.pull-left{'ng-click' => 'bulkToggleDetails()', 'ng-hide' => 'events.length == 0 || events_spin'} {{bulk}} all details
         %br
-        %li{:class => "list-group-item", 'ng-repeat' => 'event in events'}
-          %div{:class => "row"}
-            %div{:class => "panel"}
-              %div{:class => "panel-heading flat-heading event_line", :panel => "{{event.client.name}}/{{event.check.name}}"}
-                %div{:class => "col-md-2"}
+        %li.list-group-item{'ng-repeat' => 'event in events'}
+          .row
+            .panel
+              .panel-heading.flat-heading.event_line{:panel => '{{event.client.name}}/{{event.check.name}}'}
+                .col-md-2
                   %h4
-                    %span{:class => "label label-{{event.color}} pull-right pointer", 'ng-click' => 'appendQuery(event.check.status, "status", false)'}="{{event.wstatus}}"
-                %h5{:class => "event_title pull-left"}
-                  %span{'ng-show' => 'event.client.silenced', :class => 'silenceBtn glyphicon glyphicon-volume-off', 'data-toggle' => 'popover', 'data-content' => '{{event.client.silence_html}}'}
-                  %span{:class => 'appendQuery', 'ng-click' => 'appendQuery(event.client.name, "client")'}
+                    %span.label.pull-right.pointer{'class' => 'label-{{event.color}}', 'ng-click' => 'appendQuery(event.check.status, "status", false)'} {{event.wstatus}}
+                %h5.event_title.pull-left
+                  %span.silenceBtn.glyphicon.glyphicon-volume-off{'ng-show' => 'event.client.silenced', 'data-toggle' => 'popover', 'data-content' => '{{event.client.silence_html}}'}
+                  %span.appendQuery{'ng-click' => 'appendQuery(event.client.name, "client")'}
                     {{event.client.name}}
-                  %span=" / "
-                  %span{'ng-show' => 'event.check.silenced', :class => 'silenceBtn glyphicon glyphicon-volume-off', 'data-toggle' => 'popover', 'data-content' => '{{event.check.silence_html}}'}
-                  %span{:class => 'appendQuery', 'ng-click' => 'appendQuery(event.check.name, "check")'}
+                  %span= ' / '
+                  %span.silenceBtn.glyphicon.glyphicon-volume-off{'ng-show' => 'event.check.silenced', 'data-toggle' => 'popover', 'data-content' => '{{event.check.silence_html}}'}
+                  %span.appendQuery{'ng-click' => 'appendQuery(event.check.name, "check")'}
                     {{event.check.name}}
-                  %small{:class => 'text-muted muted-output'}
+                  %small.text-muted.muted-output
                     \- {{event.check.output}}
                 %h5
-                  %span{:class => 'glyphicon glyphicon-collapse-down toggleBtnIcon pull-right', 'ng-click' => "toggleDetails(event.id)"}
-              %div{:class => "panel-body panel-collapse collapse {{event.showdetails}}", :id => "{{event.id}}"}
-                %div{:class => 'dropdown actions pull-right'}
-                  %button{:class => 'btn btn-link dropdown-toggle', 'data-toggle' => 'dropdown'}
+                  %span.glyphicon.glyphicon-collapse-down.toggleBtnIcon.pull-right{'ng-click' => 'toggleDetails(event.id)'}
+              .panel-body.panel-collapse.collapse{:class => '{{event.showdetails}}', :id => '{{event.id}}'}
+                .dropdown.actions.pull-right
+                  %button.btn.btn-link.dropdown-toggle{'data-toggle' => 'dropdown'}
                     Actions
-                    %span{:class => "caret"}
-                  %ul{:class => 'dropdown-menu'}
+                    %span.caret
+                  %ul.dropdown-menu
                     %li
-                      %a{"href" => "#", 'ng-click' => 'resolveEvent(event.client.name, event.check.name)'}= "Resolve"
-                    %li{:class => 'divider'}
-                    %li{:class => 'dropdown-header'}="Silence"
+                      %a{:href => '#', 'ng-click' => 'resolveEvent(event.client.name, event.check.name)'} Resolve
+                    %li.divider
+                    %li.dropdown-header Silence
                     %li
-                      %a{"href" => "#", 'ng-click' => 'updateSilencePath(event.client.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'}= "Client"
+                      %a{:href => '#', 'ng-click' => 'updateSilencePath(event.client.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'} Client
                     %li
-                      %a{"href" => "#", 'ng-click' => 'updateSilencePath(event.client.name + "/" + event.check.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'}= "Check"
+                      %a{:href => '#', 'ng-click' => 'updateSilencePath(event.client.name + "/" + event.check.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'} Check
                 %div{'ng-bind-html' => 'to_trusted(build_event_attr_html(event))'}
                 %br
                 %br
                 %br
-                %div{:class => 'col-md-12 pull-left output'}
+                .col-md-12.pull-left.output
                   {{event.check.output}}
-  %div{:class => 'modal fade', :id => 'silence_window'}
-    %div{:class => 'modal-dialog'}
-      %div{:class => 'modal-content'}
-        %div{:class => 'modal-header'}
-          %button{:type => "button", :class => "close pull-right", 'data-dismiss' => "modal", 'aria-hidden' => "true"}
-          %h4{:class => 'modal-title'}= "Silence {{silencePath}}"
-        %div{:class => 'modal-body'}
-          %form{:class => 'form-horizontal', :role => 'form', :id => 'silence_form'}
-            %div{:class => 'form-group silence_owner has-feedback'}
-              %label{:for => 'owner', :class => 'col-sm-2 control-label'}= "Owner*"
-              %div{:class => 'col-sm-10'}
-                %input{:type => 'text', :class => 'form-control', :id => 'owner', :placeholder => 'Joe Smith'}
-            %div{:class => 'form-group silence_reason has-feedback'}
-              %label{:for => 'reason', :class => 'col-sm-2 control-label'}= "Reason*"
-              %div{:class => 'col-sm-10'}
-                %textarea{:class => 'form-control', :id => 'reason', :placeholder => 'Enter reason here', :rows => '3'}
-            %div{:class => 'form-group'}
-              %label{:for => 'expires', :class => 'col-sm-2 control-label'}="Expiration*"
-              %div{:class => 'col-sm-10'}
-                %div{:class => 'radio'}
-                  %label
-                    %input{:type => 'radio', :name => 'expiration', :id => 'resolve', :value => 'resolve', :checked => ''}
-                    On resolve
-                    %span{:class => 'glyphicon glyphicon-question-sign', 'data-toggle' => 'tooltip', 'data-placement' => 'right', :title => '"On resolve" will cause this silence to be deleted once the check clears for check, clients require all checks to clear. A minimum of 1 hour is enforced.'}
-                %div{:class => 'radio'}
-                  %label
-                    %input{:type => 'radio', :name => 'expiration', :id => 'timer', :value => 'timer'}
-                    %span{:class => 'pull-left'}="Timer"
-                    %div{:class => 'col-sm-3 silence_timer_val has-feedback'}
-                      %input{:type => 'text', :name => 'expirationl', :id => 'timer_val', :class => 'input-sm form-control', :placeholder => ''}
-                    %span{:class => 'glyphicon glyphicon-question-sign', 'data-toggle' => 'tooltip', 'data-placement' => 'right', :title => '"Timer" will cause this silence to be deleted in a predetermined time span. The expires value should be inputted as a number followed by a single character. m = minutes, h = hours, d = days, w = weeks. (examples 15m, 2h, 1d, 5w)'}
-                %div{:class => 'radio'}
-                  %label
-                    %input{:type => 'radio', :name => 'expiration', :id => 'never', :value => 'never'}
-                    Never
-                    %span{:class => 'glyphicon glyphicon-question-sign', 'data-toggle' => 'tooltip', 'data-placement' => 'right', :title => '"Never" will cause this silence to, surprise surprise, never expire. It will remain silence until yourself or someone else manually deletes the silence. It is highly discourage to permanently silence anything. Its extremely rare that that is ever the correct action.'}
-          %div{:class => 'modal-footer'}
-            %button{:type => 'submit', :class => 'btn btn-default pull-right', 'ng-click' => 'saveSilence()'}= "Create"
 
-  %div{:class => 'modal fade', :id => 'howdoisearch'}
-    %div{:class => 'modal-dialog'}
-      %div{:class => 'modal-content'}
-        %div{:class => 'modal-header'}
-          %button{:type => "button", :class => "close", 'data-dismiss' => "modal", 'aria-hidden' => "true"}
-          %h4{:class => 'modal-title'}= "How Do I Search?"
-        %div{:class => 'modal-body'}
-          %h4="Available Fields"
-          %p{:class => 'well well-sm'}
+  #silence_window.modal.fade
+    .modal-dialog
+      .modal-content
+        .modal-header
+          %button.close.pull-right{:type => 'button', 'data-dismiss' => 'modal', 'aria-hidden' => 'true'}
+          %h4.modal-title Silence {{silencePath}}
+        .modal-body
+          %form#silence_form.form-horizontal{:role => 'form'}
+            .form-group.silence_owner.has-feedback
+              %label.col-sm-2.control-label{:for => 'owner'} Owner*
+              .col-sm-10
+                %input#owner.form-control{:type => 'text', :placeholder => 'Joe Smith'}
+            .form-group.silence_reason.has-feedback
+              %label.col-sm-2.control-label{:for => 'reason'} Reason*
+              .col-sm-10
+                %textarea#reason.form-control{:placeholder => 'Enter reason here', :rows => '3'}
+            .form-group
+              %label.col-sm-2.control-label{:for => 'expires'} Expiration*
+              .col-sm-10
+                .radio
+                  %label
+                    %input#resolve{:type => 'radio', :name => 'expiration', :value => 'resolve', :checked => ''}
+                    On resolve
+                    %span.glyphicon.glyphicon-question-sign{'data-toggle' => 'tooltip', 'data-placement' => 'right', :title => '"On resolve" will cause this silence to be deleted once the check clears for check, clients require all checks to clear. A minimum of 1 hour is enforced.'}
+                .radio
+                  %label
+                    %input#timer{:type => 'radio', :name => 'expiration', :value => 'timer'}
+                    %span.pull-left Timer
+                    .col-sm-3.silence_timer_val.has-feedback
+                      %input#timer_val.input-sm.form-control{:type => 'text', :name => 'expirationl', :placeholder => ''}
+                    %span.glyphicon.glyphicon-question-sign{'data-toggle' => 'tooltip', 'data-placement' => 'right', :title => '"Timer" will cause this silence to be deleted in a predetermined time span. The expires value should be inputted as a number followed by a single character. m = minutes, h = hours, d = days, w = weeks. (examples 15m, 2h, 1d, 5w)'}
+                .radio
+                  %label
+                    %input#never{:type => 'radio', :name => 'expiration', :value => 'never'}
+                    Never
+                    %span.glyphicon.glyphicon-question-sign{'data-toggle' => 'tooltip', 'data-placement' => 'right', :title => '"Never" will cause this silence to, surprise surprise, never expire. It will remain silence until yourself or someone else manually deletes the silence. It is highly discourage to permanently silence anything. Its extremely rare that that is ever the correct action.'}
+          .modal-footer
+            %button.btn.btn-default.pull-right{:type => 'submit', 'ng-click' => 'saveSilence()'} Create
+
+  #howdoisearch.modal.fade
+    .modal-dialog
+      .modal-content
+        .modal-header
+          %button.close{:type => 'button', 'data-dismiss' => 'modal', 'aria-hidden' => 'true'}
+          %h4.modal-title How Do I Search?
+        .modal-body
+          %h4 Available Fields
+          %p.well.well-sm
             {{event_fields_name | joinBy : ', '}}
-          %h4="Query Syntax"
-          %h5="Examples"
-          %table{:class => "table table-striped"}
+          %h4 Query Syntax
+          %h5 Examples
+          %table.table.table-striped
             %tr
-              %td="Desired Result"
-              %td="Query"
+              %td Desired Result
+              %td Query
             %tr
-              %td="For clients STARTING with 'web'"
-              %td="client:web*"
+              %td For clients STARTING with "web"
+              %td client:web*
             %tr
-              %td="For checks ENDING with 'process'"
-              %td="check:process"
+              %td For checks ENDING with "process"
+              %td check:process
             %tr
-              %td="For checks MATCHING with 'disk_usage'"
-              %td="check:\"disk_usage\""
+              %td For checks MATCHING with "disk_usage"
+              %td check:"disk_usage"
             %tr
-              %td="For statuses warning or critical"
-              %td="status:[1 TO 2]"
+              %td For statuses warning or critical
+              %td status:[1 TO 2]
             %tr
-              %td="For 'web' clients and critical"
-              %td="client:web* AND status:2"
+              %td For "web" clients and critical
+              %td client:web* AND status:2
             %tr
-              %td="Search for everything, except checks that start with 'disk'"
-              %td="*:* AND NOT check:disk*"
+              %td Search for everything, except checks that start with "disk"
+              %td *:* AND NOT check:disk*
             %tr
-              %td="For 'web' or 'dbs' clients and status is unknown"
-              %td="client:(web* OR db*) AND status:3"
+              %td For "web" or "dbs" clients and status is unknown
+              %td client:(web* OR db*) AND status:3
             %tr
-              %td="Full text search for 'failure'"
-              %td="failure"
+              %td Full text search for "failure"
+              %td failure
             %tr
-              %td="Events since Jan 1, 2014"
-              %td="issued:[1388534400 TO Infinity]"
+              %td Events since Jan 1, 2014
+              %td issued:[1388534400 TO Infinity]
           %p
             The Cloudant search query syntax is based on the
-            %a{:href => 'http://lucene.apache.org/core/4_2_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package_description'}="Lucene"
+            %a{:href => 'http://lucene.apache.org/core/4_2_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package_description'}
+              Lucene
             syntax. Search queries take the form of "name:value" (unless the name is omitted, in which case they hit the default field).
           %p
             Queries over multiple fields can be logically combined and groups and fields can be grouped. The available logical operators are: "AND", "+", "OR", "NOT" and "-", and are case sensitive. Range queries can run over strings or numbers.
@@ -210,10 +210,8 @@
           %p
             The following characters require escaping if you want to search on them
 
-          %p{:class => 'well well-sm'}
+          %p.well.well-sm
             + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
 
-        %div{:class => 'modal-footer'}
-          %button{:type => 'button', :class => 'btn btn-default', 'data-dismiss' => 'modal'}= "Close"
-
-%script{:type => "text/javascript", :src => "/js/events.js"}
+        .modal-footer
+          %button.btn.btn-default{:type => 'button', 'data-dismiss' => 'modal'} Close
