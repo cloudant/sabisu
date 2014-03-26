@@ -9,6 +9,6 @@
   "threads": 8,
   "redis": {
     "server": "<redis server url>",
-    "port": "<port number>"
+    "port": <port number>
   }
 }

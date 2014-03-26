@@ -2,12 +2,12 @@
 sabisu
 ======
 
-A sensu web ui powered by [Cloudant](https://cloudant.com)
+A sensu web UI powered by [Cloudant](https://cloudant.com)
 
 Features
 ========
 
- * Full text search (based on [lucene](http://lucene.apache.org/))
+ * Full text search (based on [Lucene](http://lucene.apache.org/))
  * Complex search, filtering, and sorting
  * Smart autocomplete to help you find what you're looking for
  * Statistical analysis of your search/query (faceting)
@@ -15,7 +15,7 @@ Features
  * Add custom attributes to your sensu events and make them searchable, indexed, and give them statistical context
  * Easy "drill down" by clicking on any client, check, status or even custom attributes to see more events like them
  * Silence with expiration timeout, unsilence on resolve, or never expire
- * Create views of your sensu environment and save, bookmark, and share them with your colleagues.
+ * Create views of your sensu environment and save, bookmark, and share them with your colleagues
 
 Demo
 ====
@@ -40,12 +40,25 @@ For installation instruction, go [here](https://github.com/cloudant/sabisu/wiki/
 Development Environment
 =======================
 
-To setup sabisu for local development, 
+To setup sabisu for local development:
 
-1. first setup/install [RVM](https://rvm.io/) (or something like it, ie [rbenv](http://rbenv.org/)). Its a good idea to keep your dev environment separate from your system ruby.
-2. clone the repo (`git clone git@github.com:cloudant/sabisu.git`)
-3. Create a `.env` file to setup your environment variables (see [Environment Variables](https://github.com/cloudant/sabisu/wiki/Installation#environment-variables)).
-4. Source the file (`source .env`)
-5. Next run `bundle install` to install all gem dependencies
-6. To startup sabisu locally, run `foreman start`
-7. In your browser, visit [localhost:8080](http://localhost:8080)
+1. First setup/install [RVM](https://rvm.io/) (or something like it, i.e. [rbenv](http://rbenv.org/)). It is a good idea to keep your dev environment separate from your system Ruby.
+2. Clone the repo (`git clone git@github.com:cloudant/sabisu.git`).
+3. Create an `.env` file to setup your environment variables (see [Environment Variables](https://github.com/cloudant/sabisu/wiki/Installation#environment-variables)).
+4. Source the file (`source .env`).
+5. Next run `bundle install` to install all gem dependencies.
+6. To startup sabisu locally, run `foreman start`.
+7. In your browser, visit [localhost:8080](http://localhost:8080).
+
+sabisu uses [CoffeeScript](http://coffeescript.org/). You can install
+CoffeeScript with:
+```bash
+sudo npm install -g coffee-script`
+```
+
+Run the following command to watch the .coffee files and generate the
+equivalent .js files whenever a change is made:
+
+```bash
+cd lib/sabisu/public && coffee -cw -j js/sabisu.js coffee/sabisu.coffee coffee/
+```

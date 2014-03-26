@@ -80,12 +80,10 @@ class Cloudant
         )
       end
     rescue RestClient::Conflict
-      # Due to sensu check results are on an interval (ie 60 secs)
-      # the odds of a conflict is extremely low, (in that the doc
-      # gets update/changed in the less than a sec operation of .get
-      # the .save_doc
-      # In addition this updating a doc only occurs when there is a
-      # state change, making it even less likely.
+      # a conflict is extremely unlikely since results come in on
+      # an interval (e.g. 60 secs) and updates only happen on a
+      # state change. so just retry saving the doc, but not more than
+      # 3 times.
       retry if tries <= 3
     rescue RestClient::ResourceNotFound
       # The current_id doesn't exist yet, so create it
@@ -105,11 +103,12 @@ class Cloudant
         )
       end
     rescue RestClient::Conflict
+      # a conflict is very unlikely, but just try again up to 3 times
       retry if tries <= 3
-      puts 'Failed to delete doc due to repetitive conflict'
+      puts 'Failed to delete doc due to repeated conflicts'
     rescue RestClient::ResourceNotFound
       # do nothing, nothing to delete
-      puts "Doc doesn't exist to delete"
+      puts 'Cannot delete nonexistent doc'
     end
   end
 end

@@ -31,9 +31,9 @@ CONFIG_FILE = {} unless defined?(CONFIG_FILE)
 
 begin
   # look for local copy first for dev purposes
-  require_relative '../lib/sabisu/server'
+  require_relative '../lib/sabisu'
 rescue LoadError
-  require 'sabisu/server'
+  require 'sabisu'
 end
 
 Sabisu::Server.run!

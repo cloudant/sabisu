@@ -17,8 +17,8 @@ module Sabisu
       # rubocop:disable HandleExceptions
       rescue
         # do nothing
-      # rubocop:enable HandleExceptions
       end
+      # rubocop:enable HandleExceptions
       sensu.request(opts)
     end
 

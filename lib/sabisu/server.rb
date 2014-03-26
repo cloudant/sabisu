@@ -1,4 +1,4 @@
-gem 'thin', '1.6.2'
+gem 'thin'
 gem 'sinatra', '1.4.4'
 
 # load gems
@@ -66,15 +66,11 @@ module Sabisu
 
     helpers do
       def validate(username, password)
-        username == UI_USERNAME && password == UI_PASSWORD ? true : false
+        username == UI_USERNAME && password == UI_PASSWORD
       end
 
       def logged_in?
-        if NOAUTH == true || (session[:logged_in] == true && !session[:username].nil?)
-          return true
-        else
-          return false
-        end
+        NOAUTH == true || (session[:logged_in] == true && !session[:username].nil?)
       end
 
       def force_session_auth
