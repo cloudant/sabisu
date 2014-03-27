@@ -2,4 +2,4 @@ language: ruby
 rvm:
   - 2.0.0
 script:
-  - "bundle exec rubocop sensu-integration Rakefile lib bin"
+  - "bundle exec rake"

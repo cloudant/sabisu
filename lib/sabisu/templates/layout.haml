@@ -1,82 +1,85 @@
 !!! 5
-%html{:lang => "en", 'ng-app' => "sabisu"}
+
+%html{:lang => 'en', 'ng-app' => 'sabisu'}
   %head
-    %script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"}
-    %script{:src => "https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"}
-    %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.min.js"}
-    %script{:src => "/js/base.js"}
-    %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"}
-    %script{:src => "https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"}
-    %link{:rel => "stylesheet", :href => "/css/bootstrap.min.css"}
-    %link{:rel => "stylesheet", :href => "/css/base.css"}
+    %script{:src => 'https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'}
+    %script{:src => 'https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js'}
+    %script{:src => 'https://cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.min.js'}
+    %script{:src => '/js/sabisu.js'}
+    %script{:src => 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js'}
+    %script{:src => 'https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js'}
+    %link{:rel => 'stylesheet', :href => '/css/bootstrap.min.css'}
+    %link{:rel => 'stylesheet', :href => '/css/base.css'}
+
   %body
-    #wrapper{:class => 'container'}
+    #wrapper.container
       #header
-        .nav{:class => 'navbar navbar-default', :role => "navigation"}
+        .nav.navbar.navbar-default{:role => 'navigation'}
           .navbar-header
-            %a{:class => 'navbar-brand', "href" => "/"}= "Sabisu"
-          %ul{:class => 'nav navbar-nav navbar-right'}
+            %a.navbar-brand{:href => '/'} Sabisu
+          %ul.nav.navbar-nav.navbar-right
             - if logged_in?
-              %li{:class => 'dropdown'}
-                %a{"href" => "#", :target => '_self', :class => 'droptown-toggle', 'data-toggle' => 'dropdown'}
+              %li.dropdown
+                %a.droptown-toggle{:href => '#', :target => '_self', 'data-toggle' => 'dropdown'}
                   Events
-                  %b{:class => "caret"}
-                %ul{:class => 'dropdown-menu'}
+                  %b.caret
+                %ul.dropdown-menu
                   %li
-                    %a{"href" => "/events?sort=-age&limit=50&query=", :target => '_self'}= "Recent State Change"
+                    %a{:href => '/events?sort=-age&limit=50&query=', :target => '_self'} Recent State Change
                   %li
-                    %a{"href" => "/events?sort=age&limit=50&query=", :target => '_self'}= "Stale State"
+                    %a{:href => '/events?sort=age&limit=50&query=', :target => '_self'} Stale State
                   %li
-                    %a{"href" => "/events?sort=-age&limit=50&query=status:1", :target => '_self'}= "Warning"
+                    %a{:href => '/events?sort=-age&limit=50&query=status:1', :target => '_self'} Warning
                   %li
-                    %a{"href" => "/events?sort=-age&limit=50&query=status:2", :target => '_self'}= "Critical"
+                    %a{:href => '/events?sort=-age&limit=50&query=status:2', :target => '_self'} Critical
                   %li
-                    %a{"href" => "/events?sort=-age&limit=50&query=status:3", :target => '_self'}= "Unknown"
+                    %a{:href => '/events?sort=-age&limit=50&query=status:3', :target => '_self'} Unknown
               %li
-                %a{'href' => '/logout', :target => '_self'}= "Logout"
+                %a{:href => '/logout', :target => '_self'} Logout
             - else
               %li 
-                %a{'href' => '/login', :target => '_self'}= "Login"  
-      #content
-        =yield
-    #footer
-      .copyright{:class => 'text-center'}
-        © Copyright 
-        %a{:href => "https://www.cloudant.com"}= "Cloudant, Inc."
-        2014
-        %a{:href => "http://www.apache.org/licenses/LICENSE-2.0.html"}= "Apache License, Version 2.0"
-        %br
-        %a{'data-toggle' => 'modal', 'data-target' => '#keyboard_shortcuts'}= "Keyboard Shortcuts"
+                %a{:href => '/login', :target => '_self'} Login
 
-%div{:class => 'modal fade', :id => 'keyboard_shortcuts'}
-  %div{:class => 'modal-dialog'}
-    %div{:class => 'modal-content'}
-      %div{:class => 'modal-header'}
-        %button{:type => "button", :class => "close", 'data-dismiss' => "modal", 'aria-hidden' => "true"}
-        %h3{:class => 'modal-title'}= "Keyboard Shortcuts"
-      %div{:class => 'modal-body'}
+      #content
+        = yield
+
+    #footer
+      .copyright.text-center
+        © Copyright 
+        %a{:href => 'https://www.cloudant.com'} Cloudant, Inc.
+        2014
+        %a{:href => 'http://www.apache.org/licenses/LICENSE-2.0.html'} Apache License, Version 2.0
+        %br
+        %a{'data-toggle' => 'modal', 'data-target' => '#keyboard_shortcuts'} Keyboard Shortcuts
+
+#keyboard_shortcuts.modal.fade
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{:type => 'button', 'data-dismiss' => 'modal', 'aria-hidden' => 'true'}
+        %h3.modal-title Keyboard Shortcuts
+      .modal-body
         %div
-          %h4='Events'
-          %table{:class => "table table-striped"}
+          %h4 Events
+          %table.table.table-striped
             %tr
-              %td="Description"
-              %td="Shortcut"
+              %td Description
+              %td Shortcut
             %tr
-              %td="Show keyboard shortcuts"
+              %td Show keyboard shortcuts
               %td
-                %span{:class => 'well well-sm'}="? (question mark)"
+                %span.well.well-sm ? (question mark)
             %tr
-              %td="Goto search query"
+              %td Goto search query
               %td
-                %span{:class => 'well well-sm'}=". (period)"
+                %span.well.well-sm . (period)
             %tr
-              %td="Select the sort dropdown"
+              %td Select the sort dropdown
               %td
-                %span{:class => 'well well-sm'}="s"
+                %span.well.well-sm s
             %tr
-              %td="Press search button"
+              %td Press search button
               %td
-                %span{:class => 'well well-sm'}="enter"
-      %div{:class => 'modal-footer'}
-        %button{:type => 'button', :class => 'btn btn-default', 'data-dismiss' => 'modal'}= "Close"
-        
+                %span.well.well-sm enter
+      .modal-footer
+        %button.btn.btn-default{:type => 'button', 'data-dismiss' => 'modal'} Close
