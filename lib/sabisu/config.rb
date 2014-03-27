@@ -1,7 +1,7 @@
 # extend String class
 class String
   def to_bool
-    self == true || self =~ (/(true|t|yes|y|1)$/i)
+    self == true || self =~ (/(true|t|yes|y|1)$/i) ? true : false
   end
 end
 
