@@ -129,7 +129,7 @@ module Sabisu
         stale
       end
 
-      def clear_events(events)
+      def self.clear_events(events)
         events.each do |event|
           pp "Deleting #{event[:client]}/#{event[:check]}"
           begin
