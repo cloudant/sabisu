@@ -207,32 +207,34 @@ cloudant = Cloudant.new(
 
 threads = config[:threads].times.map do |i|
   Thread.new do
-    # pop an event off the redis queue (blocking)
-    begin
-      redis_key, redis_event = redis.brpop(config[:redis][:list])
-    rescue StandardError => e
-      puts "ERROR while retrieving event from redis: #{e.message}" + e.backtrace.join("\n")
-      # try again; sleep as redis is probably temporarily inaccessable
-      sleep 2
-      next
-    end
-
-    # process the event
-    begin
-      process_event(JSON.parse(redis_event), i, cloudant)
-    rescue StandardError => e
-      puts "ERROR: #{e.message}\n" \
-           "Failed to update the Cloudant databases. Pushing this event " \
-           "back on the head of the redis queue."
+    until quit
+      # pop an event off the redis queue (blocking)
       begin
-        redis.rpush(redis_key, redis_event)
-        # sleep as cloudant is probably temporarily inaccessable
+        redis_key, redis_event = redis.brpop(config[:redis][:list])
+      rescue StandardError => e
+        puts "ERROR while retrieving event from redis: #{e.message}" + e.backtrace.join("\n")
+        # try again; sleep as redis is probably temporarily inaccessable
         sleep 2
-      rescue StandardError
-        puts "ERROR: Unable to add the event back on the redis queue. " \
-             "It will be lost forever."
+        retry
       end
-    end until quit == true
+
+      # process the event
+      begin
+        process_event(JSON.parse(redis_event), i, cloudant)
+      rescue StandardError => e
+        puts "ERROR: #{e.message}\n" \
+             "Failed to update the Cloudant databases. Pushing this event " \
+             "back on the head of the redis queue."
+        begin
+          redis.rpush(redis_key, redis_event)
+          # sleep as cloudant is probably temporarily inaccessable
+          sleep 2
+        rescue StandardError
+          puts "ERROR: Unable to add the event back on the redis queue. " \
+               "It will be lost forever."
+        end
+      end
+    end
   end
 end
 
