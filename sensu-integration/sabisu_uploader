@@ -212,7 +212,7 @@ threads = config[:threads].times.map do |i|
       redis_key, redis_event = redis.brpop(config[:redis][:list])
     rescue StandardError => e
       puts "ERROR while retrieving event from redis: #{e.message}" + e.backtrace.join("\n")
-      # try again
+      # try again; sleep as redis is probably temporarily inaccessable
       sleep 2
       next
     end
@@ -226,6 +226,8 @@ threads = config[:threads].times.map do |i|
            "back on the head of the redis queue."
       begin
         redis.rpush(redis_key, redis_event)
+        # sleep as cloudant is probably temporarily inaccessable
+        sleep 2
       rescue StandardError
         puts "ERROR: Unable to add the event back on the redis queue. " \
              "It will be lost forever."
