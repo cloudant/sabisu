@@ -15,6 +15,17 @@ module Sabisu
       CONFIG_FILE = {}
     end
 
+    configure do
+      # set the environment
+      if defined?(SABISU_ENV)
+        environment = SABISU_ENV
+      else
+        environment = CONFIG_FILE[:SABISU_ENV] || ENV['SABISU_ENV'] || 'production'
+      end
+      set :environment, environment.to_sym
+      puts environment
+    end
+
     configure :development do
       puts 'DEVELOPMENT ENVIRONMENT!!!'
       auth = CONFIG_FILE[:NOAUTH] || ENV['NOAUTH'] || true
@@ -51,14 +62,6 @@ module Sabisu
 
       PORT = 8080 unless defined?(PORT)
       set :port, PORT
-
-      # set the environment
-      if defined?(SABISU_ENV)
-        environment = SABISU_ENV
-      else
-        environment = CONFIG_FILE[:SABISU_ENV] || ENV['SABISU_ENV'] || 'production'
-      end
-      set :environment, environment.to_sym
 
       user = CONFIG_FILE[:CLOUDANT_USER] || ENV['CLOUDANT_USER'] || nil
       password = CONFIG_FILE[:CLOUDANT_PASSWORD] || ENV['CLOUDANT_PASSWORD'] || nil
