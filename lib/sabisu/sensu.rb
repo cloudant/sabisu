@@ -15,12 +15,12 @@ module Sabisu
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
         proxy_header = { 'api-proxy' => 'true' }
-        case opts[:method]
-        when 'get'.upcase
+        case opts[:method].upcase
+        when 'GET'
           req =  Net::HTTP::Get.new(opts[:path], proxy_header)
-        when 'delete'.upcase
+        when 'DELETE'
           req =  Net::HTTP::Delete.new(opts[:path], proxy_header)
-        when 'post'.upcase
+        when 'POST'
           req =  Net::HTTP::Post.new(
             opts[:path],
             proxy_header.merge!('Content-Type' => 'application/json')
@@ -41,14 +41,15 @@ module Sabisu
           puts 'The item was submitted for processing.'
         when '204'
           puts 'Sensu is healthy' if command == 'health'
-          puts 'The item was successfully deleted.' if command == 'aggregates' ||
-            command == 'stashes'
+          if command == 'aggregates' || command == 'stashes'
+            puts 'The item was successfully deleted.'
+          end
         when '400'
           puts 'The payload is malformed.'.color(:red)
         when '401'
           puts 'The request requires user authentication.'.color(:red)
         when '404'
-          puts 'The item did not exist.'.color(:cyan)
+          puts 'The item does not exist.'.color(:cyan)
         else
           if command == 'health'
             puts 'Sensu is not healthy.'.color(:red)
