@@ -3,8 +3,9 @@
 require 'rubygems'
 require 'json/ext'
 require 'redis'
-require 'couchrest'
+require 'restclient'
 require 'optparse'
+require 'timeout'
 require 'pp'
 
 # rubocop:disable Loop, MethodLength
@@ -30,165 +31,163 @@ if options[:config].nil?
   exit 1
 else
   config = JSON.parse(File.read(options[:config]), symbolize_names: true)
+
   config[:redis][:server] = 'localhost' unless config[:redis].key?(:server)
-  config[:redis][:port] = 6379 unless config[:redis].key?(:port)
-  config[:redis][:db] = 0 unless config[:redis].key?(:db)
-  config[:redis][:list] = 'events' unless config[:redis].key?(:list)
+  config[:redis][:port] = 6379          unless config[:redis].key?(:port)
+  config[:redis][:db] = 0               unless config[:redis].key?(:db)
+  config[:redis][:list] = 'events'      unless config[:redis].key?(:list)
 
   config[:cloudant][:dbs][:current] = 'sensu_current' unless config[:cloudant][:dbs].key?(:current)
   config[:cloudant][:dbs][:history] = 'sensu_history' unless config[:cloudant][:dbs].key?(:history)
 
-  config[:threads] = 8 unless config.key?(:threads)
+  config[:batch_max_events] = 20 unless config.key?(:batch_max_events) ||
+                                        config[:batch_max_events] == 0
+  config[:batch_max_time] = 5    unless config.key?(:batch_max_time) ||
+                                        config[:batch_max_time] == 0
 end
 
-# cloudant class to send sensu events to cloudant dbs
+# cloudant class to send sensu events to cloudant dbs in bulk
+# https://wiki.apache.org/couchdb/HTTP_Bulk_Document_API
 class Cloudant
   def initialize(username, cred_user, cred_password, current_db, history_db)
     @username = username
     @credentials = { username: cred_user, password: cred_password }
-    @current_db = CouchRest.database!(make_url(current_db))
-    @history_db = CouchRest.database!(make_url(history_db))
+    @current_db = make_url(current_db)
+    @history_db = make_url(history_db)
   end
 
   def make_url(db)
-    "https://#{@credentials[:username]}:#{@credentials[:password]}@#{@username}.cloudant.com/#{db}"
+    "https://#{@credentials[:username]}:#{@credentials[:password]}@" \
+    "#{@username}.cloudant.com/#{db}"
+  end
+
+  def request(db, path, method = :get, data = {})
+    JSON.parse(
+      RestClient.send(
+        method,
+        "#{db}/#{path}",
+        data.to_json,
+        content_type: :json,
+        accept: :json
+      ),
+      symbolize_names: true
+    )
   end
 
   # get the last known event
-  def last_event(client, check)
-    @current_db.get("#{client}/#{check}")
+  def last_events(ids)
+    request(@current_db, '_all_docs?include_docs=true', :post, keys: ids)[:rows].map do |doc|
+      if doc.key?(:error)
+        nil
+      elsif doc.key?(:doc)
+        doc[:doc]
+      end
+    end.compact
   rescue RestClient::ResourceNotFound
     nil
   end
 
-  def send_history(event)
-    @history_db.save_doc('event' => event)
+  def send_history(events)
+    request(@history_db, '_bulk_docs', :post, docs: events)
   end
 
-  def send_current(event, last_event)
-    _id = "#{event['client']['name']}/#{event['check']['name']}"
-    tries = 0
-    begin
-      tries += 1
-      if last_event.nil?
-        @current_db.save_doc('_id' => _id, 'event' => event)
-      else
-        @current_db.save_doc(
-          '_id' => _id,
-          '_rev' => last_event['_rev'],
-          'event' => event
-        )
-      end
-    rescue RestClient::Conflict
-      # a conflict is extremely unlikely since results come in on
-      # an interval (e.g. 60 secs) and updates only happen on a
-      # state change. so just retry saving the doc, but not more than
-      # 3 times.
-      if tries <= 3
-        # need to grab the updated _rev before retrying
-        if last_event
-          last_event = self.last_event(event['client']['name'], event['check']['name'])
-        end
-        retry
-      end
-      puts 'Failed to update doc due to repeated conflicts'
-      raise
-    rescue RestClient::ResourceNotFound
-      # The current_id doesn't exist yet, so create it
-      @current_db.save_doc('_id' => _id, 'event' => event)
-    end
-  end
-
-  def delete(event, last_event)
-    _id = "#{event['client']['name']}/#{event['check']['name']}"
-    tries = 0
-    begin
-      tries += 1
-      unless last_event.nil?
-        @current_db.delete_doc(
-          '_id' => _id,
-          '_rev' => last_event['_rev']
-        )
-      end
-    rescue RestClient::Conflict
-      # a conflict is very unlikely, but just try again up to 3 times
-      if tries <= 3
-        # need to grab the updated _rev before retrying
-        if last_event
-          last_event = self.last_event(event['client']['name'], event['check']['name'])
-        end
-        retry
-      end
-      puts 'Failed to delete doc due to repeated conflicts'
-      raise
-    rescue RestClient::ResourceNotFound
-      # do nothing, nothing to delete
-      puts 'Cannot delete nonexistent doc'
-    end
+  def send_current(events)
+    request(@current_db, '_bulk_docs', :post, docs: events)
   end
 end
 
-def process_event(event, i, cloudant)
+def format_check(event)
+  "#{event[:client][:name]}/#{event[:check][:name]}"
+end
+
+def process_events(events, cloudant)
   starttime = Time.now
-  prefix = "Thread #{i} | "
-  last_event = cloudant.last_event(event['client']['name'], event['check']['name'])
+  current_updates, history_updates = [], []
+  last_events = cloudant.last_events(events.map { |e| format_check(e) })
 
-  # did the current event occur BEFORE the last one?
-  # this can occur if the sending of some events to the cloudant dbs failed,
-  # and the events are now arriving out-of-order.
-  out_of_order = last_event &&
-                 last_event['event']['check']['issued'].to_i > event['check']['issued'].to_i
+  events.each do |event|
+    id = format_check(event)
+    prefix = id + ' | '
 
-  if event['check']['status'] == 0
-    # check has resolved, delete it from current db.
-    # but ignore if it's out-of-order or the check doesn't exist for some reason
-    if last_event && !out_of_order
-      cloudant.delete(event, last_event)
-      puts prefix + 'Recovery (deleted current doc)'
+    # find last known event for this event
+    last_event = last_events.find do |e|
+      e[:event][:client][:name] == event[:client][:name] &&
+      e[:event][:check][:name] == event[:check][:name]
     end
-    # add to history
-    cloudant.send_history(event)
-  elsif last_event.nil?
-    # event doesn't exist yet, create it
-    # NOTE: there's a possible consistency issue here, in case an alert comes
-    #       in that has a timestamp BEFORE the last resolve. in that case, we
-    #       should simply ignore it, but we don't have any info on when it was
-    #       resolved. this case should be pretty rare. if it does happen, the
-    #       current db can be cleaned up by calling the following API endpoint
-    #       in sabisu:
-    #         /api/events/stale?clear_recovered=true
-    cloudant.send_current(event, last_event)
-    cloudant.send_history(event)
-    puts prefix + 'Created (first occurrence)'
-  else
-    # check if state has changed
-    state_changed = last_event['event']['check']['status'] != event['check']['status']
-    if state_changed
-      event['check']['state_change'] = event['check']['issued']
+
+    # did the current event occur BEFORE the last one?
+    # this can occur if the sending of some events to the cloudant dbs failed,
+    # and the events are now arriving out-of-order.
+    out_of_order = last_event &&
+                   last_event[:event][:check][:issued].to_i >= event[:check][:issued].to_i
+
+    if event[:check][:status] == 0
+      # check has resolved, delete it from current db.
+      # but ignore if it's out-of-order or the check doesn't exist for some reason
+      if last_event && !out_of_order
+        current_updates << { _id: id, _rev: last_event[:_rev], _deleted: true }
+        puts prefix + 'Recovery (deleted current doc)'
+      end
+
+      # add to history
+      history_updates << { event: event }
+
+    elsif last_event.nil?
+      # event doesn't exist yet, create it
+      # NOTE: there's a possible consistency issue here, in case an alert comes
+      #       in that has a timestamp BEFORE the last resolve. in that case, we
+      #       should simply ignore it, but we don't have any info on when it was
+      #       resolved. this case should be pretty rare. if it does happen, the
+      #       current db can be cleaned up by calling the following API endpoint
+      #       in sabisu:
+      #         /api/events/stale?clear_recovered=true
+      event[:check][:state_change] = event[:check][:issued]
+      current_updates << { _id: id, event: event }
+      history_updates << { event: event }
+      puts prefix + 'Created (first occurrence)'
     else
-      event['check']['state_change'] = last_event['event']['check']['state_change']
-    end
-
-    # check if output has changed
-    output_changed = last_event['event']['check']['output'] != event['check']['output']
-
-    # only update the current state if the event is newer than what was last written
-    unless out_of_order
+      # check if state has changed
+      state_changed = last_event[:event][:check][:status] != event[:check][:status]
       if state_changed
-        cloudant.send_current(event, last_event)
-        cloudant.send_history(event)
-        puts prefix + 'Updated (state change)'
-      elsif output_changed
-        # only update current db with only an output change
-        cloudant.send_current(event, last_event)
-        puts prefix + 'Updated (output change)'
+        event[:check][:state_change] = event[:check][:issued]
+      else
+        event[:check][:state_change] = last_event[:event][:check][:state_change]
+      end
+
+      # check if output has changed
+      output_changed = last_event[:event][:check][:output] != event[:check][:output]
+
+      # only update the current state if the event is newer than what was last written
+      unless out_of_order
+        if state_changed
+          current_updates << { _id: id, _rev: last_event[:_rev], event: event }
+          history_updates << { event: event }
+          puts prefix + 'Updated (state change)'
+        elsif output_changed
+          # only update current db with only an output change
+          current_updates << { _id: id, _rev: last_event[:_rev], event: event }
+          puts prefix + 'Updated (output change)'
+        end
       end
     end
   end
 
-  puts prefix +
-       "Finished in #{((Time.now - starttime) * 1000).round(3)} ms " +
-       "(#{event['client']['name']}/#{event['check']['name']})"
+  current_results = cloudant.send_current(current_updates)
+  history_results = cloudant.send_history(history_updates)
+
+  puts "Finished #{events.length} events in #{((Time.now - starttime) * 1000).round(3)} ms"
+  { current: current_results, history: history_results }
+end
+
+def put_back(event, config, redis)
+  unless event.nil?
+    redis.rpush(config[:redis][:list], event.to_json)
+    puts "Put event back on redis queue: #{format_check(event)}"
+  end
+rescue StandardError => e
+  puts "ERROR: Unable to add the event (#{format_check(event)}) back " \
+       "on the redis queue. It will be lost forever.\n" +
+       e.message + "\n" + e.backtrace.join("\n") + "\n"
 end
 
 quit = false
@@ -205,42 +204,58 @@ cloudant = Cloudant.new(
   config[:cloudant][:dbs][:history]
 )
 
-threads = config[:threads].times.map do |i|
-  Thread.new do
-    until quit
-      # pop an event off the redis queue (blocking)
-      begin
-        redis_key, redis_event = redis.brpop(config[:redis][:list])
-      rescue StandardError => e
-        puts "Thread #{i} | ERROR: Unable to retrieve event from redis.\n" +
-             e.message + "\n" + e.backtrace.join("\n") + "\n"
-        # try again; sleep as redis is probably temporarily inaccessable
-        sleep 2
-        retry
+until quit
+  # pop an event off the redis queue (blocking)
+  events = [] # init events in case redis.rpop fails first go
+  begin
+    Timeout.timeout(config[:batch_max_time]) do
+      until events.length >= config[:batch_max_events]
+        tmp_event = redis.rpop(config[:redis][:list])
+        events << JSON.parse(tmp_event, symbolize_names: true) if tmp_event
       end
+    end
+  rescue Timeout::Error
+    puts "It's been #{config[:batch_max_time]} seconds, time to process events."
+  rescue StandardError => err
+    puts "ERROR while retrieving event from redis.\n" +
+         err.message + "\n" + err.backtrace.join("\n") + "\n"
+  end
 
-      # process the event
-      begin
-        json_event = JSON.parse(redis_event)
-        process_event(json_event, i, cloudant)
-      rescue StandardError => e1
-        puts "Thread #{i} | ERROR (#{json_event && json_event['client']['name']}/" \
-             "#{json_event && json_event['check']['name']}): " \
-             "Failed to update the Cloudant databases. Pushing this event back on " \
-             "the head of the redis queue.\n" +
-             e1.message + "\n" + e1.backtrace.join("\n") + "\n"
-        begin
-          redis.rpush(redis_key, redis_event)
-          # sleep as cloudant is probably temporarily inaccessable
-          sleep 2
-        rescue StandardError => e2
-          puts "Thread #{i} | ERROR: Unable to add the event back " \
-               "on the redis queue. It will be lost forever.\n" +
-             e2.message + "\n" + e2.backtrace.join("\n") + "\n"
+  # dedupe events by only keeping the first (sorted by issued time),
+  # and pushing the rest back on the redis queue.
+  existing_ids = []
+  events = events.sort_by { |e| e[:check][:issued] }.map do |e|
+    check_name = format_check(e)
+    if existing_ids.include?(check_name)
+      put_back(e, config, redis)
+      nil
+    else
+      existing_ids << check_name
+      e
+    end
+  end.compact
+
+  # process the events
+  begin
+    unless events.empty?
+      results = process_events(events, cloudant)
+      results[:current].each do |r|
+        unless r.key?(:rev)
+          event = events.find { |e| format_check(e) == r[:id] }
+          puts "ERROR: Failed to update the Cloudant databases. " \
+               "Pushing this event back on the head of the redis queue.\n" +
+               r.to_json + "\n"
+          put_back(event, config, redis)
         end
       end
     end
+  rescue StandardError => err2
+    # someting went wrong, assume none of the events got uploaded.
+    # this should be ok, because if we upload the same event twice,
+    # the second one will be dropped due to the same timestamp.
+    puts "ERROR: Failed to update the Cloudant databases. " \
+         "Pushing all events back on the head of the redis queue.\n" +
+         err2.message + "\n" + err2.backtrace.join("\n") + "\n"
+    events.each { |e| put_back(e, config, redis) }
   end
 end
-
-threads.each { |t| t.join }

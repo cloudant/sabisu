@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
 
   # runtime dependencies
   s.add_dependency 'sinatra', '~> 1.4.4'
-  %w( thin haml couchrest rack-ssl-enforcer json ).each do |gem|
+  %w( thin haml couchrest restclient rack-ssl-enforcer json ).each do |gem|
     s.add_dependency gem
   end
 
