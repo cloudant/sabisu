@@ -3,7 +3,10 @@
 %script{:src => 'https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js'}
 
 #eventsController.row{'ng-controller' => 'eventsController'}
+  -# last update time in corner
   %span#corner_status
+
+  -# search box (and sort dropdown)
   #search.col-md-12.pull-right.main-content
     .panel
     #search_field.collapse.in{:role => 'search'}
@@ -30,15 +33,19 @@
               %option{:value => '-output'} output (descending)
           %input.btn.btn-success.pull-right{:type => 'submit', :value => 'Search', 'ng-click' => 'updateParams()'}
 
+  -# left sidebar with stats
   #stats.col-md-3.pull-left.main-content
     .panel
       #stats_field.collapse.in{:role => 'stats'}
         .panel-body{'ng-hide' => 'events.length == 0 || events_spin'}
+          -# stats by status
           #stats_status{'ng-hide' => 'events_spin'}
             #totals
               %span.label.label-warning.pointer{'ng-click' => 'appendQuery(1, "status", false)'}= ' - '
               %span.label.label-danger.pointer{'ng-click' => 'appendQuery(2, "status", false)'}= ' - '
               %span.label.label-info.pointer{'ng-click' => 'appendQuery(3, "status", false)'}= ' - '
+
+          -# stats by field
           #stats_by_count{'ng-repeat' => '(name, stat) in stats'}
             %h5
               {{name | uppercase }} stats
@@ -53,10 +60,12 @@
                 %td.col-md-1.text-center
                   {{s[1]}}
 
+  -# all events
   #events.col-md-9.pull-right.main-content{:style => 'margin-bottom: 100px'}
     .panel
     #events_field.collapse.in{:role => 'events'}
       %ul.list-group
+        -# events options
         .progress.progress-striped.active{'ng-show' => 'events_spin', :style => 'margin-top: 50px;'}
           .progress-bar.progress-bar-success{:role => 'progressbar', 'aria-valuenow' => '100', 'aria-valuemin' => '0', 'aria-valuemax' => '100', :style => 'width: 100%'}
             %span.sr-only getting events...
@@ -70,27 +79,32 @@
             %option{:value => '100'} 100
             %option{:value => '200'} 200
         %a#events-accordian-toggle.text-right.pull-left{'ng-click' => 'bulkToggleDetails()', 'ng-hide' => 'events.length == 0 || events_spin'} {{bulk}} all details
+
+        -# an event
         %br
         %li.list-group-item{'ng-repeat' => 'event in events'}
           .row
             .panel
+              -# event header
               .panel-heading.flat-heading.event_line{:panel => '{{event.client.name}}/{{event.check.name}}'}
                 .col-md-2
                   %h4
                     %span.label.pull-right.pointer{'class' => 'label-{{event.color}}', 'ng-click' => 'appendQuery(event.check.status, "status", false)'} {{event.wstatus}}
                 %h5.event_title.pull-left
-                  %span.silenceBtn.glyphicon.glyphicon-volume-off{'ng-show' => 'event.client.silenced', 'data-toggle' => 'popover', 'data-content' => '{{event.client.silence_html}}'}
+                  %span.silenceBtn.glyphicon.glyphicon-volume-off{'ng-show' => 'event.client.silenced', 'ng-click' => 'updateSilenceDetails(event.client.silence_stash)', 'data-toggle' => 'modal', 'data-target' => '#silence_window_mini'}
                   %span.appendQuery{'ng-click' => 'appendQuery(event.client.name, "client")'}
                     {{event.client.name}}
                   %span= ' / '
-                  %span.silenceBtn.glyphicon.glyphicon-volume-off{'ng-show' => 'event.check.silenced', 'data-toggle' => 'popover', 'data-content' => '{{event.check.silence_html}}'}
+                  %span.silenceBtn.glyphicon.glyphicon-volume-off{'ng-show' => 'event.check.silenced', 'ng-click' => 'updateSilenceDetails(event.check.silence_stash)', 'data-toggle' => 'modal', 'data-target' => '#silence_window_mini'}
                   %span.appendQuery{'ng-click' => 'appendQuery(event.check.name, "check")'}
                     {{event.check.name}}
                   %small.text-muted.muted-output
                     \- {{event.check.output}}
                 %h5
                   %span.glyphicon.glyphicon-collapse-down.toggleBtnIcon.pull-right{'ng-click' => 'toggleDetails(event.id)'}
+
               .panel-body.panel-collapse.collapse{:class => '{{event.showdetails}}', :id => '{{event.id}}'}
+                -# event actions
                 .dropdown.actions.pull-right
                   %button.btn.btn-link.dropdown-toggle{'data-toggle' => 'dropdown'}
                     Actions
@@ -101,16 +115,52 @@
                     %li.divider
                     %li.dropdown-header Silence
                     %li
-                      %a{:href => '#', 'ng-click' => 'updateSilencePath(event.client.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'} Client
+                      %a{:href => '#', 'ng-click' => 'updateSilenceDetails(event.client.silence_stash)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'} Client
                     %li
-                      %a{:href => '#', 'ng-click' => 'updateSilencePath(event.client.name + "/" + event.check.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'} Check
-                %div{'ng-bind-html' => 'to_trusted(build_event_attr_html(event))'}
-                %br
-                %br
-                %br
+                      %a{:href => '#', 'ng-click' => 'updateSilenceDetails(event.check.silence_stash)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'} Check
+
+                -# event attributes
+                %dl.dl-horizontal.col-md-5.pull-left
+                  %dt.attr_title{'ng-repeat-start' => 'attr in event.attributes.left'} {{attr[0]}}
+                  %dd.attr_value{'ng-repeat-end' => '', 'ng-bind-html' => 'attr[1]'}
+                %dl.dl-horizontal.col-md-5.pull-left
+                  %dt.attr_title{'ng-repeat-start' => 'attr in event.attributes.right'} {{attr[0]}}
+                  %dd.attr_value{'ng-repeat-end' => '', 'ng-bind-html' => 'attr[1]'}
+
+                -# event output
                 .col-md-12.pull-left.output
                   {{event.check.output}}
 
+  -# mini silence dialog (for seeing existing silences)
+  #silence_window_mini.silence_window.modal.fade
+    .modal-dialog
+      .modal-content
+        .modal-header
+          Silence Details for {{silencePath}}
+          %button.btn.btn-link.btn-xs.pull-right.close_popover{:type => 'button', 'data-dismiss' => 'modal'}
+            %span.glyphicon.glyphicon-remove
+            close
+
+        .modal-body
+          %dl.dl-horizontal
+            %dt{'ng-show' => 'silenceCreated'} Created
+            %dd{'ng-show' => 'silenceCreated'} {{silenceCreated}}
+
+            %dt{'ng-show' => 'silenceOwner'} Owner
+            %dd{'ng-show' => 'silenceOwner'} {{silenceOwner}}
+
+            %dt{:class => 'text-{{silenceExpirationClass}}', 'ng-show' => 'silenceExpires'} Expires
+            %dd{:class => 'text-{{silenceExpirationClass}}', 'ng-show' => 'silenceExpires'} {{silenceExpires}}
+
+            %dt{'ng-show' => 'silenceReason'} Reason
+            %dd{'ng-show' => 'silenceReason'} {{silenceReason}}
+
+        .modal-footer
+          %button.deleteSilenceBtn.btn.btn-danger.btn-sm.pull-right{:type => 'button', 'ng-click' => "deleteSilence('{{silencePath}}')"}
+            %span.glyphicon.glyphicon-remove
+            Delete
+
+  -# regular silence dialog (for creating a new silence)
   #silence_window.modal.fade
     .modal-dialog
       .modal-content
@@ -150,6 +200,7 @@
           .modal-footer
             %button.btn.btn-default.pull-right{:type => 'submit', 'ng-click' => 'saveSilence()'} Create
 
+  -# help dialog
   #howdoisearch.modal.fade
     .modal-dialog
       .modal-content

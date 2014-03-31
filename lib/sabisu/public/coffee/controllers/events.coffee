@@ -61,57 +61,6 @@ sabisu.controller 'eventsController',
       $scope.showAll = $location.search().showAll
       $log.info($scope.showAll)
 
-    $scope.buildSilencePopover = (stash) ->
-      html = '<div class="silence_window">'
-      if stash['content']['timestamp']?
-        html = """
-  <dl class="dl-horizontal">
-  <dt>Created</dt>
-  <dd>#{$filter('date')((stash['content']['timestamp'] * 1000), "short")}</dd>
-  """
-      if stash['content']['owner']?
-        html += """
-  <dt>Owner</dt>
-  <dd>#{stash['content']['owner']}</dd>
-  """
-      if stash['expire']? and stash['expire'] != -1
-        rel_time = moment.unix(parseInt(stash['content']['timestamp']) +
-                   parseInt(stash['expire'])).fromNow()
-        html += """
-            <dt class="text-warning">Expires</dt>
-            <dd class="text-warning">#{rel_time}</dd>
-            """
-      if stash['content']['expiration'] == 'resolve'
-        html += """
-            <dt class="text-success">Expires</dt>
-            <dd class="text-success">On resolve</dt>
-            """
-      if stash['content']['expiration'] == 'never'
-        html += """
-            <dt class="text-danger">Expires</dt>
-            <dd class="text-danger">Never</dt>
-            """
-      html += "</dl>"
-      if stash['content']['reason']?
-        html += """
-            <dl>
-            <dt>Reason</dt>
-            <dd>#{stash['content']['reason']}</dd>
-            </dl>
-            """
-      html += """
-          <button
-            type="button"
-            class="deleteSilenceBtn btn btn-danger btn-sm pull-right"
-            onclick="
-              angular.element($('#eventsController')).scope().deleteSilence('#{stash['path']}')
-            "
-          >
-          <span class="glyphicon glyphicon-remove"></span> Delete
-          </button>
-          """
-      html += "</div>"
-
     $scope.updateEventFields = ->
       eventsFactory.event_fields().success( (data, status, headers, config) ->
         defaults = [ 'client', 'check', 'status', 'state_change', 'occurrence', 'issued', 'output']
@@ -126,50 +75,6 @@ sabisu.controller 'eventsController',
       ).error( (data, status, headers, config) ->
         alert "Failed to get fields"
       )
-
-    $scope.add_event_attr_html = (key,value) ->
-      if "#{value}".match '^[0-9]{13}$'
-        value = $filter('date')(value, 'short')
-      else if $scope.typeIsArray value
-        value = $filter('joinBy')(value, ', ')
-      else if value == undefined or value == null
-        value = 'n/a'
-      else
-        for field in $scope.event_fields
-          if key == field.name
-            if field.type == 'url' and value?
-              value = "<a href=\"#{value}\">goto</a>"
-            break
-
-      html = "<dt class='attr_title'>#{key}</dt>"
-      html += "<dd class='attr_value'>#{value}</dd>"
-      html
-
-    $scope.build_event_attr_html = (event) ->
-      # split custom fields into left and right columns evenly
-      left_custom = (i for i in $scope.event_fields_custom by 2)
-      right_custom = (i for i in $scope.event_fields_custom[1..] by 2)
-
-      # build left dl
-      left_div = "<dl class='dl-horizontal col-md-5 pull-left'>"
-      left_div += $scope.add_event_attr_html('issued', event.check.issued)
-      left_div += $scope.add_event_attr_html('interval', event.check.interval)
-      left_div += $scope.add_event_attr_html('occurrences', event.occurrences)
-      for item in left_custom
-        left_div += $scope.add_event_attr_html(item.name, $scope.get_obj_attr(event, item.path))
-      left_div += "</dl>"
-
-      # build right dl
-      right_div = "<dl class='dl-horizontal col-md-5 pull-left'>"
-      right_div += $scope.add_event_attr_html('state change', event.rel_time)
-      right_div += $scope.add_event_attr_html('subscribers', event.check.subscribers)
-      right_div += $scope.add_event_attr_html('handlers', event.check.handlers)
-      for item in right_custom
-        right_div += $scope.add_event_attr_html(item.name, $scope.get_obj_attr(event, item.path))
-      right_div += "</dl>"
-
-      # return resulting html (left and right)
-      left_div + right_div
 
     $scope.updateStashes = ->
       stashesFactory.stashes().success (data, status, headers, config) ->
@@ -192,29 +97,13 @@ sabisu.controller 'eventsController',
             if client == event.client.name
               if check == null
                 event.client.silenced = true
-                event.client.silence_html = $scope.buildSilencePopover(stash)
+                event.client.silence_stash = stash
                 break
               else
                 if check == event.check.name
                   event.check.silenced = true
-                  event.check.silence_html = $scope.buildSilencePopover(stash)
+                  event.check.silence_stash = stash
                   break
-        $('.silenceBtn').popover(
-          trigger: 'click'
-          html: true
-          placement: 'right'
-          container: 'body'
-          title: """
-            Silence Details
-            <button
-              type="button"
-              class="btn btn-link btn-xs pull-right close_popover"
-              onclick="$('.silenceBtn').popover('hide')"
-            >
-              <span class="glyphicon glyphicon-remove"></span>close
-            </button>
-          """
-        )
 
         $('.close_popover').click ->
           $scope.closePopovers()
@@ -232,8 +121,29 @@ sabisu.controller 'eventsController',
     $scope.closePopovers = ->
       $('.silenceBtn').popover('hide')
 
-    $scope.updateSilencePath = (path) ->
-      $scope.silencePath = path
+    $scope.updateSilenceDetails = (stash) ->
+      parts = stash['path'].split('/', 3)
+      client = parts[1]
+      check = null
+      check = parts[2] if parts.length > 2
+
+      $scope.silencePath = client
+      $scope.silencePath += '/' + check if check
+      if stash['content']['timestamp']
+        $scope.silenceCreated = $filter('date')((stash['content']['timestamp'] * 1000), 'short')
+      $scope.silenceOwner = stash['content']['owner']
+      if stash['content']['expiration'] == 'resolve'
+        $scope.silenceExpires = 'On resolve'
+        $scope.silenceExpirationClass = 'success'
+      else if stash['content']['expiration'] == 'never'
+        $scope.silenceExpires = 'Never'
+        $scope.silenceExpirationClass = 'danger'
+      else if stash['expire']? and stash['expire'] != -1
+        $scope.silenceExpires = moment.unix(parseInt(stash['content']['timestamp']) +
+                                parseInt(stash['expire'])).fromNow()
+        $scope.silenceExpirationClass = 'warning'
+      if stash['content']['reason']?
+        $scope.silenceReason = stash['content']['reason']
 
     $scope.saveSilence = ->
       valid = true
@@ -338,6 +248,49 @@ sabisu.controller 'eventsController',
       $location.search('limit', $scope.limit)
       $scope.updateEvents()
 
+    $scope.format_attr_value = (event, key, path) ->
+      # use the path to index into the embedded hashes
+      path = path.split('.')
+      val = event
+      for p in path
+        if p of val
+          val = val[p]
+        else
+          val = null
+          break
+
+      # format the value
+      if val == undefined or val == null
+        val = 'n/a'
+      else if $scope.typeIsArray val
+        val = $filter('joinBy')(val, ', ')
+      else if String(val).match '^[0-9]{13}$'
+        val = $filter('date')(val, 'short')
+      else
+        for field in $scope.event_fields
+          if field.name == key && field.type == 'url'
+            val = "<a href='#{val}'>goto</a>"
+      $sce.trustAsHtml(String(val))
+
+    $scope.getEventAttributes = (event) ->
+      attr = {
+        'left': [
+          ['issued', 'check.issued'],
+          ['interval', 'check.interval'],
+          ['occurrences', 'occurrences']
+        ].concat([i.name, i.path] for i in $scope.event_fields_custom by 2),
+        'right': [
+          ['state change', 'rel_time'],
+          ['subscribers', 'check.subscribers'],
+          ['handlers', 'check.handlers']
+        ].concat([i.name, i.path] for i in $scope.event_fields_custom[1..] by 2)
+      }
+
+      for side in ['left', 'right']
+        for a in attr[side]
+          a[1] = $scope.format_attr_value(event, a[0], a[1])
+      attr
+
     $scope.appendQuery = (val, type = null, quote = true) ->
       q = ''
       if $scope.search.length > 0
@@ -387,6 +340,7 @@ sabisu.controller 'eventsController',
           $('#stats_status').find('#totals').find('.label-info').text(
             "Unknown: " + statuses['Unknown']
           )
+
         if 'counts' of data and not angular.equals($scope.previous_events_counts,data['counts'])
           $scope.previous_events_counts = data['counts']
 
@@ -400,6 +354,7 @@ sabisu.controller 'eventsController',
             ).reverse()
 
           $scope.stats = stats
+
         if 'rows' of data and not angular.equals($scope.previous_events_events, data.rows)
           $scope.previous_events_events = angular.copy(data.rows)
           for event in data.rows
@@ -419,6 +374,7 @@ sabisu.controller 'eventsController',
             event.check.issued = event.check.issued * 1000
             if event.check.state_change?
               event.check.state_change = event.check.state_change * 1000
+
             # add silence info
             event.client.silenced ?= false
             event.check.silenced ?= false
@@ -433,16 +389,22 @@ sabisu.controller 'eventsController',
                 if client == event.client.name
                   if check == null
                     event.client.silenced = true
-                    event.client.silence_html = $scope.buildSilencePopover(stash)
+                    event.client.silence_stash = stash
                   else if check == event.check.name
                     event.check.silenced = true
-                    event.check.silence_html = $scope.buildSilencePopover(stash)
+                    event.check.silence_stash = stash
+
+            # add formatted attributes
+            event.attributes = $scope.getEventAttributes(event)
+
             events.push event
+
           # hide progress bar
           $scope.events_spin = false
           if not angular.equals($scope.events, events)
             $scope.events = events
             $scope.updateStashes()
+
         $scope.events_spin = false
         $('#corner_status').text("Last Update: " + $filter('date')(Date.now(), 'mediumTime'))
       )
@@ -502,6 +464,7 @@ sabisu.controller 'eventsController',
     # toggle expand/contract event
     $scope.toggleDetails = (id) ->
       if not $("#" + id).hasClass('in')
+        # show the element
         $("#" + id).collapse('show')
         $scope.showDetails.push id if $scope.showDetails.indexOf(id) == -1
         # flip the button
@@ -527,20 +490,6 @@ sabisu.controller 'eventsController',
         typeof value.length is 'number' and
         typeof value.splice is 'function' and
         not ( value.propertyIsEnumerable 'length' )
-
-    $scope.to_trusted = (html_code) ->
-      $sce.trustAsHtml(html_code)
-
-    $scope.get_obj_attr = (obj, path) ->
-      path = path.split('.')
-      val = obj
-      for p in path
-        if p of val
-          val = val[p]
-        else
-          val = null
-          break
-      val
 
     ### Keyboard Shortcuts ###
     Mousetrap.bind('?', ->
