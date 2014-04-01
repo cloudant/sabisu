@@ -107,7 +107,7 @@ def process_events(events, cloudant)
 
   events.each do |event|
     id = format_check(event)
-    prefix = id + ' | '
+    prefix = "  #{id} | "
 
     # find last known event for this event
     last_event = last_events.find do |e|
@@ -183,7 +183,7 @@ end
 def put_back(event, config, redis)
   unless event.nil?
     redis.rpush(config[:redis][:list], event.to_json)
-    puts "Put event back on redis queue: #{format_check(event)}"
+    puts "  #{format_check(event)} | Put event back on redis queue"
   end
 rescue StandardError => e
   puts "ERROR: Unable to add the event (#{format_check(event)}) back " \
@@ -210,10 +210,13 @@ until quit
   events = [] # init events in case redis.rpop fails first go
   begin
     Timeout.timeout(config[:batch_max_time]) do
+      start_time = Time.now
       until events.length >= config[:batch_max_events]
         tmp_event = redis.rpop(config[:redis][:list])
         events << JSON.parse(tmp_event, symbolize_names: true) if tmp_event
       end
+      puts "We have #{events.length} events, collected in " \
+           "#{'%.1f' % (Time.now - start_time)} seconds, let's process them."
     end
   rescue Timeout::Error
     unless events.empty?
