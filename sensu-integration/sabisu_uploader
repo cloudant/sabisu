@@ -176,6 +176,7 @@ def process_events(events, cloudant)
   history_results = cloudant.send_history(history_updates)
 
   puts "Finished #{events.length} events in #{((Time.now - starttime) * 1000).round(3)} ms"
+  events.each { |e| puts "  #{format_check(e)}" }
   { current: current_results, history: history_results }
 end
 
@@ -215,7 +216,10 @@ until quit
       end
     end
   rescue Timeout::Error
-    puts "It's been #{config[:batch_max_time]} seconds, time to process events."
+    unless events.empty?
+      puts "It's been #{config[:batch_max_time]} seconds, time to " \
+           "process #{events.length} events."
+    end
   rescue StandardError => err
     puts "ERROR while retrieving event from redis.\n" +
          err.message + "\n" + err.backtrace.join("\n") + "\n"
