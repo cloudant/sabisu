@@ -115,9 +115,9 @@
                     %li.divider
                     %li.dropdown-header Silence
                     %li
-                      %a{:href => '#', 'ng-click' => 'updateSilenceDetails(event.client.silence_stash)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'} Client
+                      %a{:href => '#', 'ng-click' => 'createSilenceDetails(event.client.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'} Client
                     %li
-                      %a{:href => '#', 'ng-click' => 'updateSilenceDetails(event.check.silence_stash)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'} Check
+                      %a{:href => '#', 'ng-click' => 'createSilenceDetails(event.client.name, event.check.name)', 'data-toggle' => 'modal', 'data-target' => '#silence_window'} Check
 
                 -# event attributes
                 %dl.dl-horizontal.col-md-5.pull-left
