@@ -6,6 +6,7 @@ missing_gems = false
   rainbow
   rubocop
   haml_lint
+  bundler/gem_tasks
 ).each do |gem|
   begin
     require gem

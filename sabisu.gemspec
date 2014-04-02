@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = docs
   s.files       = docs +
                   Dir.glob('{lib,bin}/**/*', File::FNM_DOTMATCH).reject do |f|
-                    File.directory?(f)
+                    File.directory?(f) || File.extname(f) == ".coffee"
                   end
   s.executables = %x{git ls-files -- bin/*}.split("\n").map { |f| File.basename(f) }
   s.homepage    = 'http://sabisuapp.org'
