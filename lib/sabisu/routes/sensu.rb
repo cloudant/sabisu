@@ -14,7 +14,7 @@ module Sabisu
       }
       begin
         opts[:payload] = JSON.parse(request.body.read) if request.post?
-      rescue StandardError => e
+      rescue StandardError
         puts "unable to parse: #{request.body.read}"
       end
       sensu.request(opts)
