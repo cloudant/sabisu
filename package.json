@@ -4,6 +4,7 @@
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.4",
+    "grunt-cli": "~0.1.13",
     "grunt-contrib-coffee": "~0.10.1",
     "grunt-coffeelint": "~0.0.8",
     "grunt-contrib-cssmin": "~0.9.0",
