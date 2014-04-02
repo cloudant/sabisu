@@ -24,3 +24,4 @@ doc/
 
 #sabisu configs
 config*.json
+sabisu.js
