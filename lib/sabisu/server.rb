@@ -70,7 +70,7 @@ module Sabisu
       end
 
       def logged_in?
-        NOAUTH == true || (session[:logged_in] == true && !session[:username].nil?)
+        NOAUTH == true || (session[:logged_in] == true && session[:username])
       end
 
       def force_session_auth

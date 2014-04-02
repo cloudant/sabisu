@@ -47,18 +47,26 @@ To setup sabisu for local development:
 3. Create an `.env` file to setup your environment variables (see [Environment Variables](https://github.com/cloudant/sabisu/wiki/Installation#environment-variables)).
 4. Source the file (`source .env`).
 5. Next run `bundle install` to install all gem dependencies.
-6. To startup sabisu locally, run `foreman start`.
-7. In your browser, visit [localhost:8080](http://localhost:8080).
 
-sabisu uses [CoffeeScript](http://coffeescript.org/). You can install
-CoffeeScript with:
+sabisu uses [CoffeeScript](http://coffeescript.org/). You'll need to have npm (node package manager) setup first.
 ```bash
-sudo npm install -g coffee-script`
+    curl http://npmjs.org/install.sh | sh
 ```
 
-Run the following command to watch the .coffee files and generate the
-equivalent .js files whenever a change is made:
+Once you have npm installed, you can install CoffeeScript with:
+```bash
+    sudo npm install`
+```
+
+6. You'll need to generate the js files needed for sabisu, to do so run
 
 ```bash
-cd lib/sabisu/public && coffee -cw -j js/sabisu.js coffee/sabisu.coffee coffee/
+    grunt coffee
 ```
+**TIP** you can also run `grunt watch` to update the js files everytime a coffee file has changed.
+
+7. Start sabisu
+```bash
+    foreman start
+```
+8. In your browser, visit [localhost:8080](http://localhost:8080).

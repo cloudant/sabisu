@@ -1,5 +1,8 @@
 language: ruby
 rvm:
   - 2.0.0
+before_script:
+  - "npm install"
 script:
   - "bundle exec rake"
+  - "grunt"

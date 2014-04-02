@@ -25,3 +25,10 @@ doc/
 #sabisu configs
 config*.json
 sabisu.js
+
+#npm
+node_modules
+
+#minified
+*.min.css
+*.min.js
