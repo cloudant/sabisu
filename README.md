@@ -50,15 +50,18 @@ To setup sabisu for local development:
 6. To startup sabisu locally, run `foreman start`.
 7. In your browser, visit [localhost:8080](http://localhost:8080).
 
-sabisu uses [CoffeeScript](http://coffeescript.org/). You can install
-CoffeeScript with:
+sabisu uses [CoffeeScript](http://coffeescript.org/). You'll need to have npm (node package manager) setup first.
 ```bash
-sudo npm install -g coffee-script`
+    curl http://npmjs.org/install.sh | sh
+```
+Once you have npm installed, you can install CoffeeScript with:
+```bash
+sudo npm install`
 ```
 
 Run the following command to watch the .coffee files and generate the
 equivalent .js files whenever a change is made:
 
 ```bash
-cd lib/sabisu/public && coffee -cw -j js/sabisu.js coffee/sabisu.coffee coffee/
+grunt watch
 ```
