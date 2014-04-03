@@ -66,10 +66,10 @@ module Sabisu
             doc[:indexes] = search_indexes
             CURRENT_DB.save_doc(doc)
           end
-        rescue RestClient::Conflict
+        rescue ::RestClient::Conflict
           # ignore this
           puts 'doc conflict'
-        rescue RestClient::ResourceNotFound
+        rescue ::RestClient::ResourceNotFound
           CURRENT_DB.save_doc(
             '_id' => '_design/sabisu',
             :language => 'javascript',

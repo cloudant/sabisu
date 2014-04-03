@@ -121,6 +121,10 @@ sabisu.controller 'eventsController',
     $scope.closePopovers = ->
       $('.silenceBtn').popover('hide')
 
+    $scope.createSilenceDetails = (client,check = null) ->
+      $scope.silencePath = client
+      $scope.silencePath += '/' + check if check
+
     $scope.updateSilenceDetails = (stash) ->
       parts = stash['path'].split('/', 3)
       client = parts[1]

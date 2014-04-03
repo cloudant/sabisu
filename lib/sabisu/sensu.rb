@@ -1,3 +1,6 @@
+## Heavily borrowed from sensu-cli
+## https://github.com/agent462/sensu-cli/blob/master/lib/sensu-cli/api.rb
+
 require 'net/https'
 require 'json'
 

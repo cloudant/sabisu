@@ -3,7 +3,10 @@ gem 'sinatra', '1.4.4'
 
 # load gems
 require 'sinatra'
+require 'sinatra/base'
+require 'sinatra/multi_route'
 require 'couchrest'
+require 'restclient'
 require 'cgi'
 require 'json'
 require 'pp'
@@ -14,6 +17,8 @@ require_relative 'version'
 module Sabisu
   # run sabisu as a server
   class Server < Sinatra::Base
+    register Sinatra::MultiRoute
+
     # load classes
     require_relative 'sensu'
     require_relative 'event'
