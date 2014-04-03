@@ -1,3 +1,20 @@
+Deploy to Heroku
+================
+1. Update gemfile.lock
+2. add heroku to you git config
+
+```
+[remote "heroku"]
+    url = git@heroku.com:<REPONAME>.git
+    fetch = +refs/heads/*:refs/remotes/heroku/*
+```
+
+3. deploy heroku branch to master branch on remote heroku
+
+```bash
+    git push -f heroku heroku:master
+```
+
 [![Build Status](https://magnum.travis-ci.com/cloudant/sabisu.png?token=r6PdrwNFR1nUzFeEEiQ6&branch=master)](https://magnum.travis-ci.com/cloudant/sabisu)
 sabisu
 ======
