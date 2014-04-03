@@ -19,8 +19,8 @@ Also included in this directory is the sabisu uploader which will read items in 
 In order for "Unsilence on resolve" to work, you need to setup check\_stashes.rb as a sensu check. This will run routinely to see if any silences marked to be removed when the check or client is passing to remove those silences. Here is an example of what that would look like for chef.
 
 ```ruby
-sensu_check 'check-stashes' do
-  command "check-stashes.rb -a https://#{api_info['host']}:#{api_info['port']} " +
+sensu_check 'check_stashes' do
+  command "check_stashes.rb -a https://#{api_info['host']}:#{api_info['port']} " +
           "-u '#{api_info['user']}' -p '#{api_info['password']}'"
   handlers ['default']
   interval  120
