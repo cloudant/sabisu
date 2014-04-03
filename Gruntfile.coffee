@@ -29,6 +29,8 @@ module.exports = (grunt) ->
     coffeelint:
       sabisu: ["lib/sabisu/public/coffee/**/*.coffee"]
       options:
+        max_line_length:
+          value: 100
         no_trailing_whitespace:
           level: 'error'
  
