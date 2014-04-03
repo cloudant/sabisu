@@ -8,6 +8,10 @@ Deploy to Heroku
     url = git@heroku.com:<REPONAME>.git
     fetch = +refs/heads/*:refs/remotes/heroku/*
 ```
+4. Build js and commit it
+```bash
+    grunt coffee && git commit -am 'update js'
+```
 
 3. deploy heroku branch to master branch on remote heroku
 
