@@ -37,6 +37,10 @@ Installation
 
 For installation instruction, go [here](https://github.com/cloudant/sabisu/wiki/Installation) 
 
+IRC
+=======
+For support, you can join the #sabisu channel on freenode
+
 Development Environment
 =======================
 
