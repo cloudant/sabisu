@@ -19,15 +19,15 @@ module.exports = (grunt) ->
         join: true
       compile:
         files:
-          'lib/sabisu/public/js/sabisu.js': ["lib/sabisu/public/coffee/sabisu.coffee", "lib/sabisu/public/coffee/*.coffee"]
+          'lib/sabisu/public/js/sabisu.js': ["lib/sabisu/public/coffee/sabisu.coffee", "lib/sabisu/public/coffee/**/*.coffee"]
  
     watch:
       coffee:
-        files: ["lib/sabisu/public/coffee/sabisu.coffee", "lib/sabisu/public/coffee/*.coffee"]
+        files: ["lib/sabisu/public/coffee/sabisu.coffee", "lib/sabisu/public/coffee/**/*.coffee"]
         tasks: ["coffee"]
  
     coffeelint:
-      sabisu: ["lib/sabisu/public/coffee/*.coffee"]
+      sabisu: ["lib/sabisu/public/coffee/**/*.coffee"]
       options:
         no_trailing_whitespace:
           level: 'error'
