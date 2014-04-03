@@ -14,3 +14,16 @@ Included in this directory is a handler extension to send sensu events to a list
 
 ### Setting up Sabisu uploader
 Also included in this directory is the sabisu uploader which will read items in the redis list and send them to cloudant databases. You'll need to pass the sabisu uploader a configuration file which is a json file of attributes (see `config.example.json` for an example). You can configue this to have as many threads as you feel you need and it can be run on multiple servers simultaneously.
+
+### Setup check\_stashes.rb
+In order for "Unsilence on resolve" to work, you need to setup check\_stashes.rb as a sensu check. This will run routinely to see if any silences marked to be removed when the check or client is passing to remove those silences. Here is an example of what that would look like for chef.
+
+```ruby
+sensu_check 'check-stashes' do
+  command "check-stashes.rb -a https://#{api_info['host']}:#{api_info['port']} " +
+          "-u '#{api_info['user']}' -p '#{api_info['password']}'"
+  handlers ['default']
+  interval  120
+  subscribers ['monitoring_server']
+end
+```
