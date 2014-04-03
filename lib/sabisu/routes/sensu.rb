@@ -27,7 +27,7 @@ module Sabisu
       body res.body
     end
 
-    route :get, :post, :delete, '/sensu/stashes/*' do
+    delete '/sensu/stashes/*' do
       res = sensu(request)
       status res.code
       headers 'content-type' => 'application/json'
