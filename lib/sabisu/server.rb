@@ -1,5 +1,5 @@
 gem 'thin'
-gem 'sinatra', '1.4.4'
+gem 'sinatra', '~> 1.4.4'
 
 # load gems
 require 'sinatra'
@@ -41,7 +41,11 @@ module Sabisu
     end
 
     get '/' do
-      redirect '/login'
+      if logged_in?
+        redirect '/events'
+      else
+        redirect '/login'
+      end
     end
 
     get '/login' do
