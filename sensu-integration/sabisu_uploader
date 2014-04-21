@@ -216,7 +216,7 @@ until quit
         events << JSON.parse(tmp_event, symbolize_names: true) if tmp_event
       end
       puts "We have #{events.length} events, collected in " \
-           "#{'%.1f' % (Time.now - start_time)} seconds, let's process them."
+           "#{format('%.1f', (Time.now - start_time))} seconds, let's process them."
     end
   rescue Timeout::Error
     unless events.empty?
