@@ -37,8 +37,10 @@ else
   config[:redis][:db] = 0               unless config[:redis].key?(:db)
   config[:redis][:list] = 'events'      unless config[:redis].key?(:list)
 
-  config[:cloudant][:dbs][:current] = 'sensu_current' unless config[:cloudant][:dbs].key?(:current)
-  config[:cloudant][:dbs][:history] = 'sensu_history' unless config[:cloudant][:dbs].key?(:history)
+  config[:cloudant][:dbs][:current] = 'sensu_current' unless config[:cloudant][:dbs] &&
+                                                             config[:cloudant][:dbs].key?(:current)
+  config[:cloudant][:dbs][:history] = 'sensu_history' unless config[:cloudant][:dbs] &&
+                                                             config[:cloudant][:dbs].key?(:history)
 
   config[:batch_max_events] = 20 unless config.key?(:batch_max_events) ||
                                         config[:batch_max_events] == 0
