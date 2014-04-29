@@ -6,7 +6,7 @@ module Sabisu
       # return all docs
       def self.all(options = {})
         options = { skip: 0, limit: nil, sort: [] }.merge(options)
-        options.delete_if { |k, v| v.nil? || v == [] }
+        options.delete_if { |_k, v| v.nil? || v == [] }
 
         CURRENT_DB.all_docs(options.merge(include_docs: true, start_key: '"a"'))
       end
@@ -33,7 +33,7 @@ module Sabisu
           ranges: ranges.to_json,
           counts: counts
         }.merge(options)
-        options.delete_if { |k, v| v.nil? || v == [] }
+        options.delete_if { |_k, v| v.nil? || v == [] }
         # because couchrest doesn't handle arrays correctly
         options[:counts] = options[:counts].to_s unless options[:counts].nil?
         options[:sort] = options[:sort].to_s unless options[:sort].nil?

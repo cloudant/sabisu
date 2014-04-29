@@ -251,7 +251,7 @@ until quit
       results[:current].each do |r|
         unless r.key?(:rev)
           event = events.find { |e| format_check(e) == r[:id] }
-          puts "ERROR: Failed to update the Cloudant databases. " \
+          puts 'ERROR: Failed to update the Cloudant databases. ' \
                "Pushing this event back on the head of the redis queue.\n" +
                r.to_json + "\n"
           put_back(event, config, redis)
@@ -262,7 +262,7 @@ until quit
     # someting went wrong, assume none of the events got uploaded.
     # this should be ok, because if we upload the same event twice,
     # the second one will be dropped due to the same timestamp.
-    puts "ERROR: Failed to update the Cloudant databases. " \
+    puts 'ERROR: Failed to update the Cloudant databases. ' \
          "Pushing all events back on the head of the redis queue.\n" +
          err2.message + "\n" + err2.backtrace.join("\n") + "\n"
     events.each { |e| put_back(e, config, redis) }
